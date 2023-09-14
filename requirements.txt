@@ -1,0 +1,11 @@
+chainlit==0.6.402
+datasets==2.14.0
+langchain==0.0.288
+langsmith==0.0.37
+numpy==1.25.2
+openai==0.28.0
+python-dotenv==1.0.0
+ragas==0.0.12
+tiktoken==0.4.0
+torch==2.0.1
+transformers==4.31.0
