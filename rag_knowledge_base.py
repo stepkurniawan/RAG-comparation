@@ -1,0 +1,20 @@
+from datasets import load_dataset
+import tiktoken
+
+def get_arxiv_data_from_dataset():
+    data = load_dataset(
+        'jamescalam/llama-2-arxiv-papers-chunked',
+        split='train'
+    )
+    print(f'success load data: {data}')
+    return data
+
+def get_wikipedia_data_from_dataset():
+    data = load_dataset("wikipedia", "20220301.simple", split='train[:10000]')
+    print(f'success load data: {data}')
+    return data
+
+
+# TEXT SPLITTER
+
+tiktoken.encoding_for_model('gpt-3.5-turbo')
