@@ -1,5 +1,7 @@
 from datasets import load_dataset
 import tiktoken
+from langchain.document_loaders import WebBaseLoader
+
 
 def get_arxiv_data_from_dataset():
     """
@@ -19,6 +21,9 @@ def get_wikipedia_data_from_dataset():
     return data
 
 
-# TEXT SPLITTER
+def load_from_webpage(link):
+    loader = WebBaseLoader(link)
+    data = loader.load()
+    print(f'success load data from webpage: {link}')
+    return data
 
-tiktoken.encoding_for_model('gpt-3.5-turbo')

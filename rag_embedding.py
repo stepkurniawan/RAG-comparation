@@ -1,5 +1,6 @@
 from torch import cuda
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 
 device = f'cuda:{cuda.current_device()}' if cuda.is_available() else 'cpu'
 
@@ -28,3 +29,7 @@ def get_generator_embeddings():
     print(f'success load embed_model: {embed_model}')
     return embed_model
 
+def get_openai_embeddings():
+    embed_model = OpenAIEmbeddings()
+    print(f'success load embed_model: {embed_model}')
+    return embed_model

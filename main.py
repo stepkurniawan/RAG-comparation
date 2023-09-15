@@ -3,8 +3,8 @@
 
 import os
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
-from rag_knowledge_base import get_arxiv_data_from_dataset
-from rag_vectorstore import dataset_to_texts, create_local_faiss_vector_database, similarity_search
+from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage
+from rag_vectorstore import dataset_to_texts, create_local_faiss_vector_database, similarity_search_doc
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35
 from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
 from rag_chains import retrieval_qa_chain_from_local_db, qa_bot
@@ -12,35 +12,39 @@ from rag_ragas import make_eval_chains, evaluate_RAGAS
 
 from langchain.vectorstores import FAISS
 from langchain.llms import CTransformers # to use CPU only
+
 from ragas.metrics import faithfulness, answer_relevancy, context_relevancy, context_recall
 from ragas.langchain import RagasEvaluatorChain
+
 import pandas as pd
 
 
 #%% 1. UI ##############################################################
 
 #%% 2. Set up environment ############################################
-QUERY = "Explain to me the difference between nuclear fission and fusion."
+QUERY = "What is the probability of you being so much taller than the average? "
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy]
 DB_PATH = "vectorstores/db_faiss"
+LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 
 
 #%% 3. RETRIEVER #####################################################
-# 3.1 embedding
+
+# 3.1 Load knowledge base / dataset #######
+# data = get_arxiv_data_from_dataset()
+data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
+
+# 3.2 Split text into chunks ##############
+
+# 3.1 embedding ############################
 embed_model = get_retriever_embeddings()
 
-# 3.2 knowledge base / dataset
-data = get_arxiv_data_from_dataset()
-
-# 3.2 Split text into chunks
-# its part of loader
-
-# 3.3 vectorstore
+# 3.3 vectorstore ###########################
 
 ## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
-if len(os.listdir(DB_PATH)) == 0:
-    create_local_faiss_vector_database(data, embed_model, DB_PATH) 
+# if len(os.listdir(DB_PATH)) == 0:
+create_local_faiss_vector_database(data, embed_model, DB_PATH) 
 
 
 ## 3.4 index
@@ -48,7 +52,7 @@ if len(os.listdir(DB_PATH)) == 0:
 
 ## 3.5 Similiarity search
 db = FAISS.load_local(DB_PATH, embed_model)
-similar_response = similarity_search(db, QUERY)
+similar_response = similarity_search_doc(db, QUERY)
 
 #%% 4. GENERATOR #####################################################
 ## 4.1 embedding

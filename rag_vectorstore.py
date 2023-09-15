@@ -1,12 +1,11 @@
-from langchain.document_loaders import WebBaseLoader
+from langchain.document_loaders import WebBaseLoader, PyPDFLoader, DirectoryLoader
 from langchain.indexes import VectorstoreIndexCreator
-from langchain.vectorstores import FAISS
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain.vectorstores import FAISS, Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 
-
-
+FAISS_PATH = "vectorstores/db_faiss"
+CHROMA_PATH = "vectorstores/db_chroma"
 
 def get_index_vectorstore_wiki_nyc(embed_model):
     # load the Wikipedia page and create index
@@ -17,7 +16,6 @@ def get_index_vectorstore_wiki_nyc(embed_model):
         # text_splitter=CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         # vectorstore_kwargs={ "persist_directory": "/vectorstore"},
     ).from_loaders([loader]) 
-
     return index
 
 
@@ -49,8 +47,20 @@ def get_faiss_vector_database(data, embeddings):
     
     db = FAISS.from_texts(data, embeddings)
     return db
+    
+def create_chroma_db(documents, embeddings):
+    vectorstore = Chroma.from_documents(documents=documents, 
+                                        embedding=embeddings,
+                                        persist_directory=CHROMA_PATH)
+    return vectorstore
 
-def similarity_search(db, query):
+def load_chroma_db(embeddings):
+    vectorstore = Chroma(persist_directory=CHROMA_PATH, 
+                         embedding_function=embeddings)
+    return vectorstore
+    
+
+def similarity_search_doc(db, query):
     """
     Ref:
     https://github.com/JayZeeDesign/Knowledgebase-embedding/blob/main/app.py
