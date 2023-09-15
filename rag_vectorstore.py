@@ -27,7 +27,7 @@ def dataset_to_texts(data):
     return texts
 
 # create vector database
-def create_local_faiss_vector_database(texts, embeddings, DB_PATH):
+def create_local_faiss_vector_database(data, embeddings, DB_PATH):
     """
     Create a local vector database from a list of texts and an embedding model.
     """
@@ -37,9 +37,28 @@ def create_local_faiss_vector_database(texts, embeddings, DB_PATH):
     # text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
     # texts = text_splitter.split_documents(documents)
 
+    texts = dataset_to_texts(data)
     text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
     texts = text_splitter.split_texts(texts)
 
     db = FAISS.from_texts(texts, embeddings)
     db.save_local(DB_PATH)
 
+
+def get_faiss_vector_database(data, embeddings):
+    
+    db = FAISS.from_texts(data, embeddings)
+    return db
+
+def similarity_search(db, query):
+    """
+    Ref:
+    https://github.com/JayZeeDesign/Knowledgebase-embedding/blob/main/app.py
+    """
+    similar_response = db.similarity_search(query, k=3)
+
+    page_contents_array = [doc.page_content for doc in similar_response]
+
+    # print(page_contents_array)
+
+    return page_contents_array

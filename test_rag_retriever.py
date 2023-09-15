@@ -1,9 +1,12 @@
 #%% Imports
 
 from rag_embedding import get_embed_model
+from rag_vectorstore import get_index_vectorstore_wiki_nyc, similarity_search
+
+
+
 from torch import cuda
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from rag_vectorstore import get_index_vectorstore_wiki_nyc
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS
 
@@ -47,3 +50,7 @@ def test_get_index_vectorstore_wiki_nyc(embed_model):
 
 test_get_index_vectorstore_wiki_nyc("bla")
 # %%
+
+def test_similarity_search():
+    similar_context = similarity_search()
+    assert isinstance(similar_context, list) , "Failed getting the similar context, check similarity_search()"
