@@ -9,7 +9,7 @@ from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, lo
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35
 from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
-from rag_chains import retrieval_qa_chain_from_local_db, qa_bot
+from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
 from rag_ragas import make_eval_chains, evaluate_RAGAS
 from rag_splitter import split_data_to_docs
 
@@ -60,28 +60,26 @@ create_chroma_db(docs, embed_model)
 db = load_chroma_db(embed_model)
 
 # similar_response = similarity_search_doc(db, QUERY)
-similar_response = svm_similarity_search_doc(docs, QUERY, embed_model)
+similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 
 #%% 4. GENERATOR #####################################################
 ## 4.1 embedding
 # the embedding of the generator is already inside the model
 
 ## 4.3 prompt
-prompt = get_formatted_prompt(context=similar_response[0].page_content, query=QUERY)
+prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
 llm = load_llm_gpt35()
 
 ## 4.5 Chain
-qa_chain = retrieval_qa_chain_from_local_db(llm=llm, prompt_template=prompt, db=db)
-
-## 4.6 bot / agent
-# qa_bot_pipe = qa_bot(db, llm, prompt)
+qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vectorstore=db)
 
 ## 4.7 Result
-# qa_chain_result = qa_chain({"query": QUERY})
-qa_chain_result = qa_chain({"query": QUERY})
+qa_chain_result = final_result(qa_chain, QUERY)
+# qa_chain_result = chain_with_docs(qa_chain, similar_response, QUERY) # deprecated...
+
 print(qa_chain_result)
 
 #%% 5. EVALUATION ########################################################

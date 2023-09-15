@@ -76,7 +76,7 @@ def similarity_search_doc(db, query):
     """
     similar_response = db.similarity_search(query, k=3)
 
-    page_contents_array = [doc.page_content for doc in similar_response]
+    page_contents_array = get_content_from_similarity_search(similar_response)
 
     print(len(page_contents_array))
 
@@ -90,5 +90,11 @@ def svm_similarity_search_doc(documents, query, embed_model):
                                                 k = 3,
                                                 relevancy_threshold = 0.3)
     docs_svm=svm_retriever.get_relevant_documents(query)
+    docs_svm_list = get_content_from_similarity_search(docs_svm)
     len(docs_svm)
-    return docs_svm
+    return docs_svm_list
+
+def get_content_from_similarity_search(similar_response):
+    page_contents_array = [doc.page_content for doc in similar_response]
+    return page_contents_array
+
