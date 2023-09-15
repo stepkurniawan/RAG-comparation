@@ -4,14 +4,14 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQAWithSourcesChain
 
 def retrieval_qa_chain_from_local_db(llm, prompt_template, db):
-    chain_type_kwargs = {"prompt": prompt_template}
+    # chain_type_kwargs = {"prompt": prompt_template}
 
     qa_chain = RetrievalQA.from_chain_type(
         llm = llm,
         chain_type = 'stuff', # you can also change this to map reduce
         retriever = db.as_retriever(search_kwargs = {'k':3}),
         return_source_documents = True,        # retriever will ensure that llm will retrieve the information from the document that we have
-        chain_type_kwargs = chain_type_kwargs
+        # chain_type_kwargs = chain_type_kwargs
     )
     return qa_chain
 

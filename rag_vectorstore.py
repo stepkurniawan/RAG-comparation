@@ -2,6 +2,8 @@ from langchain.document_loaders import WebBaseLoader, PyPDFLoader, DirectoryLoad
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS, Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.retrievers import SVMRetriever
+
 import numpy as np
 
 FAISS_PATH = "vectorstores/db_faiss"
@@ -42,6 +44,13 @@ def create_local_faiss_vector_database(data, embeddings, DB_PATH):
     db = FAISS.from_texts(texts, embeddings)
     db.save_local(DB_PATH)
 
+def load_local_faiss_vector_database(DB_PATH, embeddings):
+    """
+    Load a local vector database from a list of texts and an embedding model.
+    """
+    db = FAISS.load_local(DB_PATH, embeddings)
+    return db
+
 
 def get_faiss_vector_database(data, embeddings):
     
@@ -69,6 +78,17 @@ def similarity_search_doc(db, query):
 
     page_contents_array = [doc.page_content for doc in similar_response]
 
-    # print(page_contents_array)
+    print(len(page_contents_array))
 
     return page_contents_array
+
+
+def svm_similarity_search_doc(documents, query, embed_model):
+
+    svm_retriever = SVMRetriever.from_documents(documents=documents,
+                                                embeddings=embed_model,
+                                                k = 3,
+                                                relevancy_threshold = 0.3)
+    docs_svm=svm_retriever.get_relevant_documents(query)
+    len(docs_svm)
+    return docs_svm
