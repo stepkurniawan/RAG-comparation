@@ -1,15 +1,19 @@
 #%%
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
 from rag_prompting import set_custom_prompt
+from rag_ragas import evaluate_RAGAS
 from langchain.vectorstores import FAISS
 from rag_llms import load_llm_ctra_llama27b
 from langchain.llms import CTransformers # to use CPU only
-from rag_chains import retrieval_qa_chain_from_local_db, qa_bot
+from rag_chains import retrieval_qa_chain_from_local_db, final_result
 from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 
+import json
+from fastapi.encoders import jsonable_encoder
 
 
+QUERY = "What is the probability of you being so much taller than the average? "
 
 DB_FAISS_PATH = "vectorstores/db_faiss"
 
@@ -47,13 +51,16 @@ print(
 )
 
 
-#%%
+#%% LLMS TESTING #########################################################
 def test_load_llm_ctra_llama27b():
     llm = load_llm_ctra_llama27b()
     assert isinstance(llm, CTransformers) , "Failed getting the llm, check test_load_llm_ctra_llama27b()"
     return llm
 
 test_llm = test_load_llm_ctra_llama27b()
+
+
+
 #%%
 def test_retrieval_qa_chain_from_local_db():
     llm = load_llm_ctra_llama27b()
@@ -64,25 +71,30 @@ def test_retrieval_qa_chain_from_local_db():
     assert isinstance(qa_chain, RetrievalQA) , "Failed getting the qa_chain, check test_retrieval_qa_chain_from_local_db()"
     return qa_chain
 
-# chain_type_kwargs = {"prompt": set_custom_prompt()}
-# qa_chain = RetrievalQA.from_chain_type(
-#         llm = test_llm,
-#         chain_type = 'stuff', # you can also change this to map reduce
-#         retriever = test_db.as_retriever(search_kwargs = {'k':3}),
-#         return_source_documents = True,        # retriever will ensure that llm will retrieve the information from the document that we have
-#         chain_type_kwargs = chain_type_kwargs
-#     )
-# print(qa_chain({'query':"what is the sky's color? "}))
-
 
 test_qa_chain = test_retrieval_qa_chain_from_local_db()
-response = test_qa_chain({"query": "What is the colour of the sky?"})
+response = test_qa_chain({"query": QUERY})
 
-def final_result(query, qa_chain):
-    qa_result = test_qa_chain
-    response = qa_result({'query': query})
+# %%
+
+def test_final_result():
+    response = final_result(test_qa_chain, QUERY)
     return response
 
-print(final_result("What is the colour of the sky?"))
+test_chain_response = test_final_result()
+# print(final_result(QUERY))
+
+
+# %% TESTING RAGAS METRICS
+
+def test_evaluate_RAGAS():
+    # must run the previous test functions first
+    ragas_result = evaluate_RAGAS(test_chain_response)
+    assert isinstance(ragas_result, dict) , "Failed getting the ragas_result, check test_evaluate_RAGAS()"
+    return ragas_result
+
+ragas_rslt = test_evaluate_RAGAS()
+print(ragas_rslt)
+
 
 # %%
