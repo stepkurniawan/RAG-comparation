@@ -26,7 +26,6 @@ import pandas as pd
 
 #%% 2. Set up environment ############################################
 QUERY = "What is the probability of you being so much taller than the average? "
-RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy]
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 
@@ -49,7 +48,7 @@ embed_model = get_retriever_embeddings()
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
 # create_local_faiss_vector_database(data, embed_model, DB_PATH) 
-create_chroma_db(docs, embed_model) 
+# create_chroma_db(docs, embed_model) 
 
 
 ## 3.4 index
@@ -84,12 +83,12 @@ print(qa_chain_result)
 
 #%% 5. EVALUATION ########################################################
 ## RAGAS criteria
+"""
+ref: https://github.com/explodinggradients/ragas
+"""
 # RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy, context_recall]
-eval_df = pd.DataFrame(columns=['query', 'answer', 'context'] + [m.name for m in RAGAS_METRICS])
 
-eval_chains = make_eval_chains(RAGAS_METRICS)
-
-evaluate_RAGAS(eval_chains, qa_chain_result, eval_df)
+evaluate_RAGAS(qa_chain_result)
 
 print("")
 
