@@ -2,9 +2,10 @@
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
 from rag_prompting import set_custom_prompt
 from langchain.vectorstores import FAISS
-from rag_llms import load_llm_ctra_llama27b
+from langchain.chat_models import ChatOpenAI
+from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35
 from langchain.llms import CTransformers # to use CPU only
-from rag_chains import retrieval_qa_chain_from_local_db, qa_bot
+from rag_chains import retrieval_qa_chain_from_local_db
 from langchain import PromptTemplate
 from langchain.chains import RetrievalQA
 
@@ -54,9 +55,18 @@ def test_load_llm_ctra_llama27b():
     return llm
 
 test_llm = test_load_llm_ctra_llama27b()
+
+#%%
+
+def test_load_llm_gpt35():
+    llm = load_llm_gpt35()
+    assert isinstance(llm, ChatOpenAI) , "Failed getting the llm, check test_load_llm_gpt35()"
+    return llm
+
+test_llm = test_load_llm_gpt35()
 #%%
 def test_retrieval_qa_chain_from_local_db():
-    llm = load_llm_ctra_llama27b()
+    llm = test_llm
     prompt = set_custom_prompt()
     db = FAISS.load_local("vectorstores/db_faiss", get_generator_embeddings())
 
@@ -83,6 +93,6 @@ def final_result(query, qa_chain):
     response = qa_result({'query': query})
     return response
 
-print(final_result("What is the colour of the sky?"))
+print(final_result(query="What is the colour of the sky?", qa_chain=test_qa_chain))
 
 # %%

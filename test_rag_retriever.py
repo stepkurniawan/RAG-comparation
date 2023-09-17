@@ -71,7 +71,7 @@ def test_print_doc_dimensions():
         f"a dimensionality of {len(embeddings[0])}.")
 
 test_print_doc_dimensions()
-# %% VECTOR STORE
+#%% VECTOR STORE
 
 def test_get_index_vectorstore_wiki_nyc(embed_model):
     embed_model = get_embed_model(embed_model_id)

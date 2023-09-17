@@ -15,9 +15,10 @@ def load_llm_ctra_llama27b():
         model_type="llama",
         max_new_tokens = 512,
         temperature = 0.0
-
     )
     return llm
+
+
 
 def load_llm_gpt35():
     load_dotenv()
@@ -26,5 +27,6 @@ def load_llm_gpt35():
         openai_api_key=openai.api_key, 
         model="gpt-3.5-turbo",
         temperature=0.0,
+        max_tokens=512,
         )
     return llm
