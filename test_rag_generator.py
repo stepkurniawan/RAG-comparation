@@ -12,6 +12,7 @@ from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS, Chroma
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import CTransformers # to use CPU only
+from langchain.llms import HuggingFacePipeline
 
 
 QUERY = "What is the probability of you being so much taller than the average? "
@@ -74,11 +75,12 @@ test_llm = test_load_llm_ctra_llama2_13b()
 
 #%%
 def test_load_llm_tokenizer_llama2_13b_hf():
-    llm, tokenizer = load_llm_tokenizer_llama2_13b_hf()
-    assert isinstance(llm, CTransformers) , "Failed getting the llm, check test_load_llm_ctra_llama27b()"
-    return llm, tokenizer
+    llm = load_llm_tokenizer_llama2_13b_hf()
+    assert isinstance(llm, HuggingFacePipeline) , "Failed getting the llm, check test_load_llm_ctra_llama27b()"
+    assert (llm.model_id == 'gpt2')
+    return llm
 
-test_llm, test_tokenizer = test_load_llm_tokenizer_llama2_13b_hf()
+test_llm = test_load_llm_tokenizer_llama2_13b_hf()
 
 #%% 
 

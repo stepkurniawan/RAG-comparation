@@ -1,5 +1,5 @@
 #%% 0. Import libraries
-# !pip install bs4 chromadb tiktoken faiss-cpu accelerate
+# !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers
 
 import os
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
@@ -7,7 +7,7 @@ from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage
 from rag_vectorstore import create_local_faiss_vector_database, load_local_faiss_vector_database
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
-from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35
+from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
 from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
 from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
 from rag_ragas import make_eval_chains, evaluate_RAGAS
@@ -48,7 +48,7 @@ embed_model = get_retriever_embeddings()
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
 # create_local_faiss_vector_database(data, embed_model, DB_PATH) 
-# create_chroma_db(docs, embed_model) 
+create_chroma_db(docs, embed_model) 
 
 
 ## 3.4 index
@@ -70,7 +70,8 @@ prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
-llm = load_llm_gpt35()
+# llm = load_llm_gpt35()
+llm = load_llm_tokenizer_llama2_13b_hf()
 
 ## 4.5 Chain
 qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vectorstore=db)
@@ -88,8 +89,8 @@ ref: https://github.com/explodinggradients/ragas
 """
 # RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy, context_recall]
 
-evaluate_RAGAS(qa_chain_result)
+eval_df = evaluate_RAGAS(qa_chain_result)
 
-print("")
+print(f"{qa_chain_result=}")
 
 ## LLM model

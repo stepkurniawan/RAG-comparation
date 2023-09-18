@@ -116,6 +116,3 @@ def load_llm_tokenizer_llama2_13b_hf():
     llm = HuggingFacePipeline(pipeline=generate_text)
 
     return llm
-
-
-test_llm, test_tokenizer = load_llm_tokenizer_llama2_13b_hf()
