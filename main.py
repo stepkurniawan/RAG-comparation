@@ -1,5 +1,5 @@
 #%% 0. Import libraries
-# !pip install bs4 chromadb tiktoken faiss-cpu
+# !pip install bs4 chromadb tiktoken faiss-cpu accelerate
 
 import os
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings

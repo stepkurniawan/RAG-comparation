@@ -44,11 +44,11 @@ def create_local_faiss_vector_database(data, embeddings, DB_PATH):
     db = FAISS.from_texts(texts, embeddings)
     db.save_local(DB_PATH)
 
-def load_local_faiss_vector_database(DB_PATH, embeddings):
+def load_local_faiss_vector_database(embeddings):
     """
     Load a local vector database from a list of texts and an embedding model.
     """
-    db = FAISS.load_local(DB_PATH, embeddings)
+    db = FAISS.load_local(FAISS_PATH, embeddings)
     return db
 
 
