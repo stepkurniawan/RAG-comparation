@@ -28,7 +28,7 @@ import pandas as pd
 QUERY = "What is the probability of you being so much taller than the average? "
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
-
+WIKI_DUMP_PATH = "data/Sustainability+Methods_dump.xml"
 
 #%% 3. RETRIEVER #####################################################
 
