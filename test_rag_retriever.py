@@ -2,7 +2,7 @@
 
 from rag_embedding import get_embed_model
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, similarity_search_doc, create_chroma_db, load_chroma_db
-from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage
+from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset
 from rag_splitter import split_data_to_docs
 
 
@@ -11,6 +11,7 @@ from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS, Chroma
 from langchain.docstore.document import Document
+from datasets import load_dataset, Dataset, DatasetDict
 
 
 embed_model_id = 'sentence-transformers/all-MiniLM-L6-v2'
@@ -30,9 +31,17 @@ def test_load_from_webpage():
 test_data=test_load_from_webpage()
 print(test_data)
 
+# %%
+def test_load_suswiki_dataset():
+    test_suswiki_dataset = load_sustainability_wiki_dataset()
+    assert isinstance(test_suswiki_dataset, Dataset) , "Failed loading sustainability wiki dataset, check load_sustainability_wiki_dataset()"
+    return test_suswiki_dataset
+
+test_suswiki_dataset=test_load_suswiki_dataset()
+print(test_suswiki_dataset[0])
 
 
-## SPLITTING DATA ##########################################
+# %% SPLITTING DATA ##########################################
 
 def test_split_data_to_docs():
     docs = split_data_to_docs(test_data)

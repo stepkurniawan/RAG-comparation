@@ -24,6 +24,11 @@ def get_wikipedia_data_from_dataset():
     print(f'success load data: {data}')
     return data
 
+def load_sustainability_wiki_dataset():
+    load_dataset_from_hf = load_dataset("stepkurniawan/sustainability-methods-wiki", split='train')
+    print(f'success load data from huggingface: stepkurniawan/sustainability-methods-wiki')
+    return load_dataset_from_hf
+
 
 def load_from_webpage(link):
     loader = WebBaseLoader(link)
