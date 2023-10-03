@@ -35,3 +35,16 @@ def load_from_webpage(link):
     data = loader.load()
     print(f'success load data from webpage: {link}')
     return data
+
+def create_ragas_dataframe():
+    """
+    REF: RAGAS quickstart https://colab.research.google.com/github/explodinggradients/ragas/blob/main/docs/quickstart.ipynb#scrollTo=f17bcf9d
+    the dataset must consists of: 
+    1. question
+    2. answer
+    3. contexts
+    4. ground_truths
+    but in this case, we only consider 1 context and 1 ground_truth
+    """
+    
+    

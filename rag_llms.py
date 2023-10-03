@@ -43,7 +43,18 @@ def load_llm_gpt35():
         openai_api_key=openai.api_key, 
         model="gpt-3.5-turbo",
         temperature=0.0,
-        max_tokens=512,
+        max_tokens=1500,
+        )
+    return llm
+
+def load_llm_gpt4():
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    llm = ChatOpenAI(
+        openai_api_key=openai.api_key, 
+        model="gpt-4",
+        temperature=0.0,
+        max_tokens=3000,
         )
     return llm
 
