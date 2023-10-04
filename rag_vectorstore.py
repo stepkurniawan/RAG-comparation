@@ -44,7 +44,8 @@ def create_local_faiss_vector_database(texts, embeddings, DB_PATH, data=None):
         text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
         texts = text_splitter.split_texts(texts)
     
-    db = FAISS.from_texts(texts, embeddings)
+    # db = FAISS.from_texts(texts, embeddings)
+    db = FAISS.from_documents(texts, embeddings)
     db.save_local(DB_PATH)
 
 def load_local_faiss_vector_database(embeddings):
@@ -54,11 +55,6 @@ def load_local_faiss_vector_database(embeddings):
     db = FAISS.load_local(FAISS_PATH, embeddings)
     return db
 
-
-def get_faiss_vector_database(data, embeddings):
-    
-    db = FAISS.from_texts(data, embeddings)
-    return db
     
 def create_chroma_db(documents, embeddings):
     vectorstore = Chroma.from_documents(documents=documents, 
