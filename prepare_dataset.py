@@ -14,6 +14,7 @@ _ = load_dotenv(find_dotenv())
 openai.api_key  = os.getenv('OPENAI_API_KEY')
 
 SEGMENTED_CSV_PATH = "data/wiki_checklist_segmented.csv"
+SEGMENTED_CSV_PATH_NEW = "data/wiki_checklist_segmented_new.csv"
 csv_dump_path = "data/Sustainability+Methods_dump_checklist.csv"
 GROUND_TRUTH_JSON_PATH = "data/ground_truth.json"
 
@@ -180,6 +181,11 @@ def create_ground_truth_json(segmented_df, llm):
     if not os.path.exists(GROUND_TRUTH_JSON_PATH):
         with open(GROUND_TRUTH_JSON_PATH, "w") as f:
             f.write("[]")
+
+    # Create new csv file to keep track which article has been processed
+    if not os.path.exists(SEGMENTED_CSV_PATH_NEW):
+        with open(SEGMENTED_CSV_PATH_NEW, "w") as f:
+            f.write("title;text;status\n")
     
     chain = LLMChain(llm = llm, prompt=prompt)
 
@@ -210,15 +216,15 @@ def create_ground_truth_json(segmented_df, llm):
         # update ground truth csv status to "done"
         row["status"] = "done"
 
-    # update the csv 
-    segmented_df.to_csv(SEGMENTED_CSV_PATH, index=False, sep=";")
-   
-
+        # append the newly updated row to the new csv
+        segmented_df_new = pd.DataFrame([row])
+        segmented_df_new.to_csv(SEGMENTED_CSV_PATH_NEW, mode='a', header=False, index=False, sep=";")
+        print("Updated segmented_df_new csv")
 
 
 segmented_df = pd.read_csv(SEGMENTED_CSV_PATH, delimiter=";")
 # segmented_df_row= segmented_df.iloc[116:118]
-llm = load_llm_gpt35()
+llm = load_llm_gpt4()
 create_ground_truth_json(segmented_df, llm)
 
 # append_raw_json(GROUND_TRUTH_JSON_PATH, "test")

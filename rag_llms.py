@@ -49,9 +49,8 @@ def load_llm_gpt35():
 
 def load_llm_gpt4():
     load_dotenv()
-    openai.api_key = os.getenv("OPENAI_API_KEY")
     llm = ChatOpenAI(
-        openai_api_key=openai.api_key, 
+        openai_api_key=os.getenv("OPENAI_API_KEY_GPT4"), 
         model="gpt-4",
         temperature=0.0,
         max_tokens=3000,
