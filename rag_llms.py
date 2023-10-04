@@ -90,9 +90,10 @@ def load_llm_tokenizer_llama2_13b_hf():
         "lm_head": "cpu",
         "transformer.h": "0",
         "transformer.ln_f": "0",
-        # "model.embed_tokens.weight": "cpu",
-        # "model.layers.0.input_layernorm.weight": "cpu",
-        # "model.layers.0.mlp.down_proj.weight": "cpu"
+        "model.embed_tokens.weight": "cpu",
+        "model.layers.0.input_layernorm.weight": "cpu",
+        "model.layers.0.mlp.down_proj.weight": "cpu",
+        "model.layers.0.mlp.gate_proj.weight": "cpu", # TODO: still a lot model layers to be set. we should use device map auto
     }
 
     model = transformers.AutoModelForCausalLM.from_pretrained(

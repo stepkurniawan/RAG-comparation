@@ -25,7 +25,7 @@ import pandas as pd
 #%% 1. UI ##############################################################
 
 #%% 2. Set up environment ############################################
-QUERY = "What is the probability of you being so much taller than the average? "
+QUERY = "When and where did the quantitative Content Analysis method originate?"
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 
@@ -36,7 +36,7 @@ LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 # data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
 # data2 = load_sustainability_wiki_dataset()
 data = load_sustainability_wiki_langchain_documents()
-print("the data is: ", data)
+# print("the data is: ", data)
 
 # 3.2 Split text into chunks ##############
 docs = split_data_to_docs(data)
@@ -49,7 +49,7 @@ embed_model = get_retriever_embeddings()
 ## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
-create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=DB_PATH) # maybe for dataset ? 
+# create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=DB_PATH) # maybe for dataset ? 
 # create_chroma_db(docs, embed_model) 
 
 
@@ -57,8 +57,8 @@ create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=D
 # index = rag_vectorstore.get_index_vectorstore_wiki_nyc(embed_model)
 
 ## 3.5 Similiarity search
-# db = load_local_faiss_vector_database(DB_PATH, embed_model)
-db = load_chroma_db(embed_model)
+db = load_local_faiss_vector_database(embed_model)
+# db = load_chroma_db(embed_model)
 
 # similar_response = similarity_search_doc(db, QUERY)
 similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
@@ -72,8 +72,10 @@ prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
-# llm = load_llm_gpt35()
-llm = load_llm_tokenizer_llama2_13b_hf()
+llm = load_llm_gpt35()
+# llm = load_llm_tokenizer_llama2_13b_hf() # TODO: not working because of model.layers.0.mlp.gate_proj.weight doesn't have any device set.
+
+print("success loading llm model")
 
 ## 4.5 Chain
 qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vectorstore=db)
@@ -82,7 +84,7 @@ qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vec
 qa_chain_result = final_result(qa_chain, QUERY)
 # qa_chain_result = chain_with_docs(qa_chain, similar_response, QUERY) # deprecated...
 
-print(qa_chain_result)
+print("the result is: ", qa_chain_result['result'])
 
 #%% 5. EVALUATION ########################################################
 ## RAGAS criteria
