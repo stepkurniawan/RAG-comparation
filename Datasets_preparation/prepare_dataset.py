@@ -1,3 +1,9 @@
+"""
+THIS FILE: is used to create Question and Answer table for RAGAS that has the columns: context, question, answer, and summary. 
+The purpose is to create an automated ground truth from the dump file of the wikipedia articles (from sustainability methods wiki).
+At the end, it outputs JSON file that we can use for RAGAS evaluation. 
+"""
+
 import json
 from rag_llms import load_llm_gpt4,load_llm_gpt35
 

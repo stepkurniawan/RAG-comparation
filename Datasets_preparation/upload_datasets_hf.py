@@ -1,3 +1,10 @@
+"""
+THIS FILE: is used to upload datasets to huggingface hub
+the input of this file was JSON file that was created from Sustainability+Methods_dump.xml
+the dump file was downloaded from wikiMedia
+to be able to make it public easily, the author decided to create a dataframe and upload the dataset to huggingface hub
+"""
+
 #%% pip install ipywidgets
 
 from datasets import load_dataset, Dataset
@@ -59,14 +66,14 @@ def create_csv_from_dataframe(df):
     df.to_csv("data/Sustainability+Methods_dump.csv", index=False, encoding='utf-8', sep=';')
     print("success create csv from dataframe")
 
-#%%
+#%% PREPARING DATAFRAME TO UPLOAD TO HUGGINGFACE
 sustainability_df = load_dataframe_from_json(JSON_PATH)
 create_csv_from_dataframe(sustainability_df)
 my_dataset = load_dataset_from_pandas(sustainability_df)
 # my_dataset = my_dataset.train_test_split(test_size=0.2, shuffle=True)
 my_dataset.push_to_hub("stepkurniawan/sustainability-methods-wiki")
 
-#%%
+#%% UPLOAD TO HUGGINGFACE
 test_load_dataset_from_hf = load_dataset("stepkurniawan/sustainability-methods-wiki")
 print(test_load_dataset_from_hf)
 
