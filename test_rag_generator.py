@@ -1,7 +1,6 @@
 #%%
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
 from rag_prompting import set_custom_prompt
-from rag_ragas import evaluate_RAGAS
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_ctra_llama2_13b, load_llm_tokenizer_llama2_13b_hf
 from rag_chains import retrieval_qa_chain_from_local_db, final_result
 from rag_vectorstore import load_chroma_db, load_local_faiss_vector_database
@@ -42,6 +41,7 @@ def test_read_db_chroma():
     assert isinstance(db, Chroma) , "Failed getting the db, check test_read_db()"
     return db
 
+test_db = test_read_db_faiss()
 test_db = test_read_db_chroma()
 
 #%%
@@ -112,15 +112,3 @@ def test_final_result():
 
 test_chain_response = test_final_result()
 print(test_chain_response)
-# %% TESTING RAGAS METRICS #####################################################
-
-def test_evaluate_RAGAS():
-    # must run the previous test functions first
-    ragas_result = evaluate_RAGAS(test_chain_response)
-    # assert isinstance(ragas_result, dict) , "Failed getting the ragas_result, check test_evaluate_RAGAS()"
-    return ragas_result
-
-ragas_rslt = test_evaluate_RAGAS()
-print(ragas_rslt)
-
-# %%

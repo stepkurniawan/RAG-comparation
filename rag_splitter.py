@@ -1,5 +1,20 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+"""
+Ref: https://python.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/split_by_token
+Splitting text has many forms. The simplest one is by characters. 
+But sometimes you want to split by words, sentences, paragraphs, or other tokens.
+Normally, language models are trained using token as a splitter. 
+Example of token splitters:
+- tiktoken
+- spaCy
+- SentenceTransformers
+- NLTK
+- HuggingFace tokenizer
+"""
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter, CharacterTextSplitter
 import tiktoken
+
+
 
 # using tiktoken as tokenizer 
 
@@ -22,3 +37,4 @@ def split_data_to_docs(data, chunk_size = 200):
     all_splits = splitter.split_documents(data)
 
     return all_splits
+

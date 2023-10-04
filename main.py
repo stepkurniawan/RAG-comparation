@@ -2,8 +2,8 @@
 # !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
 
 import os
+from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset, load_sustainability_wiki_langchain_documents
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
-from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage
 from rag_vectorstore import create_local_faiss_vector_database, load_local_faiss_vector_database
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
@@ -28,13 +28,15 @@ import pandas as pd
 QUERY = "What is the probability of you being so much taller than the average? "
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
-WIKI_DUMP_PATH = "data/Sustainability+Methods_dump.xml"
 
 #%% 3. RETRIEVER #####################################################
 
 # 3.1 Load knowledge base / dataset #######
 # data = get_arxiv_data_from_dataset()
-data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
+# data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
+# data2 = load_sustainability_wiki_dataset()
+data = load_sustainability_wiki_langchain_documents()
+print("the data is: ", data)
 
 # 3.2 Split text into chunks ##############
 docs = split_data_to_docs(data)

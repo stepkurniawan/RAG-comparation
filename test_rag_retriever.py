@@ -40,6 +40,10 @@ def test_load_suswiki_dataset():
 test_suswiki_dataset=test_load_suswiki_dataset()
 print(test_suswiki_dataset[0])
 
+# %%
+
+
+
 
 # %% SPLITTING DATA ##########################################
 
