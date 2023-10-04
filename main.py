@@ -49,8 +49,8 @@ embed_model = get_retriever_embeddings()
 ## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
-# create_local_faiss_vector_database(data, embed_model, DB_PATH) 
-create_chroma_db(docs, embed_model) 
+create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=DB_PATH) # maybe for dataset ? 
+# create_chroma_db(docs, embed_model) 
 
 
 ## 3.4 index

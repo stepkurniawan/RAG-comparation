@@ -27,9 +27,10 @@ def dataset_to_texts(data):
     return texts
 
 # create vector database
-def create_local_faiss_vector_database(data, embeddings, DB_PATH):
+def create_local_faiss_vector_database(texts, embeddings, DB_PATH, data=None):
     """
     Create a local vector database from a list of texts and an embedding model.
+    you can change the input from texts or data
     """
     # Loader for PDFs
     # loader = DirectoryLoader(DATA_PATH, glob = '*.pdf', loader_cls= PyPDFLoader)
@@ -37,10 +38,12 @@ def create_local_faiss_vector_database(data, embeddings, DB_PATH):
     # text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
     # texts = text_splitter.split_documents(documents)
 
-    texts = dataset_to_texts(data)
-    text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
-    texts = text_splitter.split_texts(texts)
-
+    # text splitter for dataset
+    if data is not None:
+        texts = dataset_to_texts(data)
+        text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
+        texts = text_splitter.split_texts(texts)
+    
     db = FAISS.from_texts(texts, embeddings)
     db.save_local(DB_PATH)
 
