@@ -99,5 +99,7 @@ def push_to_hf_hub(dataset, HF_DATASET_HUB):
     # push to HF
     dataset.push_to_hub(HF_HUB_QA_DATASET)
 
-sp_dataset = prepare_qa_dataset_ragas()
-push_to_hf_hub(sp_dataset, HF_HUB_QA_DATASET)
+#### UPLOAD qa dataset TO HF HUB stepkurniawan/qa_sustainability_wiki####
+# sp_dataset = prepare_qa_dataset_ragas()
+# push_to_hf_hub(sp_dataset, HF_HUB_QA_DATASET)
+
