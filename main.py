@@ -1,65 +1,100 @@
 #%% 0. Import libraries
+# !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
+
 import os
+from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset, load_sustainability_wiki_langchain_documents
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
-from rag_knowledge_base import get_arxiv_data_from_dataset
-from rag_vectorstore import dataset_to_texts, create_local_faiss_vector_database
-from rag_llms import load_llm_ctra_llama27b
-from rag_prompting import set_custom_prompt
-from rag_chains import retrieval_qa_chain_from_local_db, qa_bot
+from rag_vectorstore import create_local_faiss_vector_database, load_local_faiss_vector_database
+from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
+from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
+from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
+from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
+from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
+from rag_ragas import make_eval_chains, evaluate_RAGAS
+from rag_splitter import split_data_to_docs
+
 from langchain.vectorstores import FAISS
+from langchain.llms import CTransformers # to use CPU only
+
+from ragas.metrics import faithfulness, answer_relevancy, context_relevancy, context_recall
+from ragas.langchain import RagasEvaluatorChain
+
+import pandas as pd
+
 
 #%% 1. UI ##############################################################
 
 #%% 2. Set up environment ############################################
-query = "What is the best way to learn new subjects?"
+QUERY = "When and where did the quantitative Content Analysis method originate?"
+DB_PATH = "vectorstores/db_faiss"
+LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 
 #%% 3. RETRIEVER #####################################################
-# 3.1 embedding
+
+# 3.1 Load knowledge base / dataset #######
+# data = get_arxiv_data_from_dataset()
+# data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
+# data2 = load_sustainability_wiki_dataset()
+data = load_sustainability_wiki_langchain_documents()
+# print("the data is: ", data)
+
+# 3.2 Split text into chunks ##############
+docs = split_data_to_docs(data)
+
+# 3.1 embedding ###########
 embed_model = get_retriever_embeddings()
 
-# 3.2 knowledge base / dataset
-data = get_arxiv_data_from_dataset()
+# 3.3 VECTOR STORE ######################################################
 
-# 3.2 Split text into chunks
-# its part of loader
-
-# 3.3 vectorstore
-
-## LLAMA FAISS CODE
-DB_FAISS_PATH = "vectorstores/db_faiss"
-texts = dataset_to_texts(data)
-
+## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
-if len(os.listdir(DB_FAISS_PATH)) == 0:
-    create_local_faiss_vector_database(texts, embed_model, DB_FAISS_PATH) 
+# if len(os.listdir(DB_PATH)) == 0:
+# create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=DB_PATH) # maybe for dataset ? 
+# create_chroma_db(docs, embed_model) 
 
-## RAGAS code
+
+## 3.4 index
 # index = rag_vectorstore.get_index_vectorstore_wiki_nyc(embed_model)
+
+## 3.5 Similiarity search
+db = load_local_faiss_vector_database(embed_model)
+# db = load_chroma_db(embed_model)
+
+# similar_response = similarity_search_doc(db, QUERY)
+similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 
 #%% 4. GENERATOR #####################################################
 ## 4.1 embedding
-embeddings_gen = get_generator_embeddings()
-
-## 4.2 Knowledge Base / DB
-db = FAISS.load_local(DB_FAISS_PATH, embeddings_gen)
+# the embedding of the generator is already inside the model
 
 ## 4.3 prompt
-prompt = set_custom_prompt()
+prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
 
-## 4.4 model
-llm = load_llm_ctra_llama27b()
+## 4.4 LLM model : Select by comment and uncommenting the code below 
+# llm = load_llm_ctra_llama27b() 
+llm = load_llm_gpt35()
+# llm = load_llm_tokenizer_llama2_13b_hf() # TODO: not working because of model.layers.0.mlp.gate_proj.weight doesn't have any device set.
+
+print("success loading llm model")
 
 ## 4.5 Chain
-qa_chain = retrieval_qa_chain_from_local_db(llm=llm, prompt_template=prompt, db=db)
-
-## 4.6 bot / agent
-# qa_bot_pipe = qa_bot(db, llm, prompt)
+qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vectorstore=db)
 
 ## 4.7 Result
-qa_chain_result = qa_chain({"query": query})
-print(qa_chain_result)
+qa_chain_result = final_result(qa_chain, QUERY)
+# qa_chain_result = chain_with_docs(qa_chain, similar_response, QUERY) # deprecated...
+
+print("the result is: ", qa_chain_result['result'])
 
 #%% 5. EVALUATION ########################################################
 ## RAGAS criteria
+"""
+ref: https://github.com/explodinggradients/ragas
+"""
+# RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy, context_recall]
+
+eval_df = evaluate_RAGAS(qa_chain_result)
+
+print(f"{qa_chain_result=}")
 
 ## LLM model

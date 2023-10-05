@@ -1,6 +1,4 @@
-# !pip install bs4
-# !pip install chromadb
-# !pip install tiktoken
+# !pip install bs4 chromadb tiktoken
 
 #%%
 from langchain.vectorstores import Chroma
