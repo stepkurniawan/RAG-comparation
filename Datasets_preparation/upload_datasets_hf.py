@@ -16,7 +16,11 @@ import html
 from huggingface_hub import notebook_login
 
 JSON_PATH = "data/Sustainability+Methods_dump.xml.json"
+COLLECTION_GROUND_TRUTH_RAGAS_CHATGPT4_JSON_PATH = "data/collection_ground_truth_ragas_chatgpt4.json"
+
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SUST_WIKI_HUB_1 = "stepkurniawan/sustainability-methods-wiki"
+SUST_WIKI_HUB_2 = "stepkurniawan/qa_sustainability_wiki"
 
 
 #%% LOGIN
@@ -66,15 +70,20 @@ def create_csv_from_dataframe(df):
     df.to_csv("data/Sustainability+Methods_dump.csv", index=False, encoding='utf-8', sep=';')
     print("success create csv from dataframe")
 
+
+
+
+
+############################################################################################################################
 #%% PREPARING DATAFRAME TO UPLOAD TO HUGGINGFACE
 sustainability_df = load_dataframe_from_json(JSON_PATH)
 create_csv_from_dataframe(sustainability_df)
 my_dataset = load_dataset_from_pandas(sustainability_df)
 # my_dataset = my_dataset.train_test_split(test_size=0.2, shuffle=True)
-my_dataset.push_to_hub("stepkurniawan/sustainability-methods-wiki")
+my_dataset.push_to_hub(SUST_WIKI_HUB_1)
 
 #%% UPLOAD TO HUGGINGFACE
-test_load_dataset_from_hf = load_dataset("stepkurniawan/sustainability-methods-wiki")
+test_load_dataset_from_hf = load_dataset(SUST_WIKI_HUB_1)
 print(test_load_dataset_from_hf)
 
 # %%
