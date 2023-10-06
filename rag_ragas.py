@@ -95,11 +95,72 @@ def prepare_qa_dataset_ragas(PATH=QA_FULL_DATASET):
 
     return sp_dataset
 
-def push_to_hf_hub(dataset, HF_DATASET_HUB):
+def push_to_hf_hub(dataset, HF_DATASET_HUB = HF_HUB_QA_DATASET):
     # push to HF
-    dataset.push_to_hub(HF_HUB_QA_DATASET)
+    dataset.push_to_hub(HF_DATASET_HUB)
 
 #### UPLOAD qa dataset TO HF HUB stepkurniawan/qa_sustainability_wiki####
 # sp_dataset = prepare_qa_dataset_ragas()
 # push_to_hf_hub(sp_dataset, HF_HUB_QA_DATASET)
+
+
+
+
+# %% take 3 examples from these questions 
+def load_qa_rag_dataset():
+    # load from HF
+    dataset = load_dataset(HF_HUB_QA_DATASET)
+    print("success loading question answer dataset from HF")
+    print("the first question is: ", dataset['train']['question'][0])
+    print("the first ground truth is: ", dataset['train']['ground_truths'][0])
+    return dataset
+
+qa_dataset = load_qa_rag_dataset()
+# take the first 3 rows from the "train" dataset
+qa_dataset = qa_dataset['train'][:3]
+
+
+
+
+
+# %% try to answer those 3 questions using RAG, and create a dataset 
+"""
+the dataset should look like: 
+DatasetDict({
+    baseline: train({
+        features: ['question', 'ground_truths', 'answer', 'contexts'],
+        num_rows: 3
+    })
+})
+"""
+
+def generate_contexts_answer(dataset:Dataset):
+    """
+    input: Dataset with columns: question, ground_truths
+    output: Dataset with columns: question, ground_truths, contexts, answer
+
+    the context is coming from the retriever
+    the answer is coming from the generator
+    """
+    
+    dataset['train'].set_format(type='pandas')
+
+    # get the question from the dataset
+    questions = dataset['train']['question']
+
+    # create a new column for contexts and answer
+    dataset['train']['contexts'] = pd.Series(dtype='object')
+    dataset['train']['answer'] = pd.Series(dtype='object')
+
+    # find the contexts using the retriever (similarity search)
+    similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
+
+
+    # insert the contexts to the dataset under the column "contexts"
+
+    # find the answer from the generator (llm)
+
+    # insert the answer to the dataset under the column "answer"
+
+
 

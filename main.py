@@ -16,7 +16,6 @@ from rag_splitter import split_data_to_docs
 from langchain.vectorstores import FAISS
 from langchain.llms import CTransformers # to use CPU only
 
-from ragas.metrics import faithfulness, answer_relevancy, context_relevancy, context_recall
 from ragas.langchain import RagasEvaluatorChain
 
 import pandas as pd
@@ -68,7 +67,7 @@ similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 # the embedding of the generator is already inside the model
 
 ## 4.3 prompt
-prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
+# prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
@@ -78,7 +77,9 @@ llm = load_llm_gpt35()
 print("success loading llm model")
 
 ## 4.5 Chain
-qa_chain = retrieval_qa_chain_from_local_db(llm=llm, template_prompt=prompt, vectorstore=db)
+# the similar resopnse is not used here
+# but the chain is summarizing itself from the vector store, based on the arguments there
+qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
 
 ## 4.7 Result
 qa_chain_result = final_result(qa_chain, QUERY)
@@ -91,7 +92,6 @@ print("the result is: ", qa_chain_result['result'])
 """
 ref: https://github.com/explodinggradients/ragas
 """
-# RAGAS_METRICS = [faithfulness, answer_relevancy, context_relevancy, context_recall]
 
 eval_df = evaluate_RAGAS(qa_chain_result)
 
