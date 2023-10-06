@@ -101,7 +101,7 @@ def load_llm_tokenizer_llama2_13b_hf():
         trust_remote_code=True,
         config=model_config,
         quantization_config=bnb_config,
-        device_map="auto",
+        device_map='auto',
         use_auth_token=hf_auth,
     )
     model.eval()

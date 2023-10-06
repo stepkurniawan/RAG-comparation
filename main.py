@@ -71,8 +71,8 @@ similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
-llm = load_llm_gpt35()
-# llm = load_llm_tokenizer_llama2_13b_hf() # TODO: not working because of model.layers.0.mlp.gate_proj.weight doesn't have any device set.
+# llm = load_llm_gpt35()
+llm = load_llm_tokenizer_llama2_13b_hf() # note: it works using worker22
 
 print("success loading llm model")
 

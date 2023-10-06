@@ -4,12 +4,20 @@ from ragas.metrics import faithfulness, answer_relevancy, context_precision, con
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 
+from dotenv import load_dotenv
+import os
+
+from rag_llms import load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
+from rag_embedding import get_retriever_embeddings
+from rag_vectorstore import load_local_faiss_vector_database
+import time
 
 import pandas as pd
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
 HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki"
+HF_HUB_QA_LLAMA2_13B = "stepkurniawan/qa-rag-llama2-13B-chat-hf"
 
 # deprecated 
 def make_eval_chains():
@@ -180,17 +188,37 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     dataset['contexts'] = rag_contexts
     dataset['answer'] = rag_answer
 
-from rag_llms import load_llm_gpt35
-from rag_embedding import get_retriever_embeddings
-from rag_vectorstore import load_local_faiss_vector_database
+    return dataset
 
-llm = load_llm_gpt35()
+
+
+# llm = load_llm_gpt35()
+llm = load_llm_tokenizer_llama2_13b_hf()
 
 embed_model = get_retriever_embeddings()
 
 db = load_local_faiss_vector_database(embed_model)
-generate_contexts_answer(qa_dataset, llm, db)
+start_time = time.time() 
+dataset = generate_contexts_answer(qa_dataset, llm, db)
+end_time = time.time() 
+execution_time = end_time - start_time  # calculate the execution time
+print(f"Execution time: {execution_time:.2f} seconds")
 
+# # %% save the dataset to HF
+load_dotenv()
+hf_token = os.getenv('HF_AUTH_TOKEN')
+dataset.push_to_hub(HF_HUB_QA_LLAMA2_13B, token=hf_token)
+
+
+# %% TESTING TOKEN AND HF
+
+# # create a test dataset
+# test_dataset = Dataset.from_dict({
+#     'question': ['What is the probability of you being so much taller than the average?'],
+#     'ground_truths': [['I am 1.8 meters tall.']],
+# })
+
+# test_dataset.push_to_hub(HF_HUB_QA_LLAMA2_13B, token = hf_token)
 
 
 # %%
