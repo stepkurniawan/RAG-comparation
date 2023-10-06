@@ -4,6 +4,7 @@ from ragas.metrics import faithfulness, answer_relevancy, context_precision, con
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 
+
 import pandas as pd
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
@@ -134,7 +135,7 @@ DatasetDict({
 })
 """
 
-def generate_contexts_answer(dataset:Dataset):
+def generate_contexts_answer(dataset:Dataset, llm, db):
     """
     input: Dataset with columns: question, ground_truths
     output: Dataset with columns: question, ground_truths, contexts, answer
@@ -142,25 +143,54 @@ def generate_contexts_answer(dataset:Dataset):
     the context is coming from the retriever
     the answer is coming from the generator
     """
-    
-    dataset['train'].set_format(type='pandas')
 
     # get the question from the dataset
-    questions = dataset['train']['question']
-
-    # create a new column for contexts and answer
-    dataset['train']['contexts'] = pd.Series(dtype='object')
-    dataset['train']['answer'] = pd.Series(dtype='object')
+    questions = dataset['question']
 
     # find the contexts using the retriever (similarity search)
-    similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
+    # the context is from rag_chains.retrieval_qa_chain_from_local_db()
+    # but then it's stuffed ( summarized )
+    # so we need to find the summarized context -> turns out we cant...
+    # https://python.langchain.com/docs/use_cases/question_answering/how_to/vector_db_qa
+
+    # we can run direclty the generator, and get both the answer (or result) and the contexts (or source_documents) after
+    from rag_chains import retrieval_qa_chain_from_local_db, final_result
+
+    qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
+
+    # create a series to store the contexts and answer
+    rag_contexts = []
+    rag_answer = []
+
+    # loop the query, because each row have different question
+    for query in questions:
+        qa_chain_result = final_result(qa_chain, query)
+        answer = qa_chain_result['result']
+        contexts = qa_chain_result['source_documents']
+        print("the answer is: ", answer)
+        print("the contexts are: ", contexts)
+
+        # insert the contexts to the series "contexts"
+        rag_contexts.append(contexts)
+
+        # insert the answer to the series "contexts"
+        rag_answer.append(answer)
+
+    # insert the contexts and answer to the dataset
+    dataset['contexts'] = rag_contexts
+    dataset['answer'] = rag_answer
+
+from rag_llms import load_llm_gpt35
+from rag_embedding import get_retriever_embeddings
+from rag_vectorstore import load_local_faiss_vector_database
+
+llm = load_llm_gpt35()
+
+embed_model = get_retriever_embeddings()
+
+db = load_local_faiss_vector_database(embed_model)
+generate_contexts_answer(qa_dataset, llm, db)
 
 
-    # insert the contexts to the dataset under the column "contexts"
 
-    # find the answer from the generator (llm)
-
-    # insert the answer to the dataset under the column "answer"
-
-
-
+# %%

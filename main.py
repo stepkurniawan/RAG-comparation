@@ -67,7 +67,7 @@ similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 # the embedding of the generator is already inside the model
 
 ## 4.3 prompt
-# prompt = get_formatted_prompt(context=similar_docs, query=QUERY)
+# prompt = get_formatted_prompt(context=similar_docs, query=QUERY) # TODO: check if this is correct
 
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
@@ -86,15 +86,19 @@ qa_chain_result = final_result(qa_chain, QUERY)
 # qa_chain_result = chain_with_docs(qa_chain, similar_response, QUERY) # deprecated...
 
 print("the result is: ", qa_chain_result['result'])
+print("the source documents are: ", qa_chain_result['source_documents'])
 
 #%% 5. EVALUATION ########################################################
-## RAGAS criteria
+## preparing RAGAS table
 """
 ref: https://github.com/explodinggradients/ragas
 """
 
-eval_df = evaluate_RAGAS(qa_chain_result)
+#### TODO: clean up
+# eval_df = evaluate_RAGAS(qa_chain_result)
+# print(f"{qa_chain_result=}")
 
-print(f"{qa_chain_result=}")
+
+
 
 ## LLM model

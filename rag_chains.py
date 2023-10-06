@@ -8,6 +8,7 @@ from langchain.chains.question_answering import load_qa_chain
 
 
 def retrieval_qa_chain_from_local_db(llm, vectorstore, template_prompt = None):
+    # Ref: https://python.langchain.com/docs/use_cases/question_answering/how_to/vector_db_qa
     # qa_chain_prompt  = PromptTemplate.from_template(template_prompt)
 
     qa_chain = RetrievalQA.from_chain_type(
