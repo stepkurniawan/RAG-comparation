@@ -1,11 +1,12 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 from datasets import load_dataset, Dataset
 
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
-
-from dotenv import load_dotenv
-import os
 
 from rag_llms import load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
 from rag_embedding import get_retriever_embeddings
@@ -18,6 +19,7 @@ RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_reca
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
 HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki"
 HF_HUB_QA_LLAMA2_13B = "stepkurniawan/qa-rag-llama2-13B-chat-hf"
+HF_HUB_TEST = "stepkurniawan/test"
 
 # deprecated 
 def make_eval_chains():
@@ -126,7 +128,8 @@ def load_qa_rag_dataset():
 
 qa_dataset = load_qa_rag_dataset()
 # take the first 3 rows from the "train" dataset
-qa_dataset = qa_dataset['train'][:3]
+# qa_dataset = qa_dataset['train'][:3]
+
 
 
 
@@ -142,6 +145,11 @@ DatasetDict({
     })
 })
 """
+
+def simplify_source_document(docs):
+    # this function should change Document to be just a string
+    output = f"title: {docs.metadata['title']}\n\npage_content: {docs.page_content}"
+    return output
 
 def generate_contexts_answer(dataset:Dataset, llm, db):
     """
@@ -171,12 +179,13 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     rag_answer = []
 
     # loop the query, because each row have different question
-    for query in questions:
+    for index, query in enumerate(questions):
         qa_chain_result = final_result(qa_chain, query)
         answer = qa_chain_result['result']
-        contexts = qa_chain_result['source_documents']
-        print("the answer is: ", answer)
-        print("the contexts are: ", contexts)
+        contexts = qa_chain_result['source_documents'] # TODO: have to flatten this
+        print(f"{index}: question: ", query)
+        print(f"{index}: answer: ", answer)
+        # print("the contexts are: ", contexts)
 
         # insert the contexts to the series "contexts"
         rag_contexts.append(contexts)
@@ -184,41 +193,41 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
         # insert the answer to the series "contexts"
         rag_answer.append(answer)
 
+    # rag_contexts is a list of list of documents. 
+    # it doesnt work. Lets change it to be a list of list of strings
+    rag_contexts = [[simplify_source_document(doc) for doc in docs] for docs in rag_contexts]
+    
     # insert the contexts and answer to the dataset
-    dataset['contexts'] = rag_contexts
     dataset['answer'] = rag_answer
+    dataset['contexts'] = rag_contexts 
 
+    
+    # change to dataset again
+    dataset = Dataset.from_dict(dataset)
     return dataset
 
 
 
-# llm = load_llm_gpt35()
+# %%
+llm = load_llm_gpt35()
 llm = load_llm_tokenizer_llama2_13b_hf()
 
 embed_model = get_retriever_embeddings()
 
 db = load_local_faiss_vector_database(embed_model)
 start_time = time.time() 
+qa_dataset = qa_dataset['train'][:100] # limit only 100 rows 
 dataset = generate_contexts_answer(qa_dataset, llm, db)
 end_time = time.time() 
 execution_time = end_time - start_time  # calculate the execution time
-print(f"Execution time: {execution_time:.2f} seconds")
+print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
 
 # # %% save the dataset to HF
-load_dotenv()
+
 hf_token = os.getenv('HF_AUTH_TOKEN')
 dataset.push_to_hub(HF_HUB_QA_LLAMA2_13B, token=hf_token)
+print("success pushing the dataset to HF")
 
-
-# %% TESTING TOKEN AND HF
-
-# # create a test dataset
-# test_dataset = Dataset.from_dict({
-#     'question': ['What is the probability of you being so much taller than the average?'],
-#     'ground_truths': [['I am 1.8 meters tall.']],
-# })
-
-# test_dataset.push_to_hub(HF_HUB_QA_LLAMA2_13B, token = hf_token)
 
 
 # %%
