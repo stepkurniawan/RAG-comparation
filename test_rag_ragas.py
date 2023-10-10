@@ -17,6 +17,6 @@ test_dataset = Dataset.from_dict(
      })
 
 
-test_dataset.push_to_hub(HF_HUB_TEST, token = hf_token)
+test_dataset.push_to_hub(HF_HUB_TEST, config_name="starters" ,token = hf_token)
 # create local backup
 test_dataset.save_to_disk("data/test_dataset")

@@ -126,7 +126,7 @@ def load_qa_rag_dataset():
     print("the first ground truth is: ", dataset['train']['ground_truths'][0])
     return dataset
 
-qa_dataset = load_qa_rag_dataset()
+# qa_dataset = load_qa_rag_dataset()
 # take the first 3 rows from the "train" dataset
 # qa_dataset = qa_dataset['train'][:3]
 
@@ -147,8 +147,11 @@ DatasetDict({
 """
 
 def simplify_source_document(docs):
-    # this function should change Document to be just a string
-    output = f"title: {docs.metadata['title']}\n\npage_content: {docs.page_content}"
+    output = ""
+    for index, doc in enumerate(docs):
+        # this function should change Document to be just a string
+        output = output + f"| title {index+1}: {doc.metadata['title']} \n| page_content {index+1}: {doc.page_content}\n\n"
+
     return output
 
 def generate_contexts_answer(dataset:Dataset, llm, db):
@@ -182,7 +185,7 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     for index, query in enumerate(questions):
         qa_chain_result = final_result(qa_chain, query)
         answer = qa_chain_result['result']
-        contexts = qa_chain_result['source_documents'] # TODO: have to flatten this
+        contexts = qa_chain_result['source_documents'] 
         print(f"{index}: question: ", query)
         print(f"{index}: answer: ", answer)
         # print("the contexts are: ", contexts)
@@ -195,11 +198,15 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
 
     # rag_contexts is a list of list of documents. 
     # it doesnt work. Lets change it to be a list of list of strings
-    rag_contexts = [[simplify_source_document(doc) for doc in docs] for docs in rag_contexts]
+    # no its still not working, you have to change it to a list of strings (per rows)
+    rag_contexts = [simplify_source_document(docs) for docs in rag_contexts]
     
     # insert the contexts and answer to the dataset
     dataset['answer'] = rag_answer
     dataset['contexts'] = rag_contexts 
+
+    # data processing: change ground_truth column from string to be a list[string]
+    dataset['ground_truths'] = [[x] for x in dataset['ground_truths']]
 
     
     # change to dataset again
@@ -209,25 +216,67 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
 
 
 # %%
-llm = load_llm_gpt35()
+def pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH, subset_name):
+    """
+    input: qa_dataset from HF
+    output: qa_dataset with columns: question, ground_truths, contexts, answer
+    """
+
+    start_time = time.time() 
+    dataset = generate_contexts_answer(qa_dataset, llm, db)
+    end_time = time.time() 
+
+    execution_time = end_time - start_time  # calculate the execution time
+    print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
+
+    # # %% save the dataset to HF
+    
+    hf_token = os.getenv('HF_AUTH_TOKEN')
+    dataset.push_to_hub(HF_HUB_PATH, config_name=subset_name ,token=hf_token) # config name will create a new subset
+    print("success pushing the dataset to HF")
+
+
+
+### load the llm, embed_model, and db
+# llm = load_llm_gpt35()
+
+
 llm = load_llm_tokenizer_llama2_13b_hf()
-
 embed_model = get_retriever_embeddings()
-
 db = load_local_faiss_vector_database(embed_model)
-start_time = time.time() 
-qa_dataset = qa_dataset['train'][:100] # limit only 100 rows 
-dataset = generate_contexts_answer(qa_dataset, llm, db)
-end_time = time.time() 
-execution_time = end_time - start_time  # calculate the execution time
-print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
+qa_dataset = load_qa_rag_dataset()
+qa_dataset = qa_dataset['train'][:2] # limit only 100 rows max
+pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_QA_LLAMA2_13B, "FAISS_x_llama2-13B-chat-hf")
 
-# # %% save the dataset to HF
+# %% EVALUATE #################################################################################
 
-hf_token = os.getenv('HF_AUTH_TOKEN')
-dataset.push_to_hub(HF_HUB_QA_LLAMA2_13B, token=hf_token)
-print("success pushing the dataset to HF")
+def ragas_evaluate(dataset):
+    """
+    input: dataset from HF
+    output: ragas evaluation result
+    """
+    # load the Dataset from DatasetDict
+    dataset = dataset['train']
 
+    # evaluate
+    start_time = time.time() 
 
+    result = evaluate(
+                    dataset,
+                    metrics=[
+                            context_precision,
+                            faithfulness,
+                            answer_relevancy,
+                            context_recall,
+                            # harmfulness,
+                        ],
+                        )
+    end_time = time.time() 
+    execution_time = end_time - start_time  # calculate the execution time
+    print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
+    
+    result = result.to_pandas()
+    return result
 
-# %%
+qa_dataset = load_dataset(HF_HUB_QA_LLAMA2_13B)
+result = ragas_evaluate(qa_dataset)
