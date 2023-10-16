@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 from torch import cuda, bfloat16
 import transformers
 
+LLAMA2_13B_CHAT_MODEL_ID = 'meta-llama/Llama-2-13b-chat-hf'
+LLAMA2_7B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
+LLAMA2_70B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
 
 def load_llm_ctra_llama27b():
     """
@@ -58,13 +61,13 @@ def load_llm_gpt4():
     return llm
 
 
-def load_llm_tokenizer_llama2_13b_hf():
+def load_llm_tokenizer_hf_with_model(model_id):
     """
     Ref: https://github.com/pinecone-io/examples/blob/master/learn/generation/llm-field-guide/llama-2/llama-2-13b-retrievalqa.ipynb
 
     """
     load_dotenv()
-    model_id = 'meta-llama/Llama-2-13b-chat-hf'
+    
     device = f'cuda:{cuda.current_device()}' if cuda.is_available() else 'cpu'
 
     # set quantization configuration to load large model with less GPU memory
@@ -122,7 +125,7 @@ def load_llm_tokenizer_llama2_13b_hf():
         # we pass model parameters here too
         temperature=0.0,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
         max_new_tokens=512,  # mex number of tokens to generate in the output
-        repetition_penalty=1.1  # without this output begins repeating
+        repetition_penalty=0.1  # without this output begins repeating
     )
     llm = HuggingFacePipeline(pipeline=generate_text)
 

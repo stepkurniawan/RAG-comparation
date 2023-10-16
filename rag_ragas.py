@@ -1,3 +1,5 @@
+from typing import Optional
+
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -8,7 +10,9 @@ from ragas.metrics import faithfulness, answer_relevancy, context_precision, con
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 
-from rag_llms import load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
+from rag_llms import load_llm_gpt35, load_llm_tokenizer_hf_with_model
+from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_70B_CHAT_MODEL_ID
+
 from rag_embedding import get_retriever_embeddings
 from rag_vectorstore import load_local_faiss_vector_database
 import time
@@ -18,6 +22,7 @@ import pandas as pd
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
 HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki"
+HF_HUB_QA_LLAMA = "stepkurniawan/qa-rag-llama"
 HF_HUB_QA_LLAMA2_13B = "stepkurniawan/qa-rag-llama2-13B-chat-hf"
 HF_HUB_TEST = "stepkurniawan/test"
 
@@ -146,11 +151,24 @@ DatasetDict({
 })
 """
 
-def simplify_source_document(docs):
+def simplify2_source_document(docs):
     output = ""
     for index, doc in enumerate(docs):
         # this function should change Document to be just a string
         output = output + f"| title {index+1}: {doc.metadata['title']} \n| page_content {index+1}: {doc.page_content}\n\n"
+
+    return output
+
+def simplify_source_document(docs):
+    """
+    get docs, and make it list of list of strings
+    """
+    output = []
+    for index, doc in enumerate(docs):
+        # this functions with take the document's metadata's title and page_content, and put it into list of list of strings
+        title = doc.metadata['title']
+        page_content = doc.page_content
+        output.append(f"| title {index+1}: {title} \n| page_content {index+1}: {page_content}\n\n")
 
     return output
 
@@ -205,9 +223,8 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     dataset['answer'] = rag_answer
     dataset['contexts'] = rag_contexts 
 
-    # data processing: change ground_truth column from string to be a list[string]
+    # data processing: change ground_truth column from string to be a list[list[string]]
     dataset['ground_truths'] = [[x] for x in dataset['ground_truths']]
-
     
     # change to dataset again
     dataset = Dataset.from_dict(dataset)
@@ -216,14 +233,14 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
 
 
 # %%
-def pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH, subset_name):
+def pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH, subset_name:Optional[str]=None):
     """
     input: qa_dataset from HF
     output: qa_dataset with columns: question, ground_truths, contexts, answer
     """
 
     start_time = time.time() 
-    dataset = generate_contexts_answer(qa_dataset, llm, db)
+    gen_dataset = generate_contexts_answer(qa_dataset, llm, db)
     end_time = time.time() 
 
     execution_time = end_time - start_time  # calculate the execution time
@@ -232,21 +249,28 @@ def pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH, subset_
     # # %% save the dataset to HF
     
     hf_token = os.getenv('HF_AUTH_TOKEN')
-    dataset.push_to_hub(HF_HUB_PATH, config_name=subset_name ,token=hf_token) # config name will create a new subset
+    if subset_name is not None:
+        gen_dataset.push_to_hub(HF_HUB_PATH, config_name=subset_name ,token=hf_token) # config name will create a new subset
+    else:
+        subset_name = str(llm.pipeline.model.name_or_path)
+        subset_name = subset_name.split("/")[-1]
+        gen_dataset.push_to_hub(HF_HUB_PATH,config_name=subset_name, token=hf_token)
+        gen_dataset.push_to_hub(HF_HUB_PATH, token=hf_token)
     print("success pushing the dataset to HF")
 
+    return gen_dataset
 
 
 ### load the llm, embed_model, and db
 # llm = load_llm_gpt35()
 
 
-llm = load_llm_tokenizer_llama2_13b_hf()
+llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID) 
 embed_model = get_retriever_embeddings()
 db = load_local_faiss_vector_database(embed_model)
 qa_dataset = load_qa_rag_dataset()
-qa_dataset = qa_dataset['train'][:2] # limit only 100 rows max
-pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_QA_LLAMA2_13B, "FAISS_x_llama2-13B-chat-hf")
+qa_dataset = qa_dataset['train'][:3] # limit only 100 rows max
+gen_dataset = pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_QA_LLAMA) # TODO: give subset_name
 
 # %% EVALUATE #################################################################################
 
@@ -256,7 +280,10 @@ def ragas_evaluate(dataset):
     output: ragas evaluation result
     """
     # load the Dataset from DatasetDict
-    dataset = dataset['train']
+    try: 
+        dataset = dataset['train']
+    except:
+        print("ragas_evaluate(): no train dataset found, using the dataset directly")
 
     # evaluate
     start_time = time.time() 
@@ -278,5 +305,6 @@ def ragas_evaluate(dataset):
     result = result.to_pandas()
     return result
 
-qa_dataset = load_dataset(HF_HUB_QA_LLAMA2_13B)
+fiqa_eval = load_dataset("explodinggradients/fiqa", "ragas_eval")['baseline']
+qa_dataset = load_dataset(HF_HUB_QA_LLAMA, "Llama-2-13b-chat-hf")
 result = ragas_evaluate(qa_dataset)

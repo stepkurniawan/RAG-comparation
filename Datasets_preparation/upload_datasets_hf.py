@@ -8,19 +8,25 @@ to be able to make it public easily, the author decided to create a dataframe an
 #%% pip install ipywidgets
 
 from datasets import load_dataset, Dataset
-import os
 import xmltodict
 import json
 import pandas as pd
 import html
 from huggingface_hub import notebook_login
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+hf_token = os.getenv('HF_AUTH_TOKEN')
+
 JSON_PATH = "data/Sustainability+Methods_dump.xml.json"
 COLLECTION_GROUND_TRUTH_RAGAS_CHATGPT4_JSON_PATH = "data/collection_ground_truth_ragas_chatgpt4.json"
+QA_HAND_PICKED_PATH = "data/hand_picked_questions.json"
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SUST_WIKI_HUB_1 = "stepkurniawan/sustainability-methods-wiki"
 SUST_WIKI_HUB_2 = "stepkurniawan/qa_sustainability_wiki"
+
 
 
 #%% LOGIN
@@ -50,7 +56,7 @@ def create_dataset_to_current_directory():
     ds.info.write_to_directory(dir_path)
     return ds
 
-def load_dataframe_from_json(json_path):
+def load_dataframe_from_json_dump(json_path):
     dict = load_dict_from_json(json_path)
     pages = dict['mediawiki']['page']
     df = pd.DataFrame(pages)
@@ -66,8 +72,8 @@ def load_dataset_from_pandas(df):
     print("success load dataset from pandas dataframe")
     return dataset
 
-def create_csv_from_dataframe(df):
-    df.to_csv("data/Sustainability+Methods_dump.csv", index=False, encoding='utf-8', sep=';')
+def create_csv_from_dataframe(df, file_name):
+    df.to_csv(f"data/{file_name}.csv", index=False, encoding='utf-8', sep=';')
     print("success create csv from dataframe")
 
 
@@ -76,14 +82,24 @@ def create_csv_from_dataframe(df):
 
 ############################################################################################################################
 #%% PREPARING DATAFRAME TO UPLOAD TO HUGGINGFACE
-sustainability_df = load_dataframe_from_json(JSON_PATH)
-create_csv_from_dataframe(sustainability_df)
-my_dataset = load_dataset_from_pandas(sustainability_df)
+# sustainability_df = load_dataframe_from_json_dump(JSON_PATH)
+# create_csv_from_dataframe(sustainability_df, "sustainability_wiki_qa")
+# my_dataset = load_dataset_from_pandas(sustainability_df)
 # my_dataset = my_dataset.train_test_split(test_size=0.2, shuffle=True)
-my_dataset.push_to_hub(SUST_WIKI_HUB_1)
+# my_dataset.push_to_hub(SUST_WIKI_HUB_1)
 
 #%% UPLOAD TO HUGGINGFACE
-test_load_dataset_from_hf = load_dataset(SUST_WIKI_HUB_1)
-print(test_load_dataset_from_hf)
+# test_load_dataset_from_hf = load_dataset(SUST_WIKI_HUB_1)
+# print(test_load_dataset_from_hf)
+
+# %%  UPLOAD HANDPICKED JSON TO HF #######################
+handpicked_qa_dict = load_dict_from_json(QA_HAND_PICKED_PATH)
+handpicked_qa_df = pd.DataFrame(handpicked_qa_dict)
+# TODO drop other columns than question and ground_truths
+
+create_csv_from_dataframe(handpicked_qa_df, "handpicked_qa")
+handpicked_dataset = load_dataset_from_pandas(handpicked_qa_df)
+handpicked_dataset.push_to_hub(SUST_WIKI_HUB_1, token=hf_token, config_name = "50_QA")
+
 
 # %%

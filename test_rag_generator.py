@@ -1,7 +1,9 @@
 #%%
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
 from rag_prompting import set_custom_prompt
-from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_ctra_llama2_13b, load_llm_tokenizer_llama2_13b_hf
+from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_ctra_llama2_13b, load_llm_tokenizer_hf_with_model
+from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
+
 from rag_chains import retrieval_qa_chain_from_local_db, final_result
 from rag_vectorstore import load_chroma_db, load_local_faiss_vector_database
 
@@ -75,7 +77,7 @@ test_llm = test_load_llm_ctra_llama2_13b()
 
 #%%
 def test_load_llm_tokenizer_llama2_13b_hf():
-    llm = load_llm_tokenizer_llama2_13b_hf()
+    llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID)
     assert isinstance(llm, HuggingFacePipeline) , "Failed getting the llm, check test_load_llm_ctra_llama27b()"
     assert (llm.model_id == 'gpt2')
     return llm
