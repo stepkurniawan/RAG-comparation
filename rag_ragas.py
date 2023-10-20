@@ -3,6 +3,8 @@ from typing import Optional
 from dotenv import load_dotenv
 import os
 load_dotenv()
+hf_token = os.getenv('HF_AUTH_TOKEN')
+
 
 from datasets import load_dataset, Dataset
 
@@ -12,6 +14,7 @@ from ragas import evaluate
 
 from rag_llms import load_llm_gpt35, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_70B_CHAT_MODEL_ID
+from rag_chains import retrieval_qa_chain_from_local_db, final_result
 
 from rag_embedding import get_retriever_embeddings
 from rag_vectorstore import load_local_faiss_vector_database
@@ -22,9 +25,21 @@ import pandas as pd
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
 HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki"
+HF_HUB_QA_DATASET_2 = "stepkurniawan/sustainability-methods-wiki"
 HF_HUB_QA_LLAMA = "stepkurniawan/qa-rag-llama"
+HF_HUB_RAGAS = "stepkurniawan/RAGAS_50"
 HF_HUB_QA_LLAMA2_13B = "stepkurniawan/qa-rag-llama2-13B-chat-hf"
 HF_HUB_TEST = "stepkurniawan/test"
+
+
+########################################################################################
+
+
+def load_dataset_from_pandas(df):
+    dataset = Dataset.from_pandas(df)
+    print("success load dataset from pandas dataframe")
+    return dataset
+
 
 # deprecated 
 def make_eval_chains():
@@ -135,8 +150,14 @@ def load_qa_rag_dataset():
 # take the first 3 rows from the "train" dataset
 # qa_dataset = qa_dataset['train'][:3]
 
+def load_50_qa_dataset():
+    dataset = load_dataset(HF_HUB_QA_DATASET_2, "50_QA")
+    print("success loading question answer dataset from HF")
+    dataset = dataset.select_columns(['question', 'ground_truths'])     # drop dataset['train']['contexts'] and dataset['train']['summary'] because we will use retriever to fill that
 
-
+    print("the first question is: ", dataset['train']['question'][0])
+    print("the first ground truth is: ", dataset['train']['ground_truths'][0])
+    return dataset
 
 
 
@@ -151,6 +172,7 @@ DatasetDict({
 })
 """
 
+#deprecated
 def simplify2_source_document(docs):
     output = ""
     for index, doc in enumerate(docs):
@@ -181,6 +203,12 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     the answer is coming from the generator
     """
 
+    try:
+        print("to do modification on the dataset, change to dataframe")
+        dataset = dataset.to_pandas()
+    except:
+        print("dataset is already a dict. just proceed.")
+
     # get the question from the dataset
     questions = dataset['question']
 
@@ -191,8 +219,6 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     # https://python.langchain.com/docs/use_cases/question_answering/how_to/vector_db_qa
 
     # we can run direclty the generator, and get both the answer (or result) and the contexts (or source_documents) after
-    from rag_chains import retrieval_qa_chain_from_local_db, final_result
-
     qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
 
     # create a series to store the contexts and answer
@@ -201,7 +227,8 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
 
     # loop the query, because each row have different question
     for index, query in enumerate(questions):
-        qa_chain_result = final_result(qa_chain, query)
+        qa_chain_result = final_result(qa_chain, query) # result has 4 keys: questions,ground_truths, result, source_documents 
+
         answer = qa_chain_result['result']
         contexts = qa_chain_result['source_documents'] 
         print(f"{index}: question: ", query)
@@ -231,50 +258,47 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     return dataset
 
 
+def generate_context_answer_langchain(dataset:Dataset, llm, db):
+    """
+    input: Dataset with columns: question, ground_truths
+    output: Dataset with columns: question, ground_truths, contexts, answer
+
+    the context is coming from the retriever
+    the answer is coming from the generator
+    """
+    # get the question from the dataset
+    questions = dataset['question']
+    qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
+
+    for index, query in enumerate(questions):
+        qa_chain_result = final_result(qa_chain, query) # result has 4 keys: questions,ground_truths, result, source_documents 
+        
+        # append the "result" and "source_documents" to the dataset
+        # TODO TEST
+        dataset['result'][index] = qa_chain_result['result']
+        dataset['source_documents'][index] = qa_chain_result['source_documents']
+    
+    return dataset
 
 # %%
-def pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH, subset_name:Optional[str]=None):
-    """
-    input: qa_dataset from HF
-    output: qa_dataset with columns: question, ground_truths, contexts, answer
-    """
 
-    start_time = time.time() 
-    gen_dataset = generate_contexts_answer(qa_dataset, llm, db)
-    end_time = time.time() 
 
-    execution_time = end_time - start_time  # calculate the execution time
-    print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
-
-    # # %% save the dataset to HF
-    
-    hf_token = os.getenv('HF_AUTH_TOKEN')
-    if subset_name is not None:
-        gen_dataset.push_to_hub(HF_HUB_PATH, config_name=subset_name ,token=hf_token) # config name will create a new subset
-    else:
-        subset_name = str(llm.pipeline.model.name_or_path)
-        subset_name = subset_name.split("/")[-1]
-        gen_dataset.push_to_hub(HF_HUB_PATH,config_name=subset_name, token=hf_token)
-        gen_dataset.push_to_hub(HF_HUB_PATH, token=hf_token)
-    print("success pushing the dataset to HF")
-
-    return gen_dataset
 
 
 ### load the llm, embed_model, and db
 # llm = load_llm_gpt35()
 
 
-llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID) 
-embed_model = get_retriever_embeddings()
-db = load_local_faiss_vector_database(embed_model)
-qa_dataset = load_qa_rag_dataset()
-qa_dataset = qa_dataset['train'][:3] # limit only 100 rows max
-gen_dataset = pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_QA_LLAMA) # TODO: give subset_name
+# llm = load_llm_tokenizer_hf_with_model(LLAMA2_7B_CHAT_MODEL_ID) 
+# embed_model = get_retriever_embeddings()
+# db = load_local_faiss_vector_database(embed_model)
+# qa_dataset = load_50_qa_dataset()
+# qa_dataset = qa_dataset['train'][:3] # if you limit using [:2] -> it will become a dictionary, not a dataset
+# gen_dataset = pushing_dataset_to_hf_hub_pipeline(llm, db, qa_dataset, HF_HUB_PATH=HF_HUB_QA_LLAMA) 
 
 # %% EVALUATE #################################################################################
 
-def ragas_evaluate(dataset):
+def ragas_evaluate_push(dataset):
     """
     input: dataset from HF
     output: ragas evaluation result
@@ -303,8 +327,16 @@ def ragas_evaluate(dataset):
     print(f"Execution time: {execution_time:.2f} seconds, or {execution_time/60:.2f} minutes, or {execution_time/3600:.2f} hours")
     
     result = result.to_pandas()
-    return result
+
+    result_dataset = load_dataset_from_pandas(result)
+
+    subset_name = dataset.config_name # get the name of the llm from the dataset
+    result_dataset.push_to_hub(HF_HUB_RAGAS, token=hf_token, config_name=subset_name)
+    
+    return result_dataset
+
+
 
 fiqa_eval = load_dataset("explodinggradients/fiqa", "ragas_eval")['baseline']
-qa_dataset = load_dataset(HF_HUB_QA_LLAMA, "Llama-2-13b-chat-hf")
-result = ragas_evaluate(qa_dataset)
+qa_dataset = load_dataset("stepkurniawan/qa-rag-llama", "Llama-2-13b-chat-hf")
+result = ragas_evaluate_push(qa_dataset)
