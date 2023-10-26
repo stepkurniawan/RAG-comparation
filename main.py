@@ -3,11 +3,13 @@
 
 import os
 from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset, load_sustainability_wiki_langchain_documents
-from rag_embedding import get_retriever_embeddings, get_generator_embeddings
+from rag_embedding import get_retriever_embeddings, get_generator_embeddings, get_embed_model
+from rag_embedding import embedding_ids
 from rag_vectorstore import create_local_faiss_vector_database, load_local_faiss_vector_database
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
-from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_llama2_13b_hf
+from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_hf_with_model
+from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
 from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
 from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
 from rag_ragas import make_eval_chains, evaluate_RAGAS
@@ -41,7 +43,8 @@ data = load_sustainability_wiki_langchain_documents()
 docs = split_data_to_docs(data)
 
 # 3.1 embedding ###########
-embed_model = get_retriever_embeddings()
+# embed_model = get_retriever_embeddings()
+embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 
 # 3.3 VECTOR STORE ######################################################
 
@@ -72,7 +75,7 @@ similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 ## 4.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
 # llm = load_llm_gpt35()
-llm = load_llm_tokenizer_llama2_13b_hf() # note: it works using worker22
+llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID) # note: it works using worker22
 
 print("success loading llm model")
 

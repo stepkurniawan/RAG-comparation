@@ -30,7 +30,7 @@ def split_data_to_docs(data, chunk_size = 200):
     splitter = RecursiveCharacterTextSplitter(
                 separators=["\n\n", "\n", " ", ""],
                 chunk_size=chunk_size, 
-                chunk_overlap=chunk_size*0.2,
+                chunk_overlap=chunk_size*0.1,
                 length_function=length_function,
                 )
 

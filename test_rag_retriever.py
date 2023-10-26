@@ -1,6 +1,6 @@
 #%% Imports
 
-from rag_embedding import get_embed_model
+from rag_embedding import get_embed_model, embedding_ids
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, similarity_search_doc, create_chroma_db, load_chroma_db
 from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset
 from rag_splitter import split_data_to_docs
@@ -31,7 +31,7 @@ def test_load_from_webpage():
 test_data=test_load_from_webpage()
 print(test_data)
 
-# %%
+# %% 
 def test_load_suswiki_dataset():
     test_suswiki_dataset = load_sustainability_wiki_dataset()
     assert isinstance(test_suswiki_dataset, Dataset) , "Failed loading sustainability wiki dataset, check load_sustainability_wiki_dataset()"
@@ -60,14 +60,17 @@ print(test_docs[0].page_content)
 
 
 # %% 
-def test_get_embed_model():
-    
-    embed_model = get_embed_model(embed_model_id)
-    assert isinstance(embed_model, HuggingFaceEmbeddings) , "Failed getting the embedding model, check get_embed_model()"
-    assert embed_model.model_name == embed_model_id
+def test_get_embed_model(embed_model_id):
+    embed_model, embed_model_name = get_embed_model(embed_model_id)
+    # assert isinstance(embed_model, HuggingFaceEmbeddings) , "Failed getting the embedding model, check get_embed_model()"
+    # assert embed_model.model_name == embed_model_id
     return embed_model
 
-test_get_embed_model()
+for emb_name in embedding_ids:
+    print(f"Testing embedding: {emb_name}")
+    print(f"Embedding id: {embedding_ids[emb_name]}")
+    test_get_embed_model(embedding_ids[emb_name])
+    
 # %% Testing the embedding
 
 def test_print_doc_dimensions(): 

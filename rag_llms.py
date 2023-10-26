@@ -8,7 +8,7 @@ import transformers
 
 LLAMA2_13B_CHAT_MODEL_ID = 'meta-llama/Llama-2-13b-chat-hf'
 LLAMA2_7B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
-LLAMA2_70B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
+LLAMA2_70B_CHAT_MODEL_ID = 'meta-llama/Llama-2-70b-chat-hf'
 
 def load_llm_ctra_llama27b():
     """
@@ -125,7 +125,7 @@ def load_llm_tokenizer_hf_with_model(model_id):
         # we pass model parameters here too
         temperature=0.0,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
         max_new_tokens=512,  # mex number of tokens to generate in the output
-        repetition_penalty=0.1  # without this output begins repeating
+        repetition_penalty=0.2  # without this output begins repeating
     )
     llm = HuggingFacePipeline(pipeline=generate_text)
 
