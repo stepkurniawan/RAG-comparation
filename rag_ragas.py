@@ -16,23 +16,25 @@ from rag_llms import load_llm_gpt35, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_70B_CHAT_MODEL_ID
 from rag_chains import retrieval_qa_chain_from_local_db, final_result
 
-from rag_embedding import get_retriever_embeddings
+from rag_embedding import get_embed_model, embedding_ids
 from rag_vectorstore import load_local_faiss_vector_database
 import time
+import transformers
+
+from rag_load_data import load_sustainability_wiki_langchain_documents, load_from_webpage, load_qa_rag_dataset, load_50_qa_dataset
 
 import pandas as pd
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
-HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki"
-HF_HUB_QA_DATASET_2 = "stepkurniawan/sustainability-methods-wiki"
-HF_HUB_QA_LLAMA = "stepkurniawan/qa-rag-llama"
-HF_HUB_RAGAS = "stepkurniawan/RAGAS_50"
 HF_HUB_QA_LLAMA2_13B = "stepkurniawan/qa-rag-llama2-13B-chat-hf"
 HF_HUB_TEST = "stepkurniawan/test"
 
 
-########################################################################################
+#######################################
+transformers.logging.set_verbosity_info()
+
+# LOAD DATASET #######################################################################################
 
 
 def load_dataset_from_pandas(df):
@@ -137,27 +139,7 @@ def push_to_hf_hub(dataset, HF_DATASET_HUB = HF_HUB_QA_DATASET):
 
 
 
-# %% take 3 examples from these questions 
-def load_qa_rag_dataset():
-    # load from HF
-    dataset = load_dataset(HF_HUB_QA_DATASET)
-    print("success loading question answer dataset from HF")
-    print("the first question is: ", dataset['train']['question'][0])
-    print("the first ground truth is: ", dataset['train']['ground_truths'][0])
-    return dataset
 
-# qa_dataset = load_qa_rag_dataset()
-# take the first 3 rows from the "train" dataset
-# qa_dataset = qa_dataset['train'][:3]
-
-def load_50_qa_dataset():
-    dataset = load_dataset(HF_HUB_QA_DATASET_2, "50_QA")
-    print("success loading question answer dataset from HF")
-    dataset = dataset.select_columns(['question', 'ground_truths'])     # drop dataset['train']['contexts'] and dataset['train']['summary'] because we will use retriever to fill that
-
-    print("the first question is: ", dataset['train']['question'][0])
-    print("the first ground truth is: ", dataset['train']['ground_truths'][0])
-    return dataset
 
 
 
@@ -286,11 +268,9 @@ def generate_context_answer_langchain(dataset:Dataset, llm, db):
 
 
 ### load the llm, embed_model, and db
-# llm = load_llm_gpt35()
-
 
 # llm = load_llm_tokenizer_hf_with_model(LLAMA2_7B_CHAT_MODEL_ID) 
-# embed_model = get_retriever_embeddings()
+# embed_model = get_embed_model(embedding_ids['BGE_LARGE_ID'])
 # db = load_local_faiss_vector_database(embed_model)
 # qa_dataset = load_50_qa_dataset()
 # qa_dataset = qa_dataset['train'][:3] # if you limit using [:2] -> it will become a dictionary, not a dataset
@@ -336,7 +316,35 @@ def ragas_evaluate_push(dataset):
     return result_dataset
 
 
+# TESTING RAGAS
 
-fiqa_eval = load_dataset("explodinggradients/fiqa", "ragas_eval")['baseline']
-qa_dataset = load_dataset("stepkurniawan/qa-rag-llama", "Llama-2-13b-chat-hf")
-result = ragas_evaluate_push(qa_dataset)
+# fiqa_eval = load_dataset("explodinggradients/fiqa", "ragas_eval")['baseline']
+qa_dataset = load_dataset("stepkurniawan/qa-rag-llama", "Llama-2-13b-chat-hf", download_mode="force_redownload")
+# print("something")
+# result = ragas_evaluate_push(qa_dataset)
+
+
+# %% RETRIEVER EVALUATION ########################################################
+
+def retriever_evaluation(dataset): 
+    """
+    input: query, similar_docs, and ground_truths
+    output: context precision, recall, and F-measure 
+    """
+    from ragas.metrics import ContextPrecision
+    context_precision = ContextPrecision()
+
+    results = evaluate(
+                    dataset,
+                    metrics=[
+                            context_precision,
+                            context_recall,
+                        ],
+                        )
+    
+    return results
+
+result = retriever_evaluation(qa_dataset['train'])
+#save result to csv under data dir
+result.to_csv('data/retriever_evaluation.csv')
+print(result)

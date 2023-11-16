@@ -4,7 +4,10 @@ from langchain.vectorstores import FAISS, Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers import SVMRetriever
 
+from datasets import Dataset, DatasetDict
 import numpy as np
+
+VECTORSTORE_NAMES = ['FAISS', 'Chroma']
 
 FAISS_PATH = "vectorstores/db_faiss"
 CHROMA_PATH = "vectorstores/db_chroma"
@@ -26,12 +29,8 @@ def dataset_to_texts(data):
     texts = data_pd['chunk'].to_numpy()
     return texts
 
-# create vector database
-def create_local_faiss_vector_database(texts, embeddings, DB_PATH, data=None):
-    """
-    Create a local vector database from a list of texts and an embedding model.
-    you can change the input from texts or data
-    """
+# deprecated
+def create_faiss_db(documents, embedding, chunk_size_n=500, data=None):
     # Loader for PDFs
     # loader = DirectoryLoader(DATA_PATH, glob = '*.pdf', loader_cls= PyPDFLoader)
     # documents = loader.load()
@@ -40,13 +39,14 @@ def create_local_faiss_vector_database(texts, embeddings, DB_PATH, data=None):
 
     # text splitter for dataset
     if data is not None:
-        texts = dataset_to_texts(data)
-        text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
-        texts = text_splitter.split_texts(texts)
+        documents = dataset_to_texts(data)
+        text_splitter = RecursiveCharacterTextSplitter (chunk_size = chunk_size_n, chunk_overlap = 50)
+        documents = text_splitter.split_texts(documents)
     
     # db = FAISS.from_texts(texts, embeddings)
-    db = FAISS.from_documents(texts, embeddings)
-    db.save_local(DB_PATH)
+    db = FAISS.from_documents(documents, embedding)
+    db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n))
+    return db
 
 def load_local_faiss_vector_database(embeddings):
     """
@@ -66,14 +66,53 @@ def load_chroma_db(embeddings):
     vectorstore = Chroma(persist_directory=CHROMA_PATH, 
                          embedding_function=embeddings)
     return vectorstore
-    
 
-def similarity_search_doc(db, query):
+
+def create_db_pipeline(knowledge_base, vectorstore_name, texts, embedding, data=None):
+    """
+    Create a local vector database from a list of texts and an embedding model.
+    you can change the input from texts or data
+    """
+    embedding_name = embedding.model_name.split('/')[-1]
+
+    if vectorstore_name=='FAISS':
+        # db = FAISS.from_texts(texts, embeddings)
+        save_path = FAISS_PATH + "/" + knowledge_base + "/" + embedding_name
+        db = FAISS.from_documents(texts, embedding)
+        db.save_local(save_path)
+
+    if vectorstore_name=='Chroma':
+        save_path = CHROMA_PATH + "/" + knowledge_base + "/" + embedding_name
+        db = Chroma.from_documents(documents=texts, 
+                                            embedding=embedding,
+                                            persist_directory=save_path)
+        
+
+def load_db_pipeline(knowledge_base, vectorstore_name, embedding):
+    """
+    load db from local into variable
+    """
+    embedding_name = embedding.model_name.split('/')[-1]
+
+    if vectorstore_name=='FAISS':
+        load_path = FAISS_PATH + "/" + knowledge_base + "/" + embedding_name
+        db = FAISS.load_local(load_path)
+
+    if vectorstore_name=='Chroma':
+        load_path = CHROMA_PATH + "/" + knowledge_base + "/" + embedding_name
+        db = Chroma(persist_directory=load_path, 
+                         embedding_function=embedding)
+    return db
+
+
+
+
+def similarity_search_doc(db, query, top_k=3):
     """
     Ref:
     https://github.com/JayZeeDesign/Knowledgebase-embedding/blob/main/app.py
     """
-    similar_response = db.similarity_search(query, k=3)
+    similar_response = db.similarity_search(query, k=top_k)
 
     page_contents_array = get_content_from_similarity_search(similar_response)
 
@@ -81,12 +120,35 @@ def similarity_search_doc(db, query):
 
     return page_contents_array
 
+def multi_similarity_search_doc(db, dataset, top_k=3):
+    """
+    Ref: similar to similarity_search_doc(), but for multiple queries
+    input: dataset with columns: questions, ground_truths
+    output: dataset with columns: questions, ground_truths, contexts
+    """
+    
+    try: 
+        dataset = dataset['train']
+    except:
+        pass
 
-def svm_similarity_search_doc(documents, query, embed_model):
+    # change dataset into dataframe
+    dataframe = dataset.to_pandas()
+
+    # for every question, do similarity search, save the result as a new column called "contexts"
+    dataframe['contexts'] = dataframe['question'].apply(lambda q: similarity_search_doc(db, q, top_k))
+
+    # save the dataframe as a new dataset
+    dataset_new = Dataset.from_pandas(dataframe)
+    
+    return dataset_new
+
+
+def svm_similarity_search_doc(documents, query, embed_model, top_k):
 
     svm_retriever = SVMRetriever.from_documents(documents=documents,
                                                 embeddings=embed_model,
-                                                k = 3,
+                                                k = top_k,
                                                 relevancy_threshold = 0.3)
     docs_svm=svm_retriever.get_relevant_documents(query)
     docs_svm_list = get_content_from_similarity_search(docs_svm)

@@ -5,7 +5,7 @@ import os
 from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_sustainability_wiki_dataset, load_sustainability_wiki_langchain_documents
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings, get_embed_model
 from rag_embedding import embedding_ids
-from rag_vectorstore import create_local_faiss_vector_database, load_local_faiss_vector_database
+from rag_vectorstore import create_faiss_db, load_local_faiss_vector_database
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_hf_with_model
@@ -47,7 +47,6 @@ docs = split_data_to_docs(data)
 embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 
 # 3.3 VECTOR STORE ######################################################
-
 ## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
@@ -64,6 +63,20 @@ db = load_local_faiss_vector_database(embed_model)
 
 # similar_response = similarity_search_doc(db, QUERY)
 similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
+
+
+### 3.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
+retriever_evaluation = evaluate(
+                    dataset,
+                    metrics=[
+                            context_precision,
+                            faithfulness,
+                            answer_relevancy,
+                            context_recall,
+                            # harmfulness,
+                        ],
+                        )
+
 
 #%% 4. GENERATOR #####################################################
 ## 4.1 embedding

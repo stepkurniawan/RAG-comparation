@@ -14,7 +14,9 @@ Example of token splitters:
 from langchain.text_splitter import RecursiveCharacterTextSplitter, CharacterTextSplitter
 import tiktoken
 
+# VARIABLES
 
+chuck_sizes_list = [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600]
 
 # using tiktoken as tokenizer 
 
@@ -27,6 +29,10 @@ def length_function(text: str) -> int:
 # Tries to split on them in order until the chunks are small enough
 # Keep paragraphs, sentences, words together as long as possible
 def split_data_to_docs(data, chunk_size = 200):
+    """
+    input : documents
+    output : list of Document objects
+    """
     splitter = RecursiveCharacterTextSplitter(
                 separators=["\n\n", "\n", " ", ""],
                 chunk_size=chunk_size, 
