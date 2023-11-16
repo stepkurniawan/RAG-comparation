@@ -187,13 +187,19 @@ for chunk_size in chuck_sizes_list[:]:
     context_precision = ContextPrecision()
     context_recall = ContextRecall(batch_size=10)
 
-
+    print("Evaluating context precision...")
     similar_context = context_precision.score(similar_context)
+    print("Evaluating context recall...")
     similar_context = context_recall.score(similar_context)
 
     similar_context_df = pd.DataFrame(similar_context)
     # save the answer into a csv
-    similar_context_df.to_csv(f"data/retriever_evaluation_{chunk_size}.csv")
+    print("creating csv with chunk_size: ", chunk_size)
+    similar_context_df.to_csv(f"data/retriever_evaluation_{chunk_size}.csv", sep="|", )
 
-    TODO: check this value and create a graph
+    #save answer to json
+    print("creating json with chunk_size: ", chunk_size)
+    similar_context_df.to_json(f"data/retriever_evaluation_{chunk_size}.json")
+
+    # TODO: check this value and create a graph
 

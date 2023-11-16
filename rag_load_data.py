@@ -61,7 +61,7 @@ def load_sustainability_wiki_langchain_documents():
 
 
 def load_from_webpage(link):
-    loader = WebBaseLoader(link)
+    loader = WebBaseLoader(link, verify_ssl=False)
     data = loader.load()
     print(f'success load data from webpage: {link}')
     return data
