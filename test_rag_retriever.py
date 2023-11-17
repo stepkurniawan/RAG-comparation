@@ -166,40 +166,73 @@ embed_model , _ = get_embed_model(embedding_ids['BGE_LARGE_ID'])
 # %% FINDING THE BEST TEXT SPLIT ##########################################
 # TODO output: graph with X axis: chunk_size, Y axis: context recall, precision, and F-measure
 
-# for each chunk size, split the data (document), and create a vectorstore
-for chunk_size in chuck_sizes_list[:]:
-    print(f"Testing chunk_size: {chunk_size}")
-    test_docs = split_data_to_docs(test_data, chunk_size)
-    print(f"Number of docs: {len(test_docs)}")
+def compare_text_splitter(embed_id, top_k): 
+    # for each chunk size, split the data (document), and create a vectorstore
+    for chunk_size in chuck_sizes_list[:]:
+        print(f"Testing chunk_size: {chunk_size}")
+        test_docs = split_data_to_docs(test_data, chunk_size)
+        print(f"Number of docs: {len(test_docs)}")
 
-    # create vectorstore
-    init_embed_id = embedding_ids['BGE_LARGE_ID']
-    embed_model , _ = get_embed_model(init_embed_id)
-    vectorstore = create_faiss_db(test_docs, embed_model)
+        # create vectorstore
+        embed_model , _ = get_embed_model(embed_id)
+        vectorstore = create_faiss_db(test_docs, embed_model)
 
-    # load questions
-    qa_dataset = load_50_qa_dataset()
+        # load questions
+        qa_dataset = load_50_qa_dataset()
 
-    # get similarity search
-    similar_context = multi_similarity_search_doc(vectorstore, qa_dataset, 1)
+        # get similarity search
+        similar_context = multi_similarity_search_doc(vectorstore, qa_dataset, top_k)
 
-    # answer using ragas evaluate
-    context_precision = ContextPrecision()
-    context_recall = ContextRecall(batch_size=10)
+        # answer using ragas evaluate
+        context_precision = ContextPrecision()
+        context_recall = ContextRecall(batch_size=10)
 
-    print("Evaluating context precision...")
-    similar_context = context_precision.score(similar_context)
-    print("Evaluating context recall...")
-    similar_context = context_recall.score(similar_context)
+        print("Evaluating context precision...")
+        similar_context = context_precision.score(similar_context)
+        print("Evaluating context recall...")
+        similar_context = context_recall.score(similar_context)
 
-    similar_context_df = pd.DataFrame(similar_context)
-    # save the answer into a csv
-    print("creating csv with chunk_size: ", chunk_size)
-    similar_context_df.to_csv(f"data/retriever_evaluation_{chunk_size}.csv", sep="|", )
+        similar_context_df = pd.DataFrame(similar_context)
+        # save the answer into a csv
+        print("creating csv with chunk_size: ", chunk_size)
 
-    #save answer to json
-    print("creating json with chunk_size: ", chunk_size)
-    similar_context_df.to_json(f"data/retriever_evaluation_{chunk_size}.json")
+        # Check if the directory exists, if not, create it
+        file_path = f"./data/text_splitter_eval/retriever_evaluation_{chunk_size}_{embed_id}_{top_k}"
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+        similar_context_df.to_csv(file_path +".csv", sep="|", )
 
-    # TODO: check this value and create a graph
+        #save answer to json
+        print("creating json with chunk_size: ", chunk_size)
+        similar_context_df.to_json(file_path+".json")
 
+
+# %% CHECK THE CSV ##########################################
+
+def sanity_check_text_splitter_results(embed_id, top_k):
+    # create a dict based on the {chunk_size : avg_scores}
+    avg_scores_dict = {}
+    for chunk_size in chuck_sizes_list:
+        file_path = f"./data/text_splitter_eval/retriever_evaluation_{chunk_size}_{embed_id}_{top_k}"
+        df = pd.read_csv(f"{file_path}.csv", sep="|")
+        df['avg_precision_recall'] = df[['context_precision', 'context_recall']].mean(axis=1)
+        avg_score = df['avg_precision_recall'].mean()
+        avg_scores_dict[chunk_size] = avg_score
+
+    # create a bar chart based on the dict, the x axis is the chunksize, the y axis is the avg_score
+    import matplotlib.pyplot as plt
+
+    # bar chart: the x axis is the chunksize (avg_scores_dict's keys), the y axis is the avg_score avg_scores_dict's values
+    plt.bar(range(len(avg_scores_dict)), list(avg_scores_dict.values()), align='center')
+    #change the label of the x axis to be chunksize 
+    plt.xticks(range(len(avg_scores_dict)), list(avg_scores_dict.keys()))
+
+    # give labels
+    plt.xlabel('chunk_size')
+    plt.ylabel('avg_score')
+    plt.show()
+
+
+# %%
+# compare_text_splitter('sentence-transformers/all-MiniLM-L6-v2', 3)
+sanity_check_text_splitter_results('sentence-transformers/all-MiniLM-L6-v2', 3)
