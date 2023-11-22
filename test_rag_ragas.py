@@ -1,3 +1,5 @@
+from rag_ragas import azure_open_ai
+
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -20,3 +22,7 @@ test_dataset = Dataset.from_dict(
 test_dataset.push_to_hub(HF_HUB_TEST, config_name="starters" ,token = hf_token)
 # create local backup
 test_dataset.save_to_disk("data/test_dataset")
+
+# %%
+
+azure_open_ai()

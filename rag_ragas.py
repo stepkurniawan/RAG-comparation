@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -22,6 +20,8 @@ import time
 import transformers
 
 from rag_load_data import load_sustainability_wiki_langchain_documents, load_from_webpage, load_qa_rag_dataset, load_50_qa_dataset
+from langchain.llms import AzureOpenAI
+import openai
 
 import pandas as pd
 
@@ -33,6 +33,32 @@ HF_HUB_TEST = "stepkurniawan/test"
 
 #######################################
 transformers.logging.set_verbosity_info()
+
+# AZURE OPEN AI RAGAS #############################################
+
+def azure_open_ai():
+    openai.api_type = "azure"
+    openai.api_base = os.getenv("AZURE_OPENAI_API_ENDPOINT")
+    openai.api_version = "2023-07-01-preview"
+    openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+    message_text = [{"role":"system","content":"You are an AI assistant that helps people find information."},{"role":"user","content":"tell me a joke"}]
+
+    completion = openai.ChatCompletion.create(
+    engine="example1",
+    messages = message_text,
+    temperature=0,
+    max_tokens=800,
+    top_p=0.95,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=None
+    )
+
+    text = completion.choices[0].message.content
+    
+    print(text)
+
 
 # LOAD DATASET #######################################################################################
 
@@ -128,9 +154,6 @@ def prepare_qa_dataset_ragas(PATH=QA_FULL_DATASET):
 
     return sp_dataset
 
-def push_to_hf_hub(dataset, HF_DATASET_HUB = HF_HUB_QA_DATASET):
-    # push to HF
-    dataset.push_to_hub(HF_DATASET_HUB)
 
 #### UPLOAD qa dataset TO HF HUB stepkurniawan/qa_sustainability_wiki####
 # sp_dataset = prepare_qa_dataset_ragas()
@@ -344,7 +367,7 @@ def retriever_evaluation(dataset):
     
     return results
 
-result = retriever_evaluation(qa_dataset['train'])
-#save result to csv under data dir
-result.to_csv('data/retriever_evaluation.csv')
-print(result)
+# result = retriever_evaluation(qa_dataset['train'])
+# #save result to csv under data dir
+# result.to_csv('data/retriever_evaluation.csv')
+# print(result)
