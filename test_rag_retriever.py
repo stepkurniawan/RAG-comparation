@@ -222,18 +222,30 @@ def compare_text_splitter(embed_id, top_k):
 def sanity_check_text_splitter_results(embed_id, top_k):
     # create a dict based on the {chunk_size : avg_scores}
     avg_scores_dict = {}
+    df_line = pd.DataFrame(columns=['chunk_size', 'mean_context_precision', 'mean_context_recall'])
     for chunk_size in chuck_sizes_list:
         file_path = f"./data/text_splitter_eval/retriever_evaluation_{chunk_size}_{embed_id}_{top_k}"
         df = pd.read_csv(f"{file_path}.csv", sep="|")
         df['avg_precision_recall'] = df[['context_precision', 'context_recall']].mean(axis=1)
         avg_score = df['avg_precision_recall'].mean()
         avg_scores_dict[chunk_size] = avg_score
+
+        # create a dataframe for line chart. The columns are chunk_size, mean_context_precision, mean_context_recall
+        # mean_context_precision is from all the context_precision in the df divided by the number of rows
+        # mean_context_recall is from all the context_recall in the df divided by the number of rows
+        # append the df_line with the chunk_size, mean_context_precision, mean_context_recall
+        mean_context_precision = df['context_precision'].mean()
+        mean_context_recall = df['context_recall'].mean()
+        f_measure = 2 * (mean_context_precision * mean_context_recall) / (mean_context_precision + mean_context_recall)
+        df_line = pd.concat([df_line, pd.DataFrame({'chunk_size': [chunk_size], 'mean_context_precision': [mean_context_precision], 'mean_context_recall': [mean_context_recall], 'f_measure': [f_measure]})])
     
+    df_line = df_line.reset_index(drop=True)  # fix the index 
+
     # create_bar_chart(avg_scores_dict)
-    create_line_chart(df, avg_scores_dict)
+    create_line_chart(df_line)
 
-
-    
+    # add title
+    plt.text(0.5, 0.90, f'embed_id: {embed_id}, top_k: {top_k}', ha='center', va='center', transform=plt.gcf().transFigure)
     
 
 def create_bar_chart(avg_scores_dict):    
@@ -248,18 +260,27 @@ def create_bar_chart(avg_scores_dict):
     plt.ylabel('avg_score')
     plt.show()
 
-def create_line_chart(df, avg_scores_dict):
-    # create a plot that consists of 2 line charts. 
-    # 1 line chart from 'context_precision', and the other 'context_recall'. Dont forget the legend and use different color
-    # the x axis is the chunk_size (avg_scores_dict's keys), the y axis is the avg_score avg_scores_dict's values
-    plt.plot(list(avg_scores_dict.keys()), df['context_precision'], label='context_precision')
-    plt.plot(list(avg_scores_dict.keys()), df['context_recall'], label='context_recall')
-    plt.plot(list(avg_scores_dict.keys()), df['avg_precision_recall'], label='avg_precision_recall')
+
+
+def create_line_chart(df_line):
+    plt.plot(df_line['chunk_size'], df_line['mean_context_precision'], label='mean_context_precision', alpha=0.5)
+
+    plt.plot(df_line['chunk_size'], df_line['mean_context_recall'], label='mean_context_recall', alpha=0.5)
+    plt.plot(df_line['chunk_size'], df_line['f_measure'], label='f_measure', linewidth=5)
+    plt.xlabel('chunk size')
+    plt.ylabel('score')
     plt.legend()
+    
+
+    # annotate the score on each of the point
+    for i in range(len(df_line)):
+        plt.annotate(round(df_line['mean_context_precision'][i], 3), (df_line['chunk_size'][i], df_line['mean_context_precision'][i]),
+                     alpha=0.5)
+        plt.annotate(round(df_line['mean_context_recall'][i], 3), (df_line['chunk_size'][i], df_line['mean_context_recall'][i]),
+                     alpha=0.5)
+        plt.annotate(round(df_line['f_measure'][i], 4), (df_line['chunk_size'][i], df_line['f_measure'][i]))
+
     plt.show()
-
-
-
 
 
 
@@ -267,9 +288,11 @@ def create_line_chart(df, avg_scores_dict):
 start_time = time.time()
 
 
-compare_text_splitter(embedding_ids['BGE_LARGE_ID'], 1)
-# sanity_check_text_splitter_results(embedding_ids['BGE_LARGE_ID'], 1)
+# compare_text_splitter(embedding_ids['BGE_LARGE_ID'], 1)
+sanity_check_text_splitter_results(embedding_ids['BGE_LARGE_ID'], 1)
 
 
 end_time = time.time()
 print(f"Time taken: {end_time - start_time} seconds, or {(end_time - start_time)/60} minutes, or {(end_time - start_time)/3600} hours")
+
+# %%
