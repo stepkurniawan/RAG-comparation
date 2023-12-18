@@ -42,11 +42,11 @@ data = load_sustainability_wiki_langchain_documents()
 # 3.2 Split text into chunks ##############
 docs = split_data_to_docs(data)
 
-# 3.1 embedding ###########
+# 3.3 embedding ###########
 # embed_model = get_retriever_embeddings()
 embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 
-# 3.3 VECTOR STORE ######################################################
+# 4 VECTOR STORE ######################################################
 ## create LOCAL FAISS
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
@@ -54,10 +54,10 @@ embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 # create_chroma_db(docs, embed_model) 
 
 
-## 3.4 index
+## 4.4 index
 # index = rag_vectorstore.get_index_vectorstore_wiki_nyc(embed_model)
 
-## 3.5 Similiarity search
+## 4.5 Similiarity search
 db = load_local_faiss_vector_database(embed_model)
 # db = load_chroma_db(embed_model)
 
@@ -65,7 +65,7 @@ db = load_local_faiss_vector_database(embed_model)
 similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
 
 
-### 3.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
+### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
 retriever_evaluation = evaluate(
                     dataset,
                     metrics=[
@@ -78,33 +78,33 @@ retriever_evaluation = evaluate(
                         )
 
 
-#%% 4. GENERATOR #####################################################
-## 4.1 embedding
+#%% 5. GENERATOR #####################################################
+## 5.1 embedding
 # the embedding of the generator is already inside the model
 
-## 4.3 prompt
+## 5.3 prompt
 # prompt = get_formatted_prompt(context=similar_docs, query=QUERY) # TODO: check if this is correct
 
-## 4.4 LLM model : Select by comment and uncommenting the code below 
+## 5.4 LLM model : Select by comment and uncommenting the code below 
 # llm = load_llm_ctra_llama27b() 
 # llm = load_llm_gpt35()
 llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID) # note: it works using worker22
 
 print("success loading llm model")
 
-## 4.5 Chain
+## 5.5 Chain
 # the similar resopnse is not used here
 # but the chain is summarizing itself from the vector store, based on the arguments there
 qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
 
-## 4.7 Result
+## 5.6 Result
 qa_chain_result = final_result(qa_chain, QUERY)
 # qa_chain_result = chain_with_docs(qa_chain, similar_response, QUERY) # deprecated...
 
 print("the result is: ", qa_chain_result['result'])
 print("the source documents are: ", qa_chain_result['source_documents'])
 
-#%% 5. EVALUATION ########################################################
+#%% 6. EVALUATION ########################################################
 ## preparing RAGAS table
 """
 ref: https://github.com/explodinggradients/ragas

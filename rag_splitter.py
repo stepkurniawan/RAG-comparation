@@ -28,15 +28,15 @@ def length_function(text: str) -> int:
 # The default list of split characters is [\n\n, \n, " ", ""]
 # Tries to split on them in order until the chunks are small enough
 # Keep paragraphs, sentences, words together as long as possible
-def split_data_to_docs(data, chunk_size = 200):
+def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
     """
     input : documents
     output : list of Document objects
     """
     splitter = RecursiveCharacterTextSplitter(
-                separators=["\n\n", "\n", " ", ""],
+                separators=["\n\n", "\n", " "],
                 chunk_size=chunk_size, 
-                chunk_overlap=chunk_size*0.1,
+                chunk_overlap=chunk_size*chunk_overlap_scale,
                 length_function=length_function,
                 )
 

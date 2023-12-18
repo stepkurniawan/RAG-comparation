@@ -4,10 +4,15 @@ from langchain.vectorstores import FAISS, Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers import SVMRetriever
 
+from rag_load_data import load_sustainability_wiki_langchain_documents
+from rag_splitter import split_data_to_docs
+from rag_embedding import get_embed_model, embedding_ids
+
 from datasets import Dataset, DatasetDict
 import numpy as np
 
 VECTORSTORE_NAMES = ['FAISS', 'Chroma']
+VECTORSTORE_OBJS = [FAISS, Chroma]
 
 FAISS_PATH = "vectorstores/db_faiss"
 CHROMA_PATH = "vectorstores/db_chroma"
@@ -30,7 +35,7 @@ def dataset_to_texts(data):
     return texts
 
 # deprecated
-def create_faiss_db(documents, embedding, chunk_size_n=500, data=None):
+def create_faiss_db(documents, embedding, chunk_size_n=500, chunk_overlap_scale = 0.1, data=None):
     # Loader for PDFs
     # loader = DirectoryLoader(DATA_PATH, glob = '*.pdf', loader_cls= PyPDFLoader)
     # documents = loader.load()
@@ -38,14 +43,14 @@ def create_faiss_db(documents, embedding, chunk_size_n=500, data=None):
     # texts = text_splitter.split_documents(documents)
 
     # text splitter for dataset
-    if data is not None:
-        documents = dataset_to_texts(data)
-        text_splitter = RecursiveCharacterTextSplitter (chunk_size = chunk_size_n, chunk_overlap = 50)
-        documents = text_splitter.split_texts(documents)
+    # if data is not None:
+    #     documents = dataset_to_texts(data)
+    #     text_splitter = RecursiveCharacterTextSplitter (chunk_size = chunk_size_n, chunk_overlap = chunk_size_n*chunk_overlap_scale)
+    #     documents = text_splitter.split_texts(documents)
     
     # db = FAISS.from_texts(texts, embeddings)
     db = FAISS.from_documents(documents, embedding)
-    db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n))
+    db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n) + "_" + str(chunk_overlap_scale))
     return db
 
 def load_local_faiss_vector_database(embeddings):
@@ -68,25 +73,36 @@ def load_chroma_db(embeddings):
     return vectorstore
 
 
-def create_db_pipeline(knowledge_base, vectorstore_name, texts, embedding, data=None):
+def create_db_pipeline(knowledge_base, vectorstore_name, embed_id, chunk_size, chunk_overlap_scale):
     """
     Create a local vector database from a list of texts and an embedding model.
     you can change the input from texts or data
     """
-    embedding_name = embedding.model_name.split('/')[-1]
+    embedding_name = embed_id.split('/')[-1]
 
+    # Load data 
+    if knowledge_base == 'suswiki': 
+        documents = load_sustainability_wiki_langchain_documents()
+    elif knowledge_base == 'wikipedia':
+        print("# TODO : get docu from wikipedia")
+        
+    # split docs
+    split_docs = split_data_to_docs(documents, chunk_size, chunk_overlap_scale)
+
+    # vectorstore
+    embed_model , _ = get_embed_model(embed_id)
     if vectorstore_name=='FAISS':
         # db = FAISS.from_texts(texts, embeddings)
-        save_path = FAISS_PATH + "/" + knowledge_base + "/" + embedding_name
-        db = FAISS.from_documents(texts, embedding)
+        save_path = FAISS_PATH + "/"  + "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+        db = FAISS.from_documents(split_docs, embed_model)
         db.save_local(save_path)
-
-    if vectorstore_name=='Chroma':
-        save_path = CHROMA_PATH + "/" + knowledge_base + "/" + embedding_name
-        db = Chroma.from_documents(documents=texts, 
-                                            embedding=embedding,
+    elif vectorstore_name=='Chroma':
+        save_path = CHROMA_PATH + "/" + "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+        db = Chroma.from_documents(documents=split_docs, 
+                                            embedding=embed_model,
                                             persist_directory=save_path)
-        
+    
+    return db
 
 def load_db_pipeline(knowledge_base, vectorstore_name, embedding):
     """

@@ -6,7 +6,13 @@ hf_token = os.getenv('HF_AUTH_TOKEN')
 
 from datasets import load_dataset, Dataset
 
+from langchain.chat_models import AzureChatOpenAI
+from ragas.llms import LangchainLLM
+from langchain.llms import AzureOpenAI
+from langchain.embeddings import AzureOpenAIEmbeddings
+
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
+
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 
@@ -20,10 +26,13 @@ import time
 import transformers
 
 from rag_load_data import load_sustainability_wiki_langchain_documents, load_from_webpage, load_qa_rag_dataset, load_50_qa_dataset
-from langchain.llms import AzureOpenAI
 import openai
+from openai import AzureOpenAI
+
 
 import pandas as pd
+
+
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
@@ -36,7 +45,7 @@ transformers.logging.set_verbosity_info()
 
 # AZURE OPEN AI RAGAS #############################################
 
-def azure_open_ai():
+def azure_open_ai_old_version():
     openai.api_type = "azure"
     openai.api_base = os.getenv("AZURE_OPENAI_API_ENDPOINT")
     openai.api_version = "2023-07-01-preview"
@@ -54,10 +63,70 @@ def azure_open_ai():
     presence_penalty=0,
     stop=None
     )
-
     text = completion.choices[0].message.content
-    
     print(text)
+
+def get_azure_open_ai():
+    client = AzureOpenAI(
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
+        api_version="2023-07-01-preview",
+    )
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are an AI assistant that helps people find information."},
+            {"role": "user", "content": "tell me a joke"},
+        ],
+        temperature=0,
+        max_tokens=800,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+        model="example1",
+        # engine="example1",
+    )
+
+    text = chat_completion.choices[0].message.content
+    print(text)
+
+    return client
+
+
+
+def activate_azure_ragas(): 
+    azure_model = AzureChatOpenAI(
+        deployment_name="example1",
+        # model="your-model-name",
+        openai_api_base=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
+        openai_api_type="azure",
+        openai_api_version="2023-07-01-preview",
+    )
+
+
+    # wrapper around azure_model
+    ragas_azure_model = LangchainLLM(azure_model)
+    # patch the new RagasLLM instance
+    answer_relevancy.llm = ragas_azure_model
+
+    # init and change the embeddings
+    # only for answer_relevancy
+    azure_embeddings = AzureOpenAIEmbeddings(
+        deployment="Codigators",
+        # model="your-embeddings-model-name",
+        openai_api_base=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
+        openai_api_type="azure",
+        openai_api_version="2023-07-01-preview",
+    )
+    # embeddings can be used as it is
+    answer_relevancy.embeddings = azure_embeddings
+
+    # Now with some __setattr__ magic lets change it for all other metrics.
+    for m in RAGAS_METRICS:
+        m.__setattr__("llm", ragas_azure_model)
+
+
 
 
 # LOAD DATASET #######################################################################################
@@ -153,14 +222,6 @@ def prepare_qa_dataset_ragas(PATH=QA_FULL_DATASET):
     sp_dataset = dataset.train_test_split(test_size=0.2, shuffle=True)
 
     return sp_dataset
-
-
-#### UPLOAD qa dataset TO HF HUB stepkurniawan/qa_sustainability_wiki####
-# sp_dataset = prepare_qa_dataset_ragas()
-# push_to_hf_hub(sp_dataset, HF_HUB_QA_DATASET)
-
-
-
 
 
 
@@ -322,7 +383,6 @@ def ragas_evaluate_push(dataset):
                             faithfulness,
                             answer_relevancy,
                             context_recall,
-                            # harmfulness,
                         ],
                         )
     end_time = time.time() 
@@ -339,12 +399,7 @@ def ragas_evaluate_push(dataset):
     return result_dataset
 
 
-# TESTING RAGAS
 
-# fiqa_eval = load_dataset("explodinggradients/fiqa", "ragas_eval")['baseline']
-qa_dataset = load_dataset("stepkurniawan/qa-rag-llama", "Llama-2-13b-chat-hf", download_mode="force_redownload")
-# print("something")
-# result = ragas_evaluate_push(qa_dataset)
 
 
 # %% RETRIEVER EVALUATION ########################################################
