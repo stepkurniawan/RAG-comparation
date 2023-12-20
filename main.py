@@ -38,8 +38,8 @@ LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 # data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
 # data2 = load_sustainability_wiki_dataset()
 # data = load_sustainability_wiki_langchain_documents()
-# kb = KnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
-kb = KnowledgeBase("wikipedia", "20220301.simple", "huggingface_cache/wikipedia_hf")
+kb = KnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
+# kb = KnowledgeBase("wikipedia", "20220301.simple", "huggingface_cache/wikipedia_hf")
 data = kb.load_documents()
 # print("the data is: ", data)
 
@@ -66,7 +66,7 @@ db = load_local_faiss_vector_database(embed_model)
 # db = load_chroma_db(embed_model)
 
 # similar_response = similarity_search_doc(db, QUERY)
-similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model)
+similar_docs = svm_similarity_search_doc(docs, QUERY, embed_model, 1)
 
 
 ### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
