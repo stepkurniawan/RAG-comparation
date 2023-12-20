@@ -6,14 +6,15 @@ from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage, load_s
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings, get_embed_model
 from rag_embedding import embedding_ids
 from rag_vectorstore import create_faiss_db, load_local_faiss_vector_database
-from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
+# from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
-from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
+# from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
 from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
 from rag_ragas import make_eval_chains, evaluate_RAGAS
 from rag_splitter import split_data_to_docs
+from KnowledgeBase import KnowledgeBase
 
 from langchain.vectorstores import FAISS
 from langchain.llms import CTransformers # to use CPU only
@@ -36,7 +37,10 @@ LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 # data = get_arxiv_data_from_dataset()
 # data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
 # data2 = load_sustainability_wiki_dataset()
-data = load_sustainability_wiki_langchain_documents()
+# data = load_sustainability_wiki_langchain_documents()
+# kb = KnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
+kb = KnowledgeBase("wikipedia", "20220301.simple", "huggingface_cache/wikipedia_hf")
+data = kb.load_documents()
 # print("the data is: ", data)
 
 # 3.2 Split text into chunks ##############

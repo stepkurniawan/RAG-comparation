@@ -13,6 +13,7 @@ Example of token splitters:
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter, CharacterTextSplitter
 import tiktoken
+import time
 
 # VARIABLES
 
@@ -33,6 +34,8 @@ def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
     input : documents
     output : list of Document objects
     """
+    start_time = time.time()
+
     splitter = RecursiveCharacterTextSplitter(
                 separators=["\n\n", "\n", " "],
                 chunk_size=chunk_size, 
@@ -42,5 +45,8 @@ def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
 
     all_splits = splitter.split_documents(data)
 
+    end_time = time.time()
+    total_time = end_time - start_time
+    print(f"Splitting Docs time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes")
     return all_splits
 
