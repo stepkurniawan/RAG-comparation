@@ -11,11 +11,33 @@ from rag_embedding import get_embed_model, embedding_ids
 from datasets import Dataset, DatasetDict
 import numpy as np
 
-VECTORSTORE_NAMES = ['FAISS', 'Chroma']
+VECTORSTORE_NAMES = ['faiss', 'chroma']
 VECTORSTORE_OBJS = [FAISS, Chroma]
 
 FAISS_PATH = "vectorstores/db_faiss"
 CHROMA_PATH = "vectorstores/db_chroma"
+
+
+class VectorStore:
+    def __init__(self, vectorstore_name):
+        self.vectorstore_name = vectorstore_name
+        if vectorstore_name not in VECTORSTORE_NAMES:
+            raise ValueError(f"vectorstore_name must be one of {VECTORSTORE_NAMES}")
+        elif vectorstore_name == 'faiss':
+            self.vectorstore_obj = FAISS 
+            self.vectorstore_path = FAISS_PATH
+        elif vectorstore_name == 'chroma':
+            self.vectorstore_obj = Chroma
+            self.vectorstore_path = CHROMA_PATH
+        
+    def create_vectorstore(self, documents, embeddings):
+        return self.vectorstore_obj.from_documents(documents=documents,
+                                            embedding=embeddings,
+                                            persist_directory=self.vectorstore_path)
+    
+    def load_vectorstore(self, embeddings):
+        return self.vectorstore_obj(persist_directory=self.vectorstore_path, 
+                         embedding_function=embeddings)
 
 def get_index_vectorstore_wiki_nyc(embed_model):
     # load the Wikipedia page and create index
@@ -34,33 +56,20 @@ def dataset_to_texts(data):
     texts = data_pd['chunk'].to_numpy()
     return texts
 
-# deprecated
-def create_faiss_db(documents, embedding, chunk_size_n=500, chunk_overlap_scale = 0.1, data=None):
-    # Loader for PDFs
-    # loader = DirectoryLoader(DATA_PATH, glob = '*.pdf', loader_cls= PyPDFLoader)
-    # documents = loader.load()
-    # text_splitter = RecursiveCharacterTextSplitter (chunk_size = 500, chunk_overlap = 50)
-    # texts = text_splitter.split_documents(documents)
+# deprecated #########################
+# def create_faiss_db(documents, embedding, chunk_size_n=500, chunk_overlap_scale = 0.1, data=None):    
+#     db = FAISS.from_documents(documents, embedding)
+#     db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n) + "_" + str(chunk_overlap_scale))
+#     return db
 
-    # text splitter for dataset
-    # if data is not None:
-    #     documents = dataset_to_texts(data)
-    #     text_splitter = RecursiveCharacterTextSplitter (chunk_size = chunk_size_n, chunk_overlap = chunk_size_n*chunk_overlap_scale)
-    #     documents = text_splitter.split_texts(documents)
-    
-    # db = FAISS.from_texts(texts, embeddings)
-    db = FAISS.from_documents(documents, embedding)
-    db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n) + "_" + str(chunk_overlap_scale))
-    return db
+# def load_local_faiss_vector_database(embeddings):
+#     """
+#     Load a local vector database from a list of texts and an embedding model.
+#     """
+#     db = FAISS.load_local(FAISS_PATH, embeddings)
+#     return db
 
-def load_local_faiss_vector_database(embeddings):
-    """
-    Load a local vector database from a list of texts and an embedding model.
-    """
-    db = FAISS.load_local(FAISS_PATH, embeddings)
-    return db
 
-    
 def create_chroma_db(documents, embeddings):
     vectorstore = Chroma.from_documents(documents=documents, 
                                         embedding=embeddings,
@@ -71,7 +80,7 @@ def load_chroma_db(embeddings):
     vectorstore = Chroma(persist_directory=CHROMA_PATH, 
                          embedding_function=embeddings)
     return vectorstore
-
+#####################################################################
 
 def create_db_pipeline(knowledge_base, vectorstore_name, embed_id, chunk_size, chunk_overlap_scale):
     """

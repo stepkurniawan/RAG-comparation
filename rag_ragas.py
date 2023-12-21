@@ -6,10 +6,10 @@ hf_token = os.getenv('HF_AUTH_TOKEN')
 
 from datasets import load_dataset, Dataset
 
-from langchain.chat_models import AzureChatOpenAI
+# from langchain.chat_models import AzureChatOpenAI
 from ragas.llms import LangchainLLM
-from langchain.llms import AzureOpenAI
-from langchain.embeddings import AzureOpenAIEmbeddings
+# from langchain.llms import AzureOpenAI
+# from langchain.embeddings import AzureOpenAIEmbeddings
 
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 
@@ -21,7 +21,6 @@ from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_7
 from rag_chains import retrieval_qa_chain_from_local_db, final_result
 
 from rag_embedding import get_embed_model, embedding_ids
-from rag_vectorstore import load_local_faiss_vector_database
 import time
 import transformers
 
@@ -31,7 +30,8 @@ from openai import AzureOpenAI
 
 
 import pandas as pd
-
+import logging
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
@@ -404,7 +404,7 @@ def ragas_evaluate_push(dataset):
 
 # %% RETRIEVER EVALUATION ########################################################
 
-def retriever_evaluation(dataset): 
+def retriever_evaluation(dataset, path_to_save='data/retriever_evaluation.csv'): 
     """
     input: query, similar_docs, and ground_truths
     output: context precision, recall, and F-measure 
@@ -412,6 +412,7 @@ def retriever_evaluation(dataset):
     from ragas.metrics import ContextPrecision
     context_precision = ContextPrecision()
 
+    start_time = time.time()
     results = evaluate(
                     dataset,
                     metrics=[
@@ -419,6 +420,14 @@ def retriever_evaluation(dataset):
                             context_recall,
                         ],
                         )
+    print("success evaluate retriever")
+    end_time = time.time()
+    total_time = end_time - start_time
+    results.to_csv(path_to_save)
+    print("success save retriever evaluation CSV to: ", path_to_save)
+    print(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
+    logging.info("success save retriever evaluation CSV to: " + path_to_save)
+    logging.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     
     return results
 

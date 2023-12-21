@@ -13,7 +13,7 @@ JSON_PATH = "data/Sustainability+Methods_dump.xml.json"
 HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki" # 647 curated questions from the sustainability wiki dump (question, ground_truths)
 HF_HUB_QA_DATASET_2 = "stepkurniawan/sustainability-methods-wiki" # contains the whole dump files of sustainability wiki. 
 HF_HUB_QA_LLAMA = "stepkurniawan/qa-rag-llama" # 50 questions that has been answered by the RAG models, the subset is the name of the llm model
-HF_HUB_RAGAS = "stepkurniawan/RAGAS_50" # placeholder for the new 50 questions
+HF_HUB_RAGAS = "stepkurniawan/RAGAS_50" # placeholder for the new 50 questions, now is still empty
 
 QA_GT_JSON_PATH = "data/collection_ground_truth_ragas_chatgpt4.json"
 

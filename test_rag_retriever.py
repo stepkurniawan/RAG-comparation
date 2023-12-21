@@ -191,7 +191,9 @@ def compare_text_splitter(embed_id, top_k, chunk_overlap_scale=0.1):
         # create vectorstore
         embed_model , _ = get_embed_model(embed_id)
         start_create_vector_time = time.time()
+
         vectorstore = create_faiss_db(test_docs, embed_model, chunk_size)
+        
         end_create_vector_time = time.time()
         create_vector_time = end_create_vector_time - start_create_vector_time
         print(f"Time taken to create vectorstore: {create_vector_time} seconds, or {create_vector_time/60} minutes, or {create_vector_time/3600} hours")

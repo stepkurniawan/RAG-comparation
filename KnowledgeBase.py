@@ -5,7 +5,7 @@ from langchain.document_loaders import WebBaseLoader, HuggingFaceDatasetLoader
 from langchain.document_loaders import JSONLoader, TextLoader
 from typing import Iterator, List, Mapping, Optional, Sequence, Union
 
-
+import time
 import os
 import pandas as pd
 
@@ -64,13 +64,25 @@ class KnowledgeBase:
 class HuggingFaceDataset:
     def __init__(
             self, 
-            hf_path):
+            hf_path,
+            subset,
+            select_columns: Optional[List[str]] = None,):
         
         self.hf_path = hf_path
+        self.subset = subset
+        self.select_columns = select_columns
 
     def load_dataset(self):
-        dataset_from_hf = load_dataset(self.hf_path, split='train')
+        start_time = time.time()
+        dataset_from_hf = load_dataset(self.hf_path, self.subset, download_mode="force_redownload")
+        dataset_from_hf = dataset_from_hf.select_columns(self.select_columns)
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"total time to load dataset from HF: {total_time:.2f} seconds")
         print(f'success load data from huggingface: {self.hf_path}')
+        print(f'The dataset has {dataset_from_hf.num_rows} rows and {len(dataset_from_hf.column_names)} columns')
+        print(f'dataset_from_hf["train"]["question"][0]: {dataset_from_hf["train"]["question"][0]}')
+        print(f'dataset_from_hf["train"]["ground_truths"][0]: {dataset_from_hf["train"]["ground_truths"][0]}')
         return dataset_from_hf
 
 # decommisioned
@@ -145,7 +157,7 @@ def load_qa_rag_dataset():
 # qa_dataset = qa_dataset['train'][:3]
 
 def load_50_qa_dataset():
-    dataset = load_dataset(HF_HUB_QA_DATASET_2, "50_QA")
+    dataset = load_dataset(HF_HUB_QA_DATASET_2, "50_QA", download_mode="force_redownload")
     print("success loading question answer dataset from HF")
     dataset = dataset.select_columns(['question', 'ground_truths'])     # drop dataset['train']['contexts'] and dataset['train']['summary'] because we will use retriever to fill that
 
@@ -155,6 +167,7 @@ def load_50_qa_dataset():
 
 
 ##########################################################################
+# data = get_arxiv_data_from_dataset()
 # data = get_wikipedia_data_from_dataset()
 # suswiki_kb = KnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "data/suswiki_hf")
 # wikipedia_kb = KnowledgeBase("wikipedia", "20220301.simple", "data/wikipedia_hf")
