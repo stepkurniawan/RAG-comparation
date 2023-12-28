@@ -31,10 +31,20 @@ def length_function(text: str) -> int:
 # Keep paragraphs, sentences, words together as long as possible
 def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
     """
-    input : documents
+    input versi 2: Dict{source: str, documents: list of Document objects}
     output : list of Document objects
     """
-    start_time = time.time()
+    ### check wether the data is actually already a list of Document objects
+    ## or is it my dict version with additional source
+
+    if type(data) == list:
+        documents = data
+        docs_source = None
+    else:
+        docs_source = data['source'] if 'source' in data.keys() else None
+        documents = data['documents'] if 'documents' in data.keys() else data
+
+    start_time = time.time() # start timer
 
     splitter = RecursiveCharacterTextSplitter(
                 separators=["\n\n", "\n", " "],
@@ -43,10 +53,16 @@ def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
                 length_function=length_function,
                 )
 
-    all_splits = splitter.split_documents(data)
+    all_splits = splitter.split_documents(documents)
 
-    end_time = time.time()
+    end_time = time.time() # end timer
     total_time = end_time - start_time
     print(f"Splitting Docs time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes")
-    return all_splits
+    
+    dict_split = {
+        "source": docs_source,
+        "documents": all_splits
+    }
+    
+    return dict_split
 

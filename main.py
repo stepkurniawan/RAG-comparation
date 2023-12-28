@@ -6,7 +6,7 @@ from rag_load_data import get_arxiv_data_from_dataset, load_from_webpage
 from rag_embedding import get_embed_model
 from rag_embedding import embedding_ids
 from rag_vectorstore import create_faiss_db, load_local_faiss_vector_database
-# from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
+from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
 from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
@@ -14,7 +14,7 @@ from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
 from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result
 from rag_ragas import make_eval_chains, evaluate_RAGAS
 from rag_splitter import split_data_to_docs
-from KnowledgeBase import KnowledgeBase
+from StipKnowledgeBase import StipKnowledgeBase
 
 from langchain.vectorstores import FAISS
 from langchain.llms import CTransformers # to use CPU only
@@ -35,7 +35,7 @@ LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 
 # 3.1 Load knowledge base / dataset #######
 # data = load_from_webpage("https://sustainabilitymethods.org/index.php/A_matter_of_probability")
-suswiki_kb = KnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
+suswiki_kb = StipKnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
 # wikipedia_kb = KnowledgeBase("wikipedia", "20220301.simple", "huggingface_cache/wikipedia_hf")
 data = suswiki_kb.load_documents()
 print("the data is: ", data)
@@ -55,7 +55,7 @@ embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 #%% # if folder DB_FAISS_PATH is empty, then run 
 # if len(os.listdir(DB_PATH)) == 0:
 # create_local_faiss_vector_database(texts=docs, embeddings=embed_model, DB_PATH=DB_PATH) # maybe for dataset ? 
-# create_chroma_db(docs, embed_model) 
+create_chroma_db(docs, embed_model) 
 
 
 ## 4.4 index

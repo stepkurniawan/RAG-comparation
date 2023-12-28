@@ -14,30 +14,11 @@ import numpy as np
 VECTORSTORE_NAMES = ['faiss', 'chroma']
 VECTORSTORE_OBJS = [FAISS, Chroma]
 
-FAISS_PATH = "vectorstores/db_faiss"
-CHROMA_PATH = "vectorstores/db_chroma"
+FAISS_PATH = "vectorstores/db_faiss/"
+CHROMA_PATH = "vectorstores/db_chroma/"
 
 
-class VectorStore:
-    def __init__(self, vectorstore_name):
-        self.vectorstore_name = vectorstore_name
-        if vectorstore_name not in VECTORSTORE_NAMES:
-            raise ValueError(f"vectorstore_name must be one of {VECTORSTORE_NAMES}")
-        elif vectorstore_name == 'faiss':
-            self.vectorstore_obj = FAISS 
-            self.vectorstore_path = FAISS_PATH
-        elif vectorstore_name == 'chroma':
-            self.vectorstore_obj = Chroma
-            self.vectorstore_path = CHROMA_PATH
-        
-    def create_vectorstore(self, documents, embeddings):
-        return self.vectorstore_obj.from_documents(documents=documents,
-                                            embedding=embeddings,
-                                            persist_directory=self.vectorstore_path)
-    
-    def load_vectorstore(self, embeddings):
-        return self.vectorstore_obj(persist_directory=self.vectorstore_path, 
-                         embedding_function=embeddings)
+
 
 def get_index_vectorstore_wiki_nyc(embed_model):
     # load the Wikipedia page and create index
@@ -57,22 +38,22 @@ def dataset_to_texts(data):
     return texts
 
 # deprecated #########################
-# def create_faiss_db(documents, embedding, chunk_size_n=500, chunk_overlap_scale = 0.1, data=None):    
-#     db = FAISS.from_documents(documents, embedding)
-#     db.save_local(FAISS_PATH+"_"+embedding.model_name + "_" + str(chunk_size_n) + "_" + str(chunk_overlap_scale))
-#     return db
+def create_faiss_db(documents, embedding):    
+    db = FAISS.from_documents(documents, embedding)
+    db.save_local(FAISS_PATH+"_"+embedding.model_name )
+    return db
 
-# def load_local_faiss_vector_database(embeddings):
-#     """
-#     Load a local vector database from a list of texts and an embedding model.
-#     """
-#     db = FAISS.load_local(FAISS_PATH, embeddings)
-#     return db
+def load_local_faiss_vector_database(embeddings):
+    """
+    Load a local vector database from a list of texts and an embedding model.
+    """
+    db = FAISS.load_local(FAISS_PATH, embeddings)
+    return db
 
 
 def create_chroma_db(documents, embeddings):
-    vectorstore = Chroma.from_documents(documents=documents, 
-                                        embedding=embeddings,
+    vectorstore = Chroma.from_documents(documents, 
+                                        embeddings,
                                         persist_directory=CHROMA_PATH)
     return vectorstore
 
@@ -150,7 +131,7 @@ def multi_similarity_search_doc(db, dataset, top_k=3):
     """
     Ref: similar to similarity_search_doc(), but for multiple queries
     input: dataset with columns: questions, ground_truths
-    output: dataset with columns: questions, ground_truths, contexts
+    output: add new column: contexts
     """
     
     try: 
@@ -176,6 +157,7 @@ def svm_similarity_search_doc(documents, query, embed_model, top_k):
                                                 embeddings=embed_model,
                                                 k = top_k,
                                                 relevancy_threshold = 0.3)
+    
     docs_svm=svm_retriever.get_relevant_documents(query)
     docs_svm_list = get_content_from_similarity_search(docs_svm)
     len(docs_svm)

@@ -30,7 +30,8 @@ def get_embed_model(embed_model_id):
         )
         model_name = embed_model.model_name.split('/')[-1]
 
-    return embed_model, model_name
+    return embed_model
+
 
 def get_retriever_embeddings():
     embed_model = get_embed_model(embed_model_id_retriever)

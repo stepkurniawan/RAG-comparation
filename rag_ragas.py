@@ -26,13 +26,10 @@ import transformers
 
 from rag_load_data import load_sustainability_wiki_langchain_documents, load_from_webpage, load_qa_rag_dataset, load_50_qa_dataset
 import openai
-from openai import AzureOpenAI
 
 
 import pandas as pd
-import logging
-logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
+from LogSetup import logger
 
 RAGAS_METRICS = [faithfulness, answer_relevancy, context_precision, context_recall]
 QA_FULL_DATASET = "data/collection_ground_truth_ragas_chatgpt4.json"
@@ -42,90 +39,6 @@ HF_HUB_TEST = "stepkurniawan/test"
 
 #######################################
 transformers.logging.set_verbosity_info()
-
-# AZURE OPEN AI RAGAS #############################################
-
-def azure_open_ai_old_version():
-    openai.api_type = "azure"
-    openai.api_base = os.getenv("AZURE_OPENAI_API_ENDPOINT")
-    openai.api_version = "2023-07-01-preview"
-    openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
-
-    message_text = [{"role":"system","content":"You are an AI assistant that helps people find information."},{"role":"user","content":"tell me a joke"}]
-
-    completion = openai.ChatCompletion.create(
-    engine="example1",
-    messages = message_text,
-    temperature=0,
-    max_tokens=800,
-    top_p=0.95,
-    frequency_penalty=0,
-    presence_penalty=0,
-    stop=None
-    )
-    text = completion.choices[0].message.content
-    print(text)
-
-def get_azure_open_ai():
-    client = AzureOpenAI(
-        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-        azure_endpoint=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
-        api_version="2023-07-01-preview",
-    )
-
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": "You are an AI assistant that helps people find information."},
-            {"role": "user", "content": "tell me a joke"},
-        ],
-        temperature=0,
-        max_tokens=800,
-        top_p=0.95,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=None,
-        model="example1",
-        # engine="example1",
-    )
-
-    text = chat_completion.choices[0].message.content
-    print(text)
-
-    return client
-
-
-
-def activate_azure_ragas(): 
-    azure_model = AzureChatOpenAI(
-        deployment_name="example1",
-        # model="your-model-name",
-        openai_api_base=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
-        openai_api_type="azure",
-        openai_api_version="2023-07-01-preview",
-    )
-
-
-    # wrapper around azure_model
-    ragas_azure_model = LangchainLLM(azure_model)
-    # patch the new RagasLLM instance
-    answer_relevancy.llm = ragas_azure_model
-
-    # init and change the embeddings
-    # only for answer_relevancy
-    azure_embeddings = AzureOpenAIEmbeddings(
-        deployment="Codigators",
-        # model="your-embeddings-model-name",
-        openai_api_base=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
-        openai_api_type="azure",
-        openai_api_version="2023-07-01-preview",
-    )
-    # embeddings can be used as it is
-    answer_relevancy.embeddings = azure_embeddings
-
-    # Now with some __setattr__ magic lets change it for all other metrics.
-    for m in RAGAS_METRICS:
-        m.__setattr__("llm", ragas_azure_model)
-
 
 
 
@@ -404,7 +317,8 @@ def ragas_evaluate_push(dataset):
 
 # %% RETRIEVER EVALUATION ########################################################
 
-def retriever_evaluation(dataset, path_to_save='data/retriever_evaluation.csv'): 
+def retriever_evaluation(dataset : Dataset, 
+                         path_to_save : str ='data/retriever_evaluation.csv'): 
     """
     input: query, similar_docs, and ground_truths
     output: context precision, recall, and F-measure 
@@ -426,8 +340,8 @@ def retriever_evaluation(dataset, path_to_save='data/retriever_evaluation.csv'):
     results.to_csv(path_to_save)
     print("success save retriever evaluation CSV to: ", path_to_save)
     print(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
-    logging.info("success save retriever evaluation CSV to: " + path_to_save)
-    logging.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
+    logger.info("success save retriever evaluation CSV to: " + path_to_save)
+    logger.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     
     return results
 
