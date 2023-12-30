@@ -22,6 +22,7 @@ class StipVectorStore:
         self.total_time = 0 # how long does it take in seconds to create vectorstore
         self.chunk_size = 0 # how many characters in a chunk
         self.chunk_overlap_scale = 0 # how much overlap between chunks
+        self.k = 0 # number of nearest neighbors
         self.db = None # vectorstore object
 
         if vectorstore_name not in VECTORSTORE_NAMES:
