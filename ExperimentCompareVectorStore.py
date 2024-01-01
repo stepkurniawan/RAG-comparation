@@ -2,6 +2,7 @@
 # !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
 
 import os
+import time
 
 from rag_vectorstore import similarity_search_doc, multi_similarity_search_doc
 # from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
@@ -48,9 +49,7 @@ print(f'successful load data from {dict_data["source"]}')
 docs = split_data_to_docs(data=dict_data, chunk_size=200, chunk_overlap_scale=0.1)
 
 # 3.3 embedding ###########
-# embed_model = get_retriever_embeddings()
 embed_model = StipEmbedding("bge").embed_model
-# embed_model = get_embed_model(embedding_ids['HF_BER_ID_2'])
 
 #%% 4 VECTOR STORE ######################################################
 ## create LOCAL FAISS
@@ -60,20 +59,35 @@ def prepare_vectorstore():
     chroma_vs = StipVectorStore("chroma")
 
     # Create vectorstore
+    start_time_faiss = time.time()
     faiss_sus_bge = faiss_vs.create_vectorstore(docs, embed_model) 
+    end_time_faiss = time.time()
+    elapsed_time_faiss = end_time_faiss - start_time_faiss
+    print(f"elapsed time to create faiss: {elapsed_time_faiss} seconds")
+
+    start_time_chroma = time.time()
     chroma_sus_bge = chroma_vs.create_vectorstore(docs, embed_model) 
+    end_time_chroma = time.time()
+    elapsed_time_chroma = end_time_chroma - start_time_chroma
+    print(f"elapsed time to create chroma: {elapsed_time_chroma} seconds")
+
 
     return faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs
 
 # uncomment this to create vectorstore
-# faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs = prepare_vectorstore()
+faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs = prepare_vectorstore()
 
 
 #%% # 4.5 Similiarity search
 ## uncomment this to do similarity search
-# database = faiss_sus_bge
-# database_obj = faiss_vs
-# similar_docs = similarity_search_doc(database, QUERY, 1)
+database = faiss_sus_bge
+database_obj = faiss_vs
+database_name = "faiss"
+database2 = chroma_sus_bge
+database_obj2 = chroma_vs
+database_name2 = "chroma"
+
+similar_docs = similarity_search_doc(database, QUERY, 1)
 
 ###################### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
 
@@ -84,10 +98,14 @@ dataset = curated_qa_dataset['train']
 # create a table with question, ground_truths, and context (retrieved_answer)
 my_k = 3
 
-def evaluate_retriever(vectorstore_database, qa_dataset, k = my_k):
+def evaluate_retriever(vectorstore_database, qa_dataset, k):
     # 4.5.1 answer using similarity search
     # create a table with question, ground_truths, and context (retrieved_answer)
+    start_time = time.time()
     contexted_dataset = multi_similarity_search_doc(vectorstore_database, qa_dataset, k)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"!Note: elapsed time for multi similarity search: {elapsed_time} seconds")
 
     # answer using ragas evaluate
     context_precision = ContextPrecision()
@@ -98,7 +116,7 @@ def evaluate_retriever(vectorstore_database, qa_dataset, k = my_k):
     contexted_df = pd.DataFrame(contexted_dataset)
     return contexted_df
 
-def save_locally(contexted_df):
+def save_locally(contexted_df, database_obj):
     # Check if the directory exists, if not, create it
     file_path = f"{OUTPUT_PATH}/{database_obj.vectorstore_name}_{database_obj.docs_source}_{database_obj.model_name}_{database_obj.chunk_size}_{database_obj.chunk_overlap_scale}_k{my_k}"
     if not os.path.exists(file_path):
@@ -108,8 +126,10 @@ def save_locally(contexted_df):
     contexted_df.to_json(file_path+".json")
 
 
-# contexted_df = evaluate_retriever(database, dataset, 1)
-# save_locally(contexted_df)
+contexted_df = evaluate_retriever(database, dataset, my_k)
+contexted_df2 = evaluate_retriever(database2, dataset, my_k)
+save_locally(contexted_df, database_obj)
+save_locally(contexted_df2, database_obj2)
     
 # %%
 import pandas as pd 

@@ -121,9 +121,7 @@ def similarity_search_doc(db, query, top_k=3):
     similar_response = db.similarity_search(query, k=top_k)
 
     page_contents_array = get_content_from_similarity_search(similar_response)
-    print(page_contents_array)
-
-    # print(len(page_contents_array))
+    # print(page_contents_array)
 
     return page_contents_array
 
@@ -144,6 +142,7 @@ def multi_similarity_search_doc(db, dataset, top_k=3):
 
     # for every question, do similarity search, save the result as a new column called "contexts"
     dataframe['contexts'] = dataframe['question'].apply(lambda q: similarity_search_doc(db, q, top_k))
+    # TODO, add topk as a parameter above
 
     # save the dataframe as a new dataset
     dataset_new = Dataset.from_pandas(dataframe)
