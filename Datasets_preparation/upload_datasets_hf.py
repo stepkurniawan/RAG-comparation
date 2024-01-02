@@ -22,6 +22,7 @@ hf_token = os.getenv('HF_AUTH_TOKEN')
 JSON_PATH = "data/Sustainability+Methods_dump.xml.json"
 COLLECTION_GROUND_TRUTH_RAGAS_CHATGPT4_JSON_PATH = "data/collection_ground_truth_ragas_chatgpt4.json"
 QA_HAND_PICKED_PATH = "data/hand_picked_questions.json"
+QA_HAND_PICKED_REVIEW_PATH = "data/hand_picked_questions_3.json"
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SUST_WIKI_HUB_1 = "stepkurniawan/sustainability-methods-wiki"
@@ -93,13 +94,13 @@ def create_csv_from_dataframe(df, file_name):
 # print(test_load_dataset_from_hf)
 
 # %%  UPLOAD HANDPICKED JSON TO HF #######################
-handpicked_qa_dict = load_dict_from_json(QA_HAND_PICKED_PATH)
+handpicked_qa_dict = load_dict_from_json(QA_HAND_PICKED_REVIEW_PATH)
 handpicked_qa_df = pd.DataFrame(handpicked_qa_dict)
 # TODO drop other columns than question and ground_truths
 
 create_csv_from_dataframe(handpicked_qa_df, "handpicked_qa")
 handpicked_dataset = load_dataset_from_pandas(handpicked_qa_df)
-handpicked_dataset.push_to_hub(SUST_WIKI_HUB_1, token=hf_token, config_name = "50_QA")
+handpicked_dataset.push_to_hub(SUST_WIKI_HUB_1, token=hf_token, config_name = "50_QA_reviewed")
 
 
 # %%

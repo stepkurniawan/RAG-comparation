@@ -1,3 +1,8 @@
+"""
+Experiment to compare different vector store and see the effect on the retriever performance
+"""
+
+
 #%% 0. Import libraries
 # !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
 
@@ -15,9 +20,6 @@ from StipVectorStore import StipVectorStore
 from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset
 from StipEmbedding import StipEmbedding
 
-from langchain.llms import CTransformers # to use CPU only
-
-from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 from ragas.metrics import ContextPrecision, ContextRecall
 
@@ -46,13 +48,13 @@ print(f'successful load data from {dict_data["source"]}')
 # data = data[:10]
 
 # 3.2 Split text into chunks ##############
-docs = split_data_to_docs(data=dict_data, chunk_size=200, chunk_overlap_scale=0.1)
-
+# docs = split_data_to_docs(data=dict_data, chunk_size=200, chunk_overlap_scale=0.1) # already split in create_vectorsore
+docs = dict_data
 # 3.3 embedding ###########
 embed_model = StipEmbedding("bge").embed_model
 
 #%% 4 VECTOR STORE ######################################################
-## create LOCAL FAISS
+## create LOCAL FAISS and chroma
 def prepare_vectorstore():
     # 4.1 create vectorstore
     faiss_vs = StipVectorStore("faiss")
@@ -70,7 +72,6 @@ def prepare_vectorstore():
     end_time_chroma = time.time()
     elapsed_time_chroma = end_time_chroma - start_time_chroma
     print(f"elapsed time to create chroma: {elapsed_time_chroma} seconds")
-
 
     return faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs
 
