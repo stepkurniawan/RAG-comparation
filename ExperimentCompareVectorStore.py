@@ -7,6 +7,9 @@ Experiment to compare different vector store and see the effect on the retriever
 # !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
 
 import os
+import threading
+import concurrent.futures
+
 import time
 
 from rag_vectorstore import similarity_search_doc, multi_similarity_search_doc
@@ -55,36 +58,76 @@ embed_model = StipEmbedding("bge").embed_model
 
 #%% 4 VECTOR STORE ######################################################
 ## create LOCAL FAISS and chroma
-def prepare_vectorstore():
+def prepare_vectorstore(vectorstore_type: str):
     # 4.1 create vectorstore
-    faiss_vs = StipVectorStore("faiss")
-    chroma_vs = StipVectorStore("chroma")
+    vs = StipVectorStore(vectorstore_type)
 
     # Create vectorstore
-    start_time_faiss = time.time()
-    faiss_sus_bge = faiss_vs.create_vectorstore(docs, embed_model) 
-    end_time_faiss = time.time()
-    elapsed_time_faiss = end_time_faiss - start_time_faiss
-    print(f"elapsed time to create faiss: {elapsed_time_faiss} seconds")
+    start_time = time.time()
+    vs_data = vs.create_vectorstore(docs, embed_model) 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"elapsed time to create {vectorstore_type}: {elapsed_time} seconds")
 
-    start_time_chroma = time.time()
-    chroma_sus_bge = chroma_vs.create_vectorstore(docs, embed_model) 
-    end_time_chroma = time.time()
-    elapsed_time_chroma = end_time_chroma - start_time_chroma
-    print(f"elapsed time to create chroma: {elapsed_time_chroma} seconds")
-
-    return faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs
+    return vs_data, vs
 
 # uncomment this to create vectorstore
-faiss_sus_bge, chroma_sus_bge, faiss_vs, chroma_vs = prepare_vectorstore()
+
+def thread_function(vs_type: str):
+    try:
+        data_vs, vs = prepare_vectorstore(vs_type)
+        print(f"finish creating {vs_type} vectorstore")
+        return data_vs, vs
+    except Exception as e:
+        print(f"Exception occurred in thread_function: {e}")
+
+#### threading.Thread() ####
+# faiss_thread = threading.Thread(target=thread_function, args=("faiss",))
+# chroma_thread = threading.Thread(target=thread_function, args=("chroma",))
+# faiss_thread.start()
+# chroma_thread.start()
+# faiss_thread.join()
+# chroma_thread.join()
+# faiss_data, faiss_vs = faiss_thread.result
+# chroma_data, chroma_vs = chroma_thread.result
+# print("finish creating vectorstore")
+####################################
+
+# ### concurrent.futures.ThreadPoolExecutor() ####
+# with concurrent.futures.ThreadPoolExecutor() as executor:
+#     vectorstore_types = ["faiss", "chroma"]
+#     results_generator = executor.map(thread_function, vectorstore_types)
+
+# results_list = list(results_generator)
+# faiss_future = results_list[0]
+# chroma_future = results_list[1]
+
+# try: 
+#     faiss_data, faiss_vs = faiss_future[0], faiss_future[1]
+#     chroma_data, chroma_vs = chroma_future[0], chroma_future[1]
+# except Exception as e:
+#     print(f"Exception occurred: {e}")
+####################################
+
+
+########## FIRST TIME ONLE ##########
+faiss_data , faiss_vs = prepare_vectorstore("faiss")
+chroma_data, chroma_vs = prepare_vectorstore("chroma")
+
+####### LOAD FROM LOCAL ##########
+faiss_vs = StipVectorStore("faiss")
+faiss_data = faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+chroma_vs = StipVectorStore("chroma")
+chroma_data = chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+
 
 
 #%% # 4.5 Similiarity search
 ## uncomment this to do similarity search
-database = faiss_sus_bge
+database = faiss_data
 database_obj = faiss_vs
 database_name = "faiss"
-database2 = chroma_sus_bge
+database2 = chroma_data
 database_obj2 = chroma_vs
 database_name2 = "chroma"
 
@@ -125,6 +168,7 @@ def save_locally(contexted_df, database_obj):
     contexted_df.to_csv(file_path +".csv", sep="|", )
     #save answer to json
     contexted_df.to_json(file_path+".json")
+
 
 
 contexted_df = evaluate_retriever(database, dataset, my_k)
