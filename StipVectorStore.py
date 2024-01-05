@@ -54,7 +54,7 @@ class StipVectorStore:
             print(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
             logger.info(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
 
-            return self.db
+            return self
 
 
 

@@ -111,15 +111,16 @@ def thread_function(vs_type: str):
 
 
 ########## FIRST TIME ONLE ##########
-faiss_data , faiss_vs = prepare_vectorstore("faiss")
-chroma_data, chroma_vs = prepare_vectorstore("chroma")
+# faiss_data , faiss_vs = prepare_vectorstore("faiss")
+# chroma_data, chroma_vs = prepare_vectorstore("chroma")
 
 ####### LOAD FROM LOCAL ##########
 faiss_vs = StipVectorStore("faiss")
-faiss_data = faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+faiss_data = faiss_vs.db
 chroma_vs = StipVectorStore("chroma")
-chroma_data = chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
-
+chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+chroma_data = chroma_vs.db
 
 
 #%% # 4.5 Similiarity search
@@ -140,7 +141,7 @@ dataset = curated_qa_dataset['train']
 
 # 4.5.1 answer using similarity search
 # create a table with question, ground_truths, and context (retrieved_answer)
-my_k = 3
+
 
 def evaluate_retriever(vectorstore_database, qa_dataset, k):
     # 4.5.1 answer using similarity search
@@ -162,7 +163,7 @@ def evaluate_retriever(vectorstore_database, qa_dataset, k):
 
 def save_locally(contexted_df, database_obj):
     # Check if the directory exists, if not, create it
-    file_path = f"{OUTPUT_PATH}/{database_obj.vectorstore_name}_{database_obj.docs_source}_{database_obj.model_name}_{database_obj.chunk_size}_{database_obj.chunk_overlap_scale}_k{my_k}"
+    file_path = f"{OUTPUT_PATH}/{database_obj.vectorstore_name}_{database_obj.docs_source}_{database_obj.embedding_name}_{database_obj.chunk_size}_{database_obj.chunk_overlap_scale}_k{my_k}"
     if not os.path.exists(file_path):
         os.makedirs(file_path)
     contexted_df.to_csv(file_path +".csv", sep="|", )
@@ -170,25 +171,33 @@ def save_locally(contexted_df, database_obj):
     contexted_df.to_json(file_path+".json")
 
 
+# my_k = 8
+# faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
+# chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
+# save_locally(faiss_contexted_result_df, faiss_vs)
+# save_locally(chroma_contexted_result_df, chroma_vs)
 
-contexted_df = evaluate_retriever(database, dataset, my_k)
-contexted_df2 = evaluate_retriever(database2, dataset, my_k)
-save_locally(contexted_df, database_obj)
-save_locally(contexted_df2, database_obj2)
+# # do a for loop for k from 1 - 10
+for my_k in range(8, 11):
+    print(f"evaluate for k: {my_k}--------------------")
+
+    faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
+    chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
+    save_locally(faiss_contexted_result_df, faiss_vs)
+    save_locally(chroma_contexted_result_df, chroma_vs)
     
 # %%
-import pandas as pd 
 
-def read_local_results(docs_source, model_name, chunk_size, chunk_overlap_scale, k):
+def read_local_results(docs_source, embedding_name, chunk_size, chunk_overlap_scale, k):
     output_df = pd.DataFrame() # this will countain columns: question, ground_truths, contexts, context_precision_FAISS, context_recall_FAISS, context_precision_Chroma, context_recall_Chroma
-    faiss_df = pd.read_csv(f"{OUTPUT_PATH}/faiss_{docs_source}_{model_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )
-    chroma_df = pd.read_csv(f"{OUTPUT_PATH}/chroma_{docs_source}_{model_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )
+    faiss_df = pd.read_csv(f"{OUTPUT_PATH}/faiss_{docs_source}_{embedding_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )
+    chroma_df = pd.read_csv(f"{OUTPUT_PATH}/chroma_{docs_source}_{embedding_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )
 
     vectorstores = ["faiss", "chroma"]
     # get the columns: question, ground_truths, contexts, context_precision_FAISS, context_recall_FAISS from each vectorstore
     for vectorstore in vectorstores:
         # load from local
-        file_path = f"{OUTPUT_PATH}/{vectorstore}_{docs_source}_{model_name}_{chunk_size}_{chunk_overlap_scale}_k{k}"
+        file_path = f"{OUTPUT_PATH}/{vectorstore}_{docs_source}_{embedding_name}_{chunk_size}_{chunk_overlap_scale}_k{k}"
         print("load from :", file_path)
         df = pd.read_csv(file_path +".csv", sep="|", )
         df = df.drop(columns=['Unnamed: 0'])
@@ -201,10 +210,9 @@ def read_local_results(docs_source, model_name, chunk_size, chunk_overlap_scale,
         
 
 output_df, faiss_df, chroma_df = read_local_results("sustainability-methods-wiki", "bge-large-en-v1.5", "200", "0.1", my_k)
-print(output_df)
+# print(output_df)
 
 
-# %% # 
 faiss_mean_context_precision = faiss_df['context_precision'].mean()
 faiss_mean_context_recall = faiss_df['context_recall'].mean()
 faiss_f_measure = 2 * faiss_mean_context_precision * faiss_mean_context_recall / (faiss_mean_context_precision + faiss_mean_context_recall)
@@ -217,6 +225,7 @@ final_df = pd.DataFrame({"vectorstore": ["faiss", "chroma"],
                             "context_precision": [faiss_mean_context_precision, chroma_mean_context_precision],
                             "context_recall": [faiss_mean_context_recall, chroma_mean_context_recall],
                             "f_measure": [faiss_f_measure, chroma_f_measure]})
+print("current_k = ", my_k)
 print(final_df)
 
 

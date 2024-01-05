@@ -33,7 +33,7 @@ faiss_vs = StipVectorStore("faiss")
 # faiss_sus_bge_db = faiss_vs.create_vectorstore(suswiki_docs, StipEmbedding("bge").embed_model, chunk_size=200, chunk_overlap_scale=0.1)
 
 #### Load vectorstore
-faiss_sus_bge_db = faiss_vs.load_vectorstore()
+faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
 
 #%% 
 
