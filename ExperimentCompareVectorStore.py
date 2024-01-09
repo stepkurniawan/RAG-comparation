@@ -9,6 +9,8 @@ Experiment to compare different vector store and see the effect on the retriever
 import os
 import threading
 import concurrent.futures
+import matplotlib.pyplot as plt
+
 
 import time
 
@@ -170,21 +172,23 @@ def save_locally(contexted_df, database_obj):
     #save answer to json
     contexted_df.to_json(file_path+".json")
 
-
-# my_k = 8
+#### Uncomment this to evaluate retriever (use OpenAI API)
+my_k = 1
 # faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
 # chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
 # save_locally(faiss_contexted_result_df, faiss_vs)
 # save_locally(chroma_contexted_result_df, chroma_vs)
 
-# # do a for loop for k from 1 - 10
-for my_k in range(8, 11):
-    print(f"evaluate for k: {my_k}--------------------")
 
-    faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
-    chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
-    save_locally(faiss_contexted_result_df, faiss_vs)
-    save_locally(chroma_contexted_result_df, chroma_vs)
+#### Uncomment this to evaluate retriever (loop)
+# # # do a for loop for k from 1 - 10
+# for my_k in range(8, 11):
+#     print(f"evaluate for k: {my_k}--------------------")
+
+#     faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
+#     chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
+#     save_locally(faiss_contexted_result_df, faiss_vs)
+#     save_locally(chroma_contexted_result_df, chroma_vs)
     
 # %%
 
@@ -228,5 +232,87 @@ final_df = pd.DataFrame({"vectorstore": ["faiss", "chroma"],
 print("current_k = ", my_k)
 print(final_df)
 
+
+# %% LOAD 7 results from local
+
+# loop for k from 1 - 7
+final_df = pd.DataFrame()
+for k in range(1, 8):
+    print(f"evaluate for k: {k}--------------------")
+
+    output_df, faiss_df, chroma_df = read_local_results("sustainability-methods-wiki", "bge-large-en-v1.5", "200", "0.1", k)
+    faiss_mean_context_precision = faiss_df['context_precision'].mean()
+    faiss_mean_context_recall = faiss_df['context_recall'].mean()
+    faiss_f_measure = 2 * faiss_mean_context_precision * faiss_mean_context_recall / (faiss_mean_context_precision + faiss_mean_context_recall)
+    chroma_mean_context_precision = chroma_df['context_precision'].mean()
+    chroma_mean_context_recall = chroma_df['context_recall'].mean()
+    chroma_f_measure = 2 * chroma_mean_context_precision * chroma_mean_context_recall / (chroma_mean_context_precision + chroma_mean_context_recall)
+
+    # concat the result to final_df
+    df = pd.DataFrame({ "k": [k,k],
+                        "vectorstore": ["faiss", "chroma"],
+                        "context_precision": [faiss_mean_context_precision, chroma_mean_context_precision],
+                        "context_recall": [faiss_mean_context_recall, chroma_mean_context_recall],
+                        "f_measure": [faiss_f_measure, chroma_f_measure]})
+    final_df = pd.concat([final_df, df], axis=0)
+    
+    print("current_k = ", k)
+
+    print(final_df)
+
+
+# Filter the DataFrame for each vectorstore
+faiss_df = final_df[final_df['vectorstore'] == 'faiss']
+chroma_df = final_df[final_df['vectorstore'] == 'chroma']
+
+
+
+#%% CREATE VISUALIZATION
+
+reddishbrown = '#8B4513'
+# FAISS variance error bar for context precision and context recall
+# plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue', label='FAISS context_precision with stddev')
+# plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown, label='Chroma context_precision with stddev')
+
+# plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue', label='FAISS context_recall with stddev')
+# plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown, label='Chroma context_recall with stddev')
+
+# Add labels and title
+plt.title("Context Precision and Recall for different Vector Store based on k")
+plt.xlabel("k")
+plt.ylabel("context_precision and context_recall score")
+
+
+
+#### Add labels at each point
+# Plot the data and error bars
+plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue')
+for i in range(len(faiss_df)):
+    plt.annotate(f"{faiss_df['context_precision'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue')
+for i in range(len(faiss_df)):
+    plt.annotate(f"{faiss_df['context_recall'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown)
+for i in range(len(chroma_df)):
+    plt.annotate(f"{chroma_df['context_precision'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown)
+for i in range(len(chroma_df)):
+    plt.annotate(f"{chroma_df['context_recall'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+#### Create custom legend
+
+import matplotlib.lines as mlines
+
+orange_line = mlines.Line2D([], [], color='skyblue', label='FAISS')
+reddishbrown_line = mlines.Line2D([], [], color=reddishbrown, label='Chroma')
+solid_line = mlines.Line2D([], [], color='black', linestyle='-', label='context_precision')
+dotted_line = mlines.Line2D([], [], color='black', linestyle='--', label='context_recall')
+plt.legend(handles=[orange_line, reddishbrown_line, solid_line, dotted_line], bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
+# Show the plot
+plt.show()
 
 # %%
