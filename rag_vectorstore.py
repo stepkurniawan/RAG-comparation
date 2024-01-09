@@ -37,30 +37,7 @@ def dataset_to_texts(data):
     texts = data_pd['chunk'].to_numpy()
     return texts
 
-# deprecated #########################
-def create_faiss_db(documents, embedding):    
-    db = FAISS.from_documents(documents, embedding)
-    db.save_local(FAISS_PATH+"_"+embedding.model_name )
-    return db
 
-def load_local_faiss_vector_database(embeddings):
-    """
-    Load a local vector database from a list of texts and an embedding model.
-    """
-    db = FAISS.load_local(FAISS_PATH, embeddings)
-    return db
-
-
-def create_chroma_db(documents, embeddings):
-    vectorstore = Chroma.from_documents(documents, 
-                                        embeddings,
-                                        persist_directory=CHROMA_PATH)
-    return vectorstore
-
-def load_chroma_db(embeddings):
-    vectorstore = Chroma(persist_directory=CHROMA_PATH, 
-                         embedding_function=embeddings)
-    return vectorstore
 #####################################################################
 
 def create_db_pipeline(knowledge_base, vectorstore_name, embed_id, chunk_size, chunk_overlap_scale):
@@ -88,9 +65,12 @@ def create_db_pipeline(knowledge_base, vectorstore_name, embed_id, chunk_size, c
         db.save_local(save_path)
     elif vectorstore_name=='Chroma':
         save_path = CHROMA_PATH + "/" + "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+        
         db = Chroma.from_documents(documents=split_docs, 
                                             embedding=embed_model,
-                                            persist_directory=save_path)
+                                            persist_directory=save_path,
+                                            collection_metadata={"hnsw:space": "cosine"}, # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
+                                            )
     
     return db
 
@@ -118,9 +98,15 @@ def similarity_search_doc(db, query, top_k=3):
     Ref:
     https://github.com/JayZeeDesign/Knowledgebase-embedding/blob/main/app.py
     """
-    similar_response = db.similarity_search(query, k=top_k)
+    similar_response = db.similarity_search_with_score(query, k=top_k)
 
-    page_contents_array = get_content_from_similarity_search(similar_response)
+    # if similarity_search_with_score, the similar_response is a list of tuple (doc, score)
+    # else if similarity_search, the similar_response is a list of doc
+    if similar_response and isinstance(similar_response[0], tuple): 
+        page_contents_array = [doc[0].page_content for doc in similar_response]
+    else:
+        page_contents_array = [doc.page_content for doc in similar_response]
+
     # print(page_contents_array)
 
     return page_contents_array
@@ -158,11 +144,8 @@ def svm_similarity_search_doc(documents, query, embed_model, top_k):
                                                 relevancy_threshold = 0.3)
     
     docs_svm=svm_retriever.get_relevant_documents(query)
-    docs_svm_list = get_content_from_similarity_search(docs_svm)
+    docs_svm_list = [doc.page_content for doc in docs_svm]
     len(docs_svm)
     return docs_svm_list
 
-def get_content_from_similarity_search(similar_response):
-    page_contents_array = [doc.page_content for doc in similar_response]
-    return page_contents_array
 

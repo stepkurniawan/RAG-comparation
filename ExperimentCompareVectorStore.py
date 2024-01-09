@@ -35,7 +35,7 @@ import pandas as pd
 # 1. UI ##############################################################
 
 # 2. Set up environment ############################################
-QUERY = "When and where did the quantitative Content Analysis method originate?"
+QUERY = "What is the ANOVA powerful for?"
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 OUTPUT_PATH = "experiments/vectorstore_comp"
@@ -134,11 +134,11 @@ database2 = chroma_data
 database_obj2 = chroma_vs
 database_name2 = "chroma"
 
-similar_docs = similarity_search_doc(database, QUERY, 1)
+similar_docs = similarity_search_doc(database2, QUERY, 9)
 
 ###################### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
 
-curated_qa_dataset = StipHuggingFaceDataset("stepkurniawan/sustainability-methods-wiki", "50_QA", ["question", "ground_truths"]).load_dataset()
+curated_qa_dataset = StipHuggingFaceDataset("stepkurniawan/sustainability-methods-wiki", "50_QA_reviewed", ["question", "ground_truths"]).load_dataset()
 dataset = curated_qa_dataset['train']
 
 # 4.5.1 answer using similarity search
@@ -182,7 +182,7 @@ my_k = 1
 
 #### Uncomment this to evaluate retriever (loop)
 # # # do a for loop for k from 1 - 10
-# for my_k in range(8, 11):
+# for my_k in range(1, 6):
 #     print(f"evaluate for k: {my_k}--------------------")
 
 #     faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
