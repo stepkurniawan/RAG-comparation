@@ -12,7 +12,7 @@
 
 #%% INIT HF Embedding Pipeline
 from torch import cuda
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
 embed_model_id = 'sentence-transformers/all-MiniLM-L6-v2'
 
@@ -53,9 +53,9 @@ data = load_dataset(
 model_id = embed_model_id
 embedding = embed_model
 
-from langchain.vectorstores import FAISS
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain_community.text_splitter import RecursiveCharacterTextSplitter
 
 # DATA_PATH = "data/"
 DB_FAISS_PATH = "vectorstores/db_faiss"
@@ -89,10 +89,10 @@ create_vector_database(texts, embedding)
 # %%
 
 from langchain import PromptTemplate
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.llms import CTransformers # to use CPU only
-from langchain.chains import RetrievalQA
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_community.llms import CTransformers # to use CPU only
+from langchain_community.chains import RetrievalQA
 import chainlit as cl
 import transformers
 

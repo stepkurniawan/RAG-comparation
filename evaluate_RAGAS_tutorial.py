@@ -1,19 +1,19 @@
 # !pip install bs4 chromadb tiktoken
 
 #%%
-from langchain.vectorstores import Chroma
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.llms import AzureOpenAI
-from langchain.vectorstores import FAISS
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.llms import AzureOpenAI
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 
 from langchain.chains import LLMMathChain
 
-from langchain.document_loaders import WebBaseLoader
-from langchain.indexes import VectorstoreIndexCreator
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.indexes import VectorstoreIndexCreator
 from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 
 from torch import cuda
 

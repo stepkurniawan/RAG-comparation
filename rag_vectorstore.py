@@ -1,8 +1,12 @@
-from langchain.document_loaders import WebBaseLoader, PyPDFLoader, DirectoryLoader
+from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader, DirectoryLoader
 from langchain.indexes import VectorstoreIndexCreator
-from langchain.vectorstores import FAISS, Chroma
+
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_community.vectorstores.chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.retrievers import SVMRetriever
+from langchain_community.retrievers import SVMRetriever
+import chromadb
+
 
 from rag_load_data import load_sustainability_wiki_langchain_documents
 from rag_splitter import split_data_to_docs
@@ -39,40 +43,47 @@ def dataset_to_texts(data):
 
 
 #####################################################################
+### DEPRECATED
+# def create_db_pipeline(
+#         knowledge_base, 
+#         vectorstore_name: str, 
+#         embed_id : str, 
+#         chunk_size : int, 
+#         chunk_overlap_scale: float, 
+#         index_distance):
+#     """
+#     Create a local vector database from a list of texts and an embedding model.
+#     you can change the input from texts or data
+#     """
+#     embedding_name = embed_id.split('/')[-1]
 
-def create_db_pipeline(knowledge_base, vectorstore_name, embed_id, chunk_size, chunk_overlap_scale):
-    """
-    Create a local vector database from a list of texts and an embedding model.
-    you can change the input from texts or data
-    """
-    embedding_name = embed_id.split('/')[-1]
-
-    # Load data 
-    if knowledge_base == 'suswiki': 
-        documents = load_sustainability_wiki_langchain_documents()
-    elif knowledge_base == 'wikipedia':
-        print("# TODO : get docu from wikipedia")
+#     # Load data 
+#     if knowledge_base == 'suswiki': 
+#         documents = load_sustainability_wiki_langchain_documents()
+#     elif knowledge_base == 'wikipedia':
+#         print("# TODO : get docu from wikipedia")
         
-    # split docs
-    split_docs = split_data_to_docs(documents, chunk_size, chunk_overlap_scale)
+#     # split docs
+#     split_docs = split_data_to_docs(documents, chunk_size, chunk_overlap_scale)
 
-    # vectorstore
-    embed_model , _ = get_embed_model(embed_id)
-    if vectorstore_name=='FAISS':
-        # db = FAISS.from_texts(texts, embeddings)
-        save_path = FAISS_PATH + "/"  + "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
-        db = FAISS.from_documents(split_docs, embed_model)
-        db.save_local(save_path)
-    elif vectorstore_name=='Chroma':
-        save_path = CHROMA_PATH + "/" + "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+#     # vectorstore
+#     embed_model , _ = get_embed_model(embed_id)
+#     collection_name = knowledge_base + "_" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+#     if vectorstore_name=='FAISS':
+#         # db = FAISS.from_texts(texts, embeddings)
+#         save_path = FAISS_PATH +  "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
+#         db = FAISS.from_documents(split_docs, embed_model)
+#         db.save_local(save_path)
+#     elif vectorstore_name=='Chroma':
+#         save_path = CHROMA_PATH +  "/" + embedding_name + "_" + str(chunk_size) + "_" + str(chunk_overlap_scale)
         
-        db = Chroma.from_documents(documents=split_docs, 
-                                            embedding=embed_model,
-                                            persist_directory=save_path,
-                                            collection_metadata={"hnsw:space": "cosine"}, # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
-                                            )
+#         db = Chroma.from_documents(documents=split_docs, 
+#                                             embedding=embed_model,
+#                                             persist_directory=save_path,
+#                                             collection_metadata ={"hnsw:space": index_distance}, # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
+#                                             )
     
-    return db
+#     return db
 
 def load_db_pipeline(knowledge_base, vectorstore_name, embedding):
     """
@@ -93,13 +104,12 @@ def load_db_pipeline(knowledge_base, vectorstore_name, embedding):
 
 
 
-def similarity_search_doc(db, query, top_k=3):
+def similarity_search_doc(db, query:str, top_k:int=3):
     """
     Ref:
     https://github.com/JayZeeDesign/Knowledgebase-embedding/blob/main/app.py
     """
-    similar_response = db.similarity_search_with_score(query, k=top_k)
-
+    similar_response = db.similarity_search_with_score(query, k=top_k) # use this to check the score wether it changes when we change the index_distance in StipVectorStore
     # if similarity_search_with_score, the similar_response is a list of tuple (doc, score)
     # else if similarity_search, the similar_response is a list of doc
     if similar_response and isinstance(similar_response[0], tuple): 

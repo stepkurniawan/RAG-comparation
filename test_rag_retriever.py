@@ -18,10 +18,10 @@ from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
 from rag_load_data import load_50_qa_dataset
 
 from torch import cuda
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.indexes import VectorstoreIndexCreator
-from langchain.vectorstores import FAISS, Chroma
-from langchain.docstore.document import Document
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.indexes import VectorstoreIndexCreator
+from langchain_community.vectorstores import FAISS, Chroma
+from langchain_community.docstore.document import Document
 from datasets import load_dataset, Dataset, DatasetDict
 
 from ragas.metrics import ContextPrecision, ContextRecall

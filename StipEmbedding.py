@@ -1,6 +1,6 @@
 from torch import cuda
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import OpenAIEmbeddings
 
 embedding_ids = {
     'openai': 'text-embedding-ada-002',

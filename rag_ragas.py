@@ -6,10 +6,10 @@ hf_token = os.getenv('HF_AUTH_TOKEN')
 
 from datasets import load_dataset, Dataset
 
-# from langchain.chat_models import AzureChatOpenAI
+# from langchain_community.chat_models import AzureChatOpenAI
 from ragas.llms import LangchainLLM
-# from langchain.llms import AzureOpenAI
-# from langchain.embeddings import AzureOpenAIEmbeddings
+# from langchain_community.llms import AzureOpenAI
+# from langchain_community.embeddings import AzureOpenAIEmbeddings
 
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 

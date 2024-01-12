@@ -16,8 +16,8 @@ from rag_ragas import make_eval_chains, evaluate_RAGAS
 from rag_splitter import split_data_to_docs
 from StipKnowledgeBase import StipKnowledgeBase
 
-from langchain.vectorstores import FAISS
-from langchain.llms import CTransformers # to use CPU only
+from langchain_community.vectorstores import FAISS
+from langchain_community.llms import CTransformers # to use CPU only
 
 from ragas.langchain import RagasEvaluatorChain
 

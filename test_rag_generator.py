@@ -9,11 +9,11 @@ from rag_vectorstore import load_chroma_db, load_local_faiss_vector_database
 
 
 from langchain import PromptTemplate
-from langchain.chains import RetrievalQA
-from langchain.vectorstores import FAISS, Chroma
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import CTransformers # to use CPU only
-from langchain.llms import HuggingFacePipeline
+from langchain_community.chains import RetrievalQA
+from langchain_community.vectorstores import FAISS, Chroma
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.llms import CTransformers # to use CPU only
+from langchain_community.llms import HuggingFacePipeline
 
 
 QUERY = "What is the probability of you being so much taller than the average? "

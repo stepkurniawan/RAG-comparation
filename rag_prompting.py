@@ -1,5 +1,5 @@
 from langchain import PromptTemplate
-from langchain.prompts import ChatPromptTemplate
+from langchain_community.prompts import ChatPromptTemplate
 
 
 

@@ -10,8 +10,8 @@ from rag_llms import load_llm_gpt4,load_llm_gpt35
 import openai
 import os
 import pandas as pd
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain_community.prompts import PromptTemplate
+from langchain_community.chains import LLMChain
 
 
 from dotenv import load_dotenv, find_dotenv

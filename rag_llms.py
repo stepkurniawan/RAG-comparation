@@ -1,5 +1,5 @@
-from langchain.llms import CTransformers, HuggingFacePipeline # to use CPU only
-from langchain.chat_models import ChatOpenAI
+from langchain_community.llms import CTransformers, HuggingFacePipeline # to use CPU only
+from langchain_community.chat_models import ChatOpenAI
 import os
 import openai
 from dotenv import load_dotenv

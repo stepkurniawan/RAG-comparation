@@ -1,7 +1,6 @@
-from langchain.chains import RetrievalQA
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.chains import RetrievalQA, RetrievalQAWithSourcesChain
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores.faiss import FAISS
 from langchain import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 

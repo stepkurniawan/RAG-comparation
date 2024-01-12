@@ -47,7 +47,8 @@ def split_data_to_docs(data, chunk_size = 200, chunk_overlap_scale = 0.1):
     start_time = time.time() # start timer
 
     splitter = RecursiveCharacterTextSplitter(
-                separators=["\n\n", "\n", " "],
+                # separators=["\n\n", "\n", " "], # separates either on words or paragraphs
+                separators=[" "], # only split on spaces, meaning: words
                 chunk_size=chunk_size, 
                 chunk_overlap=chunk_size*chunk_overlap_scale,
                 length_function=length_function,

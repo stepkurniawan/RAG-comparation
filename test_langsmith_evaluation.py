@@ -29,13 +29,13 @@ for input_prompt in example_inputs:
 
 # %% DEFINE LLM
 
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 
 llm = ChatOpenAI(temperature=0)
 
 # %% EVALUATE LLM
 
-from langchain.smith import RunEvalConfig, run_on_dataset
+from langchain_community.smith import RunEvalConfig, run_on_dataset
 
 eval_config = RunEvalConfig(
   evaluators=[

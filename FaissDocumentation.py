@@ -18,10 +18,10 @@ from rag_embedding import get_embed_model, embedding_ids
 # Uncomment the following line if you need to initialize FAISS with no AVX2 optimization
 # os.environ['FAISS_NO_AVX2'] = '1'
 
-from langchain.document_loaders import TextLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import TextLoader
+from langchain_community.embeddings.openai import OpenAIEmbeddings
+from langchain_community.text_splitter import CharacterTextSplitter
+from langchain_community.vectorstores import FAISS
 
 loader = TextLoader("requirements.txt")
 documents = loader.load()

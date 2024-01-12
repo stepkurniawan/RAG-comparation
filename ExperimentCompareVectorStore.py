@@ -1,5 +1,12 @@
 """
 Experiment to compare different vector store and see the effect on the retriever performance
+
+Structure:
+1. Create vectorstore
+2. Load vectorstore (check path)
+3. Evaluate retriever
+4. Visualize the result
+
 """
 
 
@@ -7,10 +14,13 @@ Experiment to compare different vector store and see the effect on the retriever
 # !pip install bs4 chromadb tiktoken faiss-cpu accelerate xformers ragas
 
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import threading
 import concurrent.futures
 import matplotlib.pyplot as plt
-
+from adjustText import adjust_text # better annotation
 
 import time
 
@@ -32,10 +42,9 @@ from ragas.metrics import ContextPrecision, ContextRecall
 import pandas as pd
 
 
-# 1. UI ##############################################################
 
 # 2. Set up environment ############################################
-QUERY = "What is the ANOVA powerful for?"
+QUERY = "What is the advantage of A/B testing?"
 DB_PATH = "vectorstores/db_faiss"
 LINK = "https://sustainabilitymethods.org/index.php/A_matter_of_probability"
 OUTPUT_PATH = "experiments/vectorstore_comp"
@@ -66,75 +75,34 @@ def prepare_vectorstore(vectorstore_type: str):
 
     # Create vectorstore
     start_time = time.time()
-    vs_data = vs.create_vectorstore(docs, embed_model) 
+    vs_data = vs.create_vectorstore(docs, embed_model,200,0.1, index_distance="l2") 
     end_time = time.time()
     elapsed_time = end_time - start_time
     print(f"elapsed time to create {vectorstore_type}: {elapsed_time} seconds")
 
     return vs_data, vs
 
-# uncomment this to create vectorstore
-
-def thread_function(vs_type: str):
-    try:
-        data_vs, vs = prepare_vectorstore(vs_type)
-        print(f"finish creating {vs_type} vectorstore")
-        return data_vs, vs
-    except Exception as e:
-        print(f"Exception occurred in thread_function: {e}")
-
-#### threading.Thread() ####
-# faiss_thread = threading.Thread(target=thread_function, args=("faiss",))
-# chroma_thread = threading.Thread(target=thread_function, args=("chroma",))
-# faiss_thread.start()
-# chroma_thread.start()
-# faiss_thread.join()
-# chroma_thread.join()
-# faiss_data, faiss_vs = faiss_thread.result
-# chroma_data, chroma_vs = chroma_thread.result
-# print("finish creating vectorstore")
-####################################
-
-# ### concurrent.futures.ThreadPoolExecutor() ####
-# with concurrent.futures.ThreadPoolExecutor() as executor:
-#     vectorstore_types = ["faiss", "chroma"]
-#     results_generator = executor.map(thread_function, vectorstore_types)
-
-# results_list = list(results_generator)
-# faiss_future = results_list[0]
-# chroma_future = results_list[1]
-
-# try: 
-#     faiss_data, faiss_vs = faiss_future[0], faiss_future[1]
-#     chroma_data, chroma_vs = chroma_future[0], chroma_future[1]
-# except Exception as e:
-#     print(f"Exception occurred: {e}")
-####################################
-
 
 ########## FIRST TIME ONLE ##########
+#### Uncomment this if needed ######
 # faiss_data , faiss_vs = prepare_vectorstore("faiss")
 # chroma_data, chroma_vs = prepare_vectorstore("chroma")
 
 ####### LOAD FROM LOCAL ##########
 faiss_vs = StipVectorStore("faiss")
-faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_l2")
 faiss_data = faiss_vs.db
+
 chroma_vs = StipVectorStore("chroma")
-chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
+chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_l2")
 chroma_data = chroma_vs.db
 
 
-#%% # 4.5 Similiarity search
-## uncomment this to do similarity search
-database = faiss_data
-database_obj = faiss_vs
-database_name = "faiss"
-database2 = chroma_data
-database_obj2 = chroma_vs
-database_name2 = "chroma"
+#%% # SIMILARITY SEARCH ##############################################
 
-similar_docs = similarity_search_doc(database2, QUERY, 9)
+
+
+similar_docs = similarity_search_doc(chroma_data, QUERY, 9)
 
 ###################### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
 
@@ -181,12 +149,12 @@ my_k = 1
 
 
 #### Uncomment this to evaluate retriever (loop)
-# # # do a for loop for k from 1 - 10
-# for my_k in range(1, 6):
+# # do a for loop for k from 1 - 10
+# for my_k in range(4, 8):
 #     print(f"evaluate for k: {my_k}--------------------")
 
-#     faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
-#     chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
+#     faiss_contexted_result_df = evaluate_retriever(faiss_data, dataset, my_k)
+#     chroma_contexted_result_df = evaluate_retriever(chroma_data, dataset, my_k)
 #     save_locally(faiss_contexted_result_df, faiss_vs)
 #     save_locally(chroma_contexted_result_df, chroma_vs)
     
@@ -279,30 +247,57 @@ reddishbrown = '#8B4513'
 
 # Add labels and title
 plt.title("Context Precision and Recall for different Vector Store based on k")
-plt.xlabel("k")
+plt.xlabel("number of top document k")
 plt.ylabel("context_precision and context_recall score")
 
 
 
 #### Add labels at each point
+texts = []
+
 # Plot the data and error bars
-plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue')
+
+# plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue')
+# for i in range(len(faiss_df)):
+#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_precision'].values[i], f"{faiss_df['context_precision'].values[i]:.2f}", ha='center'))
+#     # plt.annotate(f"{faiss_df['context_precision'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+# plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue')
+# for i in range(len(faiss_df)):
+#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_recall'].values[i], f"{faiss_df['context_recall'].values[i]:.2f}", ha='center'))
+#     # plt.annotate(f"{faiss_df['context_recall'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+# plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown)
+# for i in range(len(chroma_df)):
+#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_precision'].values[i], f"{chroma_df['context_precision'].values[i]:.2f}", ha='center'))
+#     # plt.annotate(f"{chroma_df['context_precision'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+# plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown)
+# for i in range(len(chroma_df)):
+#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_recall'].values[i], f"{chroma_df['context_recall'].values[i]:.2f}", ha='center'))
+#     # plt.annotate(f"{chroma_df['context_recall'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+
+# just a line plot instead of error bar
+plt.plot(faiss_df['k'], faiss_df['context_precision'], '-', color='skyblue')
 for i in range(len(faiss_df)):
-    plt.annotate(f"{faiss_df['context_precision'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+    texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_precision'].values[i], f"{faiss_df['context_precision'].values[i]:.2f}", ha='center'))
 
-plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue')
+plt.plot(faiss_df['k'], faiss_df['context_recall'], '--', color='skyblue')
 for i in range(len(faiss_df)):
-    plt.annotate(f"{faiss_df['context_recall'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+    texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_recall'].values[i], f"{faiss_df['context_recall'].values[i]:.2f}", ha='center'))
 
-plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown)
+plt.plot(chroma_df['k'], chroma_df['context_precision'], '-', color=reddishbrown)
 for i in range(len(chroma_df)):
-    plt.annotate(f"{chroma_df['context_precision'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+    texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_precision'].values[i], f"{chroma_df['context_precision'].values[i]:.2f}", ha='center'))
 
-plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown)
+plt.plot(chroma_df['k'], chroma_df['context_recall'], '--', color=reddishbrown)
 for i in range(len(chroma_df)):
-    plt.annotate(f"{chroma_df['context_recall'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
+    texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_recall'].values[i], f"{chroma_df['context_recall'].values[i]:.2f}", ha='center'))
+    
+
+
+
 #### Create custom legend
-
 import matplotlib.lines as mlines
 
 orange_line = mlines.Line2D([], [], color='skyblue', label='FAISS')

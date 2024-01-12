@@ -1,6 +1,6 @@
 from datasets import load_dataset, Dataset
-from langchain.document_loaders import WebBaseLoader, HuggingFaceDatasetLoader
-from langchain.document_loaders import JSONLoader
+from langchain_community.document_loaders import WebBaseLoader, HuggingFaceDatasetLoader
+from langchain_community.document_loaders import JSONLoader
 
 
 import os

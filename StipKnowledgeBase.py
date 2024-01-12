@@ -1,8 +1,8 @@
 from datasets import load_dataset, Dataset
 from langchain.schema import Document
 
-from langchain.document_loaders import WebBaseLoader, HuggingFaceDatasetLoader
-from langchain.document_loaders import JSONLoader, TextLoader
+from langchain_community.document_loaders import WebBaseLoader, HuggingFaceDatasetLoader
+from langchain_community.document_loaders import JSONLoader, TextLoader
 from typing import Iterator, List, Mapping, Optional, Sequence, Union
 
 import time
