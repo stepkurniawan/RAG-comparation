@@ -32,6 +32,7 @@ class StipVectorStore:
         self.k: int = 0 # number of nearest neighbors
         self.db = None # vectorstore object
         self.index_distance: str = "l2" # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
+        self.ndata: int = 0 # number of data in vectorstore
 
         if vectorstore_name not in VECTORSTORE_NAMES:
             raise ValueError(f"vectorstore_name must be one of {VECTORSTORE_NAMES}")
@@ -61,7 +62,8 @@ class StipVectorStore:
             print(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
             logger.info(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
 
-            return self
+            return self              
+    
 
 
 
@@ -103,7 +105,10 @@ class StipVectorStore:
                 self.db.save_local(self.save_path)
                 print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
                 print(f'!NOTE: how many datapoints in vectorstore: {self.db.index.ntotal}')
+                self.ndata = self.db.index.ntotal
                 print(f'!NOTE: hnsw space: {self.db.distance_strategy}')
+                self.index_distance = self.db.distance_strategy
+                
 
             except Exception as e:
                 print(f"!NOTE: Exception occurred while creating FAISS vectorstore using {self.embedding_name}: {e}")
@@ -126,6 +131,7 @@ class StipVectorStore:
 
             collection = persistent_client.create_collection(name=collection_name,
                                                                 metadata={"hnsw:space": self.index_distance})# default index_distance is euclidean 'l2', Inner product 'ip', Cosine similarity 'cosine'
+            
             print(f'!NOTE: here, the collection count should be 0: {collection.count()}')
 
             # add documents to the collection
@@ -133,6 +139,8 @@ class StipVectorStore:
             page_contents = [doc.page_content for doc in split_docs]
             # page_contents_short = [doc.page_content for doc in split_docs if len(doc.page_content) <= 100] # DEBUG only: to check if there is any too short empty page_content
             collection.add(ids=ids_list, documents=page_contents)
+            print(f'!NOTE: here, the collection count should be {len(split_docs)}: {collection.count()}')
+            self.ndata = collection.count()
 
             # create langchain chroma client replaces from_documents()
             self.db = Chroma(

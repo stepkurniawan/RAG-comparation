@@ -21,6 +21,8 @@ import threading
 import concurrent.futures
 import matplotlib.pyplot as plt
 from adjustText import adjust_text # better annotation
+import numpy as np
+
 
 import time
 
@@ -40,6 +42,7 @@ from ragas.metrics import ContextPrecision, ContextRecall
 
 
 import pandas as pd
+import ast
 
 
 
@@ -102,7 +105,7 @@ chroma_data = chroma_vs.db
 
 
 
-similar_docs = similarity_search_doc(chroma_data, QUERY, 9)
+similar_docs = similarity_search_doc(chroma_data, QUERY, 6)
 
 ###################### 4.5 EVALUATE RETRIEVER : context precision , recall, and F-measure
 
@@ -141,9 +144,9 @@ def save_locally(contexted_df, database_obj):
     contexted_df.to_json(file_path+".json")
 
 #### Uncomment this to evaluate retriever (use OpenAI API)
-my_k = 1
-# faiss_contexted_result_df = evaluate_retriever(database, dataset, my_k)
-# chroma_contexted_result_df = evaluate_retriever(database2, dataset, my_k)
+my_k = 6
+# faiss_contexted_result_df = evaluate_retriever(faiss_data, dataset, my_k)
+chroma_contexted_result_df = evaluate_retriever(chroma_data, dataset, my_k)
 # save_locally(faiss_contexted_result_df, faiss_vs)
 # save_locally(chroma_contexted_result_df, chroma_vs)
 
@@ -205,7 +208,8 @@ print(final_df)
 
 # loop for k from 1 - 7
 final_df = pd.DataFrame()
-for k in range(1, 8):
+max_k = 6
+for k in range(1, max_k):
     print(f"evaluate for k: {k}--------------------")
 
     output_df, faiss_df, chroma_df = read_local_results("sustainability-methods-wiki", "bge-large-en-v1.5", "200", "0.1", k)
@@ -257,43 +261,41 @@ texts = []
 
 # Plot the data and error bars
 
-# plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue')
-# for i in range(len(faiss_df)):
-#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_precision'].values[i], f"{faiss_df['context_precision'].values[i]:.2f}", ha='center'))
-#     # plt.annotate(f"{faiss_df['context_precision'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
-
-# plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue')
-# for i in range(len(faiss_df)):
-#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_recall'].values[i], f"{faiss_df['context_recall'].values[i]:.2f}", ha='center'))
-#     # plt.annotate(f"{faiss_df['context_recall'].values[i]:.2f}", (faiss_df['k'].values[i], faiss_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
-
-# plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown)
-# for i in range(len(chroma_df)):
-#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_precision'].values[i], f"{chroma_df['context_precision'].values[i]:.2f}", ha='center'))
-#     # plt.annotate(f"{chroma_df['context_precision'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_precision'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
-
-# plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown)
-# for i in range(len(chroma_df)):
-#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_recall'].values[i], f"{chroma_df['context_recall'].values[i]:.2f}", ha='center'))
-#     # plt.annotate(f"{chroma_df['context_recall'].values[i]:.2f}", (chroma_df['k'].values[i], chroma_df['context_recall'].values[i]), textcoords="offset points", xytext=(0,10), ha='center')
-
-# just a line plot instead of error bar
-plt.plot(faiss_df['k'], faiss_df['context_precision'], '-', color='skyblue')
+plt.errorbar(faiss_df['k'], faiss_df['context_precision'], yerr=faiss_df['context_precision'].std(), fmt='-', color='skyblue')
 for i in range(len(faiss_df)):
     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_precision'].values[i], f"{faiss_df['context_precision'].values[i]:.2f}", ha='center'))
 
-plt.plot(faiss_df['k'], faiss_df['context_recall'], '--', color='skyblue')
+plt.errorbar(faiss_df['k'], faiss_df['context_recall'], yerr=faiss_df['context_recall'].std(), fmt='--', color='skyblue')
 for i in range(len(faiss_df)):
     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_recall'].values[i], f"{faiss_df['context_recall'].values[i]:.2f}", ha='center'))
 
-plt.plot(chroma_df['k'], chroma_df['context_precision'], '-', color=reddishbrown)
+plt.errorbar(chroma_df['k'], chroma_df['context_precision'], yerr=chroma_df['context_precision'].std(), fmt='-', color=reddishbrown)
 for i in range(len(chroma_df)):
     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_precision'].values[i], f"{chroma_df['context_precision'].values[i]:.2f}", ha='center'))
 
-plt.plot(chroma_df['k'], chroma_df['context_recall'], '--', color=reddishbrown)
+plt.errorbar(chroma_df['k'], chroma_df['context_recall'], yerr=chroma_df['context_recall'].std(), fmt='--', color=reddishbrown)
 for i in range(len(chroma_df)):
     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_recall'].values[i], f"{chroma_df['context_recall'].values[i]:.2f}", ha='center'))
-    
+
+
+
+# # just a line plot instead of error bar
+# plt.plot(faiss_df['k'], faiss_df['context_precision'], '-', color='skyblue')
+# for i in range(len(faiss_df)):
+#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_precision'].values[i], f"{faiss_df['context_precision'].values[i]:.2f}", ha='center'))
+
+# plt.plot(faiss_df['k'], faiss_df['context_recall'], '--', color='skyblue')
+# for i in range(len(faiss_df)):
+#     texts.append(plt.text(faiss_df['k'].values[i], faiss_df['context_recall'].values[i], f"{faiss_df['context_recall'].values[i]:.2f}", ha='center'))
+
+# plt.plot(chroma_df['k'], chroma_df['context_precision'], '-', color=reddishbrown)
+# for i in range(len(chroma_df)):
+#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_precision'].values[i], f"{chroma_df['context_precision'].values[i]:.2f}", ha='center'))
+
+# plt.plot(chroma_df['k'], chroma_df['context_recall'], '--', color=reddishbrown)
+# for i in range(len(chroma_df)):
+#     texts.append(plt.text(chroma_df['k'].values[i], chroma_df['context_recall'].values[i], f"{chroma_df['context_recall'].values[i]:.2f}", ha='center'))
+
 
 
 
@@ -307,7 +309,36 @@ dotted_line = mlines.Line2D([], [], color='black', linestyle='--', label='contex
 plt.legend(handles=[orange_line, reddishbrown_line, solid_line, dotted_line], bbox_to_anchor=(1.05, 1), loc='upper left')
 
 
+#### change the x tick
+# Get the current x-axis limits
+xmin, xmax = plt.xlim()
+# Create a range of integer values from xmin to xmax
+xticks = np.arange(np.ceil(xmin), np.floor(xmax)+1)
+# Set the new x-axis ticks
+plt.xticks(xticks)
+
 # Show the plot
 plt.show()
 
+# %% MANUAL EXPERIMENT
+import ast
+
+question_row=0
+k = 6
+# load document from local based on k
+output_df_man, faiss_df_man, chroma_df_man = read_local_results("sustainability-methods-wiki", "bge-large-en-v1.5", "200", "0.1", k)
+
+# grab the first row
+current_row = output_df_man.iloc[question_row]
+
+faiss_context = current_row['contexts_faiss'] # string
+faiss_context_list = ast.literal_eval(faiss_context)
+
+chroma_context = current_row['contexts_chroma']
+chroma_context_list = ast.literal_eval(chroma_context)
+
+
+
+
+print("")
 # %%
