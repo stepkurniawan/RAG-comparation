@@ -1,6 +1,13 @@
 import shutil
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_community.vectorstores.chroma import Chroma
+from langchain_community.vectorstores.utils import (
+    DistanceStrategy,
+    maximal_marginal_relevance,
+)
+
+from typing import Iterator, List, Mapping, Optional, Sequence, Union
+
 
 import chromadb
 import os
@@ -20,7 +27,7 @@ CHROMA_PATH = "vectorstores/db_chroma"
 
 
 class StipVectorStore:
-    def __init__(self, vectorstore_name):
+    def __init__(self, vectorstore_name, index_distance="l2"):
         self.vectorstore_name: str = vectorstore_name # faiss or chroma
         self.docs_source: str = "" # source of the documents (suswiki, wikipedia, etc)
         self.embedding = None # embedding object
@@ -31,13 +38,31 @@ class StipVectorStore:
         self.chunk_overlap_scale: float = 0 # how much overlap between chunks
         self.k: int = 0 # number of nearest neighbors
         self.db = None # vectorstore object
-        self.index_distance: str = "l2" # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
+        self.index_distance: Optional[str] = index_distance  # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
         self.ndata: int = 0 # number of data in vectorstore
 
+        
+
+
+        # # Mapping dictionary for vector stores
+        # vector_stores = {
+        #     'faiss': (FAISS, FAISS_PATH),
+        #     'chroma': (Chroma, CHROMA_PATH)
+        # }
+
+        # # Check if vectorstore_name is valid
+        # if self.vectorstore_name not in vector_stores:
+        #     raise ValueError(f"vectorstore_name must be one of {list(vector_stores.keys())}")
+
+        # # Assign vectorstore_obj and vectorstore_path using tuple unpacking
+        # self.vectorstore_obj, self.vectorstore_path = vector_stores[vectorstore_name]
+
+
+        ### deprecated ####
         if vectorstore_name not in VECTORSTORE_NAMES:
             raise ValueError(f"vectorstore_name must be one of {VECTORSTORE_NAMES}")
         elif vectorstore_name == 'faiss':
-            self.vectorstore_obj = FAISS 
+            self.vectorstore_obj = FAISS
             self.vectorstore_path = FAISS_PATH
         elif vectorstore_name == 'chroma':
             self.vectorstore_obj = Chroma
@@ -53,10 +78,14 @@ class StipVectorStore:
                 self.__dict__.update(pickle.load(f))
 
             if self.vectorstore_name == 'faiss':
-                self.db = self.vectorstore_obj.load_local(self.save_path, self.embedding)
+                faiss_distance_strategy = get_faiss_distance_strategy(self.index_distance)
+                self.db = self.vectorstore_obj.load_local(self.save_path, self.embedding, distance_strategy=faiss_distance_strategy)
             elif self.vectorstore_name == 'chroma':
+                print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
                 self.db = self.vectorstore_obj(persist_directory=self.save_path, 
-                            embedding_function=self.embedding)
+                            embedding_function=self.embedding,
+                            )
+                
                 
             end_time = time.time()
             print(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
@@ -74,7 +103,7 @@ class StipVectorStore:
                            embedding, 
                            chunk_size, 
                            chunk_overlap_scale, 
-                           index_distance,
+                           index_distance: Optional[str],
                             ):
         
         # set attributes
@@ -92,7 +121,7 @@ class StipVectorStore:
         else:
             self.docs_source = dict_docs['source'] if 'source' in dict_docs.keys() else None
             documents = dict_docs['documents'] if 'documents' in dict_docs.keys() else dict_docs
-        self.save_path = self.vectorstore_path+ "/" + self.docs_source + "/" + self.embedding_name + "_" + str(self.chunk_size) + "_" + str(self.chunk_overlap_scale)+"_"+index_distance
+        self.save_path = self.vectorstore_path+ "/" + self.docs_source + "/" + self.embedding_name + "_" + str(self.chunk_size) + "_" + str(self.chunk_overlap_scale)+"_"+self.index_distance
 
         # splitting documents
         split_docs = split_data_to_docs(documents, chunk_size, chunk_overlap_scale)['documents']
@@ -100,22 +129,39 @@ class StipVectorStore:
         start_time = time.time()
 
         if self.vectorstore_name == 'faiss':
+            """
+            Creating FAISS Vector Store
+            https://python.langchain.com/docs/integrations/vectorstores/faiss
+            """
+
+            faiss_distance_strategy = get_faiss_distance_strategy(self.index_distance)
             try:
-                self.db = self.vectorstore_obj.from_documents(split_docs, self.embedding)
-                self.db.save_local(self.save_path)
+
+                self.db = self.vectorstore_obj.from_documents(split_docs, self.embedding, distance_strategy=faiss_distance_strategy)
+                # self.db = FAISS.from_documents(split_docs, self.embedding)
+                insanity_check = self.db.similarity_search_with_score("A/B testing", k=3)
+
+                self.ndata = self.db.index.ntotal
+                print(f'!NOTE: distance strategy: {self.db.distance_strategy}')
                 print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
                 print(f'!NOTE: how many datapoints in vectorstore: {self.db.index.ntotal}')
-                self.ndata = self.db.index.ntotal
-                print(f'!NOTE: hnsw space: {self.db.distance_strategy}')
-                self.index_distance = self.db.distance_strategy
+                
+                self.db.save_local(self.save_path)
+                # self.db.distance_strategy = self.index_distance
+                
                 
 
             except Exception as e:
                 print(f"!NOTE: Exception occurred while creating FAISS vectorstore using {self.embedding_name}: {e}")
 
     
+
+
         elif self.vectorstore_name == 'chroma':
-            
+            """
+            Creating Chroma Vector Store
+            https://python.langchain.com/docs/integrations/vectorstores/chroma#similarity-search-with-score
+            """
             #### USING CHROMA NATIVE COLLECTION ####
             ### pass a chroma client to into Langchain : ref: https://python.langchain.com/docs/integrations/vectorstores/chroma 
             persistent_client = chromadb.PersistentClient(path="./" + self.save_path)
@@ -164,9 +210,9 @@ class StipVectorStore:
             #                                 persist_directory=self.save_path,
             #                                 collection_metadata ={"hnsw:space": self.index_distance}) # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
             
-            # print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
-            # print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
-            # print(f'!NOTE: how many datapoints in vectorstore: {self.db._collection.count()}')
+            print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
+            print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
+            print(f'!NOTE: how many datapoints in vectorstore: {self.db._collection.count()}')
 
 
         
@@ -196,4 +242,13 @@ class StipVectorStore:
         
         return self.db
     
-    
+
+def get_faiss_distance_strategy(index_distance):
+    # Mapping dictionary for distance strategies
+    distance_strategies = {
+        "ip": DistanceStrategy.MAX_INNER_PRODUCT,
+        "cosine": DistanceStrategy.COSINE
+    }
+    # Default to EUCLIDEAN_DISTANCE if no match found in the dictionary
+    faiss_distance_strategy = distance_strategies.get(index_distance, DistanceStrategy.EUCLIDEAN_DISTANCE)
+    return faiss_distance_strategy

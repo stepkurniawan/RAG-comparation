@@ -23,18 +23,43 @@ from StipVectorStore import StipVectorStore
 from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset
 from StipEmbedding import StipEmbedding
 
+#### 
+EMBED_MODEL = StipEmbedding("bge").embed_model
+CHUNK_SIZE = 200
+CHUNK_OVERLAP_SCALE = 0.1
+
+
 #### Knowledge Base 
 suswiki_kb = StipKnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
 suswiki_docs = suswiki_kb.load_documents()
+# suswiki_docs["documents"] = suswiki_docs["documents"][:100] # limit data for test
 print(f'successful load data from {suswiki_docs["source"]}. It has source and documents keys')
 
+#### Embedding
+
 #### Split and create vectorstore
+
+EUCLEDIAN = "l2"
+COSINE = "cosine"
+INNER_PRODUCT = "ip"
+
+## 1. faiss
 faiss_vs = StipVectorStore("faiss")
-# faiss_sus_bge_db = faiss_vs.create_vectorstore(suswiki_docs, StipEmbedding("bge").embed_model, chunk_size=200, chunk_overlap_scale=0.1)
+# faiss_eucledian = faiss_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, EUCLEDIAN)
+# faiss_cosine = faiss_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, COSINE)
+# faiss_ip = faiss_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, INNER_PRODUCT)
+
+
+# ## 2. chroma
+chroma_vs = StipVectorStore("chroma")
+# chroma_eucledian = chroma_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, EUCLEDIAN)
+chroma_cosine = chroma_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, COSINE)
+# chroma_ip = chroma_vs.create_vectorstore(suswiki_docs, EMBED_MODEL, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, INNER_PRODUCT)
+
 
 #### Load vectorstore
-faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1")
-
+# faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_l2")
+chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_cosine")
 #%% 
 
 
