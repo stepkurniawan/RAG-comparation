@@ -81,17 +81,19 @@ class StipVectorStore:
                 faiss_distance_strategy = get_faiss_distance_strategy(self.index_distance)
                 self.db = self.vectorstore_obj.load_local(self.save_path, self.embedding, distance_strategy=faiss_distance_strategy)
             elif self.vectorstore_name == 'chroma':
-                print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
                 self.db = self.vectorstore_obj(persist_directory=self.save_path, 
                             embedding_function=self.embedding,
                             )
+                print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
                 
                 
             end_time = time.time()
             print(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
             logger.info(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
+            
 
-            return self              
+
+            return self.db          
     
 
 
@@ -164,75 +166,65 @@ class StipVectorStore:
             """
             #### USING CHROMA NATIVE COLLECTION ####
             ### pass a chroma client to into Langchain : ref: https://python.langchain.com/docs/integrations/vectorstores/chroma 
-            persistent_client = chromadb.PersistentClient(path="./" + self.save_path)
-            collection_name = self.docs_source+"_"+self.embedding_name+"_"+str(self.chunk_size)+"_"+str(self.chunk_overlap_scale)+"_"+str(self.k)+"_"+index_distance
+            # persistent_client = chromadb.PersistentClient(path="./" + self.save_path)
+            # collection_name = self.docs_source+"_"+self.embedding_name+"_"+str(self.chunk_size)+"_"+str(self.chunk_overlap_scale)+"_"+str(self.k)+"_"+index_distance
 
-            # delete if the collection already exist, if not create a new collection
-            try: 
-                collection = persistent_client.get_collection(name=collection_name)
-                persistent_client.delete_collection(name=collection_name)
-            except ValueError:
-                # First time creating the collection
-                print(f'!NOTE: First time creating the collection: {collection_name}')
+            # # delete if the collection already exist, if not create a new collection
+            # try: 
+            #     collection = persistent_client.get_collection(name=collection_name)
+            #     persistent_client.delete_collection(name=collection_name)
+            # except ValueError:
+            #     # First time creating the collection
+            #     print(f'!NOTE: First time creating the collection: {collection_name}')
 
-            collection = persistent_client.create_collection(name=collection_name,
-                                                                metadata={"hnsw:space": self.index_distance})# default index_distance is euclidean 'l2', Inner product 'ip', Cosine similarity 'cosine'
+            # collection = persistent_client.create_collection(name=collection_name,
+            #                                                     metadata={"hnsw:space": self.index_distance})# default index_distance is euclidean 'l2', Inner product 'ip', Cosine similarity 'cosine'
             
-            print(f'!NOTE: here, the collection count should be 0: {collection.count()}')
+            # print(f'!NOTE: here, the collection count should be 0: {collection.count()}')
 
-            # add documents to the collection
-            ids_list = list(map(str, range(len(split_docs)))) # manually create ids
-            page_contents = [doc.page_content for doc in split_docs]
-            # page_contents_short = [doc.page_content for doc in split_docs if len(doc.page_content) <= 100] # DEBUG only: to check if there is any too short empty page_content
-            collection.add(ids=ids_list, documents=page_contents)
-            print(f'!NOTE: here, the collection count should be {len(split_docs)}: {collection.count()}')
-            self.ndata = collection.count()
+            # # add documents to the collection
+            # ids_list = list(map(str, range(len(split_docs)))) # manually create ids
+            # page_contents = [doc.page_content for doc in split_docs]
+            # # page_contents_short = [doc.page_content for doc in split_docs if len(doc.page_content) <= 100] # DEBUG only: to check if there is any too short empty page_content
+            # collection.add(ids=ids_list, documents=page_contents, embeddings=self.embedding) # TODO this throws error because embeddings should be a list, so i should have len(split_docs) amount of embeeding
+            # print(f'!NOTE: here, the collection count should be {len(split_docs)}: {collection.count()}')
+            # self.ndata = collection.count()
 
-            # create langchain chroma client replaces from_documents()
-            self.db = Chroma(
-                client=persistent_client,
-                collection_name=collection_name,
-                embedding_function=self.embedding,
-                )
+            # # create langchain chroma client replaces from_documents()
+            # self.db = Chroma(
+            #     client=persistent_client,
+            #     collection_name=collection_name,
+            #     embedding_function=self.embedding,
+            #     )
 
             
-            # ####  deprecated: using langchain's from_documents() #####
-            # # if there is already folder in self.save_path, delete it, otherwise continue
-            # if os.path.exists(self.save_path):
-            #     shutil.rmtree(self.save_path)
-            #     print(f'!NOTE: delete existing folder: {self.save_path}')
-            #     print(f'!NOTE: start from_documents(): {self.vectorstore_name}')
-            # else:
-            #     print(f'!NOTE: start from_documents(): {self.vectorstore_name}')
+            ####  deprecated: using langchain's from_documents() #####
+            # if there is already folder in self.save_path, delete it, otherwise continue
+            if os.path.exists(self.save_path):
+                shutil.rmtree(self.save_path)
+                print(f'!NOTE: delete existing folder: {self.save_path}')
+                print(f'!NOTE: start from_documents(): {self.vectorstore_name}')
+            else:
+                print(f'!NOTE: start from_documents(): {self.vectorstore_name}')
 
-            # self.db = self.vectorstore_obj.from_documents(documents=split_docs,
-            #                                 embedding=self.embedding,
-            #                                 persist_directory=self.save_path,
-            #                                 collection_metadata ={"hnsw:space": self.index_distance}) # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
+            self.db = self.vectorstore_obj.from_documents(documents=split_docs,
+                                            embedding=self.embedding,
+                                            persist_directory=self.save_path,
+                                            collection_metadata ={"hnsw:space": self.index_distance}) # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
             
             print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
             print(f'!NOTE: hnsw space: {self.db._collection.metadata["hnsw:space"]}')
-            print(f'!NOTE: how many datapoints in vectorstore: {self.db._collection.count()}')
+            print(f'!NOTE: how many datapoints in vectorstore - should be len(split_docs): {self.db._collection.count()}')
 
-
-        
-            
         end_time = time.time()
         self.total_time = end_time-start_time
 
         try:
         # save metadata
             with open(self.save_path + "/_attributes.pkl", "wb") as f:
-                
-
                 obj_dict = self.__dict__.copy()  # Create a copy of the object's attribute dictionary
                 obj_dict.pop('db', None)  # Remove the 'db' attribute
                 pickle.dump(obj_dict, f, pickle.HIGHEST_PROTOCOL)  # Pickle the modified dictionary
-
-
-                
-
-
         except Exception as e:
             print(f"Exception occurred while saving metadata: {e}")
 

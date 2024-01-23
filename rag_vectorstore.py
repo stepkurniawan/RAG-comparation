@@ -138,7 +138,6 @@ def multi_similarity_search_doc(db, dataset, top_k=3):
 
     # for every question, do similarity search, save the result as a new column called "contexts"
     dataframe['contexts'] = dataframe['question'].apply(lambda q: similarity_search_doc(db, q, top_k))
-    # TODO, add topk as a parameter above
 
     # save the dataframe as a new dataset
     dataset_new = Dataset.from_pandas(dataframe)
