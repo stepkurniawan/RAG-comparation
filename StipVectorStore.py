@@ -41,9 +41,6 @@ class StipVectorStore:
         self.index_distance: Optional[str] = index_distance  # default is euclidean 'l2', Inner product	'ip', Cosine similarity	'cosine'
         self.ndata: int = 0 # number of data in vectorstore
 
-        
-
-
         # # Mapping dictionary for vector stores
         # vector_stores = {
         #     'faiss': (FAISS, FAISS_PATH),
@@ -88,11 +85,9 @@ class StipVectorStore:
                 
                 
             end_time = time.time()
-            print(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
-            logger.info(f'success load vectorstore: {self.vectorstore_name} in {end_time-start_time} seconds')
+            print(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
+            logger.info(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
             
-
-
             return self.db          
     
 
@@ -115,19 +110,27 @@ class StipVectorStore:
         self.chunk_overlap_scale = chunk_overlap_scale
         self.index_distance = index_distance
 
+        
         # check if the dict_docs is already documents, or is my dictionary that contain sources
         # get source and the documents
+        print("Checking type of dict_docs...")
         if type(dict_docs) == list:
+            print("dict_docs is a list.")
             documents = dict_docs
             self.docs_source = None
         else:
+            print("dict_docs is a dictionary.")
             self.docs_source = dict_docs['source'] if 'source' in dict_docs.keys() else None
             documents = dict_docs['documents'] if 'documents' in dict_docs.keys() else dict_docs
+        print("Type of dict_docs checked.")
+
         self.save_path = self.vectorstore_path+ "/" + self.docs_source + "/" + self.embedding_name + "_" + str(self.chunk_size) + "_" + str(self.chunk_overlap_scale)+"_"+self.index_distance
 
         # splitting documents
+        print("Splitting documents...")
         split_docs = split_data_to_docs(documents, chunk_size, chunk_overlap_scale)['documents']
-        
+        print("Documents split.")
+
         start_time = time.time()
 
         if self.vectorstore_name == 'faiss':
@@ -135,12 +138,11 @@ class StipVectorStore:
             Creating FAISS Vector Store
             https://python.langchain.com/docs/integrations/vectorstores/faiss
             """
-
+            print("Creating FAISS Vector Store...")
             faiss_distance_strategy = get_faiss_distance_strategy(self.index_distance)
             try:
-
+                print("Trying to create vectorstore from documents...")
                 self.db = self.vectorstore_obj.from_documents(split_docs, self.embedding, distance_strategy=faiss_distance_strategy)
-                # self.db = FAISS.from_documents(split_docs, self.embedding)
                 insanity_check = self.db.similarity_search_with_score("A/B testing", k=3)
 
                 self.ndata = self.db.index.ntotal
@@ -148,11 +150,10 @@ class StipVectorStore:
                 print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
                 print(f'!NOTE: how many datapoints in vectorstore: {self.db.index.ntotal}')
                 
+                print("Saving vectorstore locally...")
                 self.db.save_local(self.save_path)
-                # self.db.distance_strategy = self.index_distance
+                print("Vectorstore saved.")
                 
-                
-
             except Exception as e:
                 print(f"!NOTE: Exception occurred while creating FAISS vectorstore using {self.embedding_name}: {e}")
 
@@ -228,8 +229,8 @@ class StipVectorStore:
         except Exception as e:
             print(f"Exception occurred while saving metadata: {e}")
 
-        print(f'success create vectorstore: {self.vectorstore_name} using {self.embedding_name} in {self.total_time} seconds')
-        logger.info(f'success create vectorstore: {self.vectorstore_name} using {self.embedding_name} in {self.total_time} seconds')
+        print(f'!NOTE: success create vectorstore: {self.vectorstore_name} using {self.embedding_name} in {self.total_time} seconds or {self.total_time/60} minutes')
+        logger.info(f'!NOTE: success create vectorstore: {self.vectorstore_name} using {self.embedding_name} in {self.total_time} seconds or {self.total_time/60} minutes')
         
         
         return self.db

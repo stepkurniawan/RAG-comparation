@@ -1,5 +1,8 @@
+from typing import Optional
 from dotenv import load_dotenv
 import os
+
+from StipVectorStore import StipVectorStore
 load_dotenv()
 hf_token = os.getenv('HF_AUTH_TOKEN')
 
@@ -15,6 +18,7 @@ from ragas.metrics import faithfulness, answer_relevancy, context_precision, con
 
 from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
+from ragas.metrics import ContextPrecision, ContextRecall
 
 from rag_llms import load_llm_gpt35, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_70B_CHAT_MODEL_ID
@@ -26,6 +30,8 @@ import transformers
 
 from rag_load_data import load_sustainability_wiki_langchain_documents, load_from_webpage, load_qa_rag_dataset, load_50_qa_dataset
 import openai
+
+from rag_vectorstore import similarity_search_doc, multi_similarity_search_doc
 
 
 import pandas as pd
@@ -317,33 +323,46 @@ def ragas_evaluate_push(dataset):
 
 # %% RETRIEVER EVALUATION ########################################################
 
-def retriever_evaluation(dataset : Dataset, 
-                         path_to_save : str ='data/retriever_evaluation.csv'): 
+def retriever_evaluation(
+    dataset: Dataset,
+    path_to_save: str = 'data/retriever_evaluation.csv',
+    db: Optional[StipVectorStore] = None,
+    top_k: Optional[int] = 3,
+):
     """
-    input: query, similar_docs, and ground_truths
-    output: context precision, recall, and F-measure 
+    calls RAGAS to evaluate retriever
+    Usage: evaluate_retriever(multisimilaritysearch(StipVectorStore("chroma").load_vectorstore("vectorstore_path")), qa_dataset, 6)
+    Input: vectorstore_database that has column "contexts" 
+    returns a dataframe with additional columns: context_precision, context_recall
     """
-    from ragas.metrics import ContextPrecision
-    context_precision = ContextPrecision()
 
-    start_time = time.time()
-    results = evaluate(
-                    dataset,
-                    metrics=[
-                            context_precision,
-                            context_recall,
-                        ],
-                        )
+    ## do multisimilarity search, only when there is no "contexts" column
+    if "contexts" not in dataset.column_names:
+        print("dataset doesnt have 'contexts' column. Do multisimilarity search")
+        try:
+            contexted_dataset = multi_similarity_search_doc(db, dataset, top_k)
+        except:
+            raise Exception("Error: dataset doesnt have 'contexts' column, and failed to do multisimilarity search, check if you have the correct db and topk")
+    else:
+        print("dataset already has 'contexts' column. Skip multisimilarity search")
+        contexted_dataset = dataset
+        
+    context_precision = ContextPrecision()
+    context_recall = ContextRecall(batch_size=10)
+    start_time = time.time() 
+    contexted_dataset = context_precision.score(contexted_dataset)
+    contexted_dataset = context_recall.score(contexted_dataset)
+    contexted_df = pd.DataFrame(contexted_dataset)
     print("success evaluate retriever")
     end_time = time.time()
     total_time = end_time - start_time
-    results.to_csv(path_to_save)
+    contexted_df.to_csv(path_to_save)
     print("success save retriever evaluation CSV to: ", path_to_save)
     print(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     logger.info("success save retriever evaluation CSV to: " + path_to_save)
     logger.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     
-    return results
+    return contexted_df
 
 # result = retriever_evaluation(qa_dataset['train'])
 # #save result to csv under data dir

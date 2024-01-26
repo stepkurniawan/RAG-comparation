@@ -9,6 +9,8 @@ import time
 import os
 import pandas as pd
 
+HUGGINGFACE_CACHE_PATH = "huggingface_cache/"
+
 ########### KNOWLEDGE BASE & Questions Dataset ###########
 class StipKnowledgeBase:
     def __init__(
@@ -30,6 +32,17 @@ class StipKnowledgeBase:
     
     # load data from suswiki
     def load_documents(self, limit: Optional[int] = None):
+        """
+        Load documents from huggingface or cache_dir based on StipKnowledgeBase object
+
+        input: StipKnowledgeBase object
+        output: ```
+            dict_documents = {
+                source: suswiki / wikipedia
+                documents: list of Documents
+                }
+                ```
+        """
         # the result is Document(page_content=...) just like load_from_webpage()
         # self.path = "stepkurniawan/sustainability-methods-wiki"
         # usage ex: KnowledgeBase(WIKI_PATH).load_documents() -> langchain.Documents
@@ -64,13 +77,23 @@ class StipKnowledgeBase:
             "documents": documents[:limit]
         }
         return dict_documents
+    
+def load_suswiki():
+    suswiki_kb = StipKnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
+    suswiki_docs = suswiki_kb.load_documents()
+    return suswiki_docs
+
+def load_wikipedia():
+    wikipedia_kb = StipKnowledgeBase("wikipedia", "20220301.simple", "huggingface_cache/wikipedia_hf")
+    wikipedia_docs = wikipedia_kb.load_documents()
+    return wikipedia_docs
 
 
 class StipHuggingFaceDataset:
     def __init__(
             self, 
-            hf_path,
-            subset,
+            hf_path:str,
+            subset:str,
             select_columns: Optional[List[str]] = None,):
         
         self.hf_path = hf_path
@@ -90,6 +113,17 @@ class StipHuggingFaceDataset:
         print(f'dataset_from_hf["train"]["ground_truths"][0]: {dataset_from_hf["train"]["ground_truths"][0]}')
         return dataset_from_hf
 
+def load_50_qa_dataset():
+    # dataset = load_dataset("stepkurniawan/sustainability-methods-wiki", "50_QA_reviewed", download_mode="force_redownload")
+    dataset = load_dataset("stepkurniawan/sustainability-methods-wiki", "50_QA_reviewed")
+
+    dataset = dataset.select_columns(['question', 'ground_truths']) 
+    print("success loading question ground_truth dataset from HF")
+    return dataset
+    
+    
+
+
 # decommisioned
 WIKI_PATH = "data/Sustainability+Methods_dump.xml"
 JSON_PATH = "data/Sustainability+Methods_dump.xml.json"
@@ -98,6 +132,7 @@ HF_HUB_QA_DATASET = "stepkurniawan/qa_sustainability_wiki" # 647 curated questio
 HF_HUB_QA_DATASET_2 = "stepkurniawan/sustainability-methods-wiki" # contains the whole dump files of sustainability wiki. (title, text)
 HF_HUB_QA_LLAMA = "stepkurniawan/qa-rag-llama" # 50 questions that has been answered by the RAG models, the subset is the name of the llm model
 HF_HUB_RAGAS = "stepkurniawan/RAGAS_50" # placeholder for the new 50 questions
+
 
 QA_GT_JSON_PATH = "data/collection_ground_truth_ragas_chatgpt4.json"
 
@@ -160,15 +195,6 @@ def load_qa_rag_dataset():
 # qa_dataset = load_qa_rag_dataset()
 # take the first 3 rows from the "train" dataset
 # qa_dataset = qa_dataset['train'][:3]
-
-def load_50_qa_dataset():
-    dataset = load_dataset(HF_HUB_QA_DATASET_2, "50_QA", download_mode="force_redownload")
-    print("success loading question answer dataset from HF")
-    dataset = dataset.select_columns(['question', 'ground_truths'])     # drop dataset['train']['contexts'] and dataset['train']['summary'] because we will use retriever to fill that
-
-    print("the first question is: ", dataset['train']['question'][0])
-    print("the first ground truth is: ", dataset['train']['ground_truths'][0])
-    return dataset
 
 
 ##########################################################################

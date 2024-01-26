@@ -117,8 +117,14 @@ dataset = curated_qa_dataset['train']
 
 
 def evaluate_retriever(vectorstore_database, qa_dataset, k):
-    # 4.5.1 answer using similarity search
-    # create a table with question, ground_truths, and context (retrieved_answer)
+    """
+    calls RAGAS to evaluate retriever
+    Usage: evaluate_retriever(StipVectorStore("chroma").load_vectorstore("vectorstore_path"), qa_dataset, 6)
+    Input: vectorstore_database that has no column "contexts" yet
+    returns a dataframe with additional columns: context_precision, context_recall
+    """
+    ## do similarity search and add a new column called "contexts"
+    ## only when the column "contexts" does not exist
     start_time = time.time()
     contexted_dataset = multi_similarity_search_doc(vectorstore_database, qa_dataset, k)
     end_time = time.time()
@@ -145,7 +151,7 @@ def save_locally(contexted_df, database_obj):
 
 #### Uncomment this to evaluate retriever (use OpenAI API)
 my_k = 6
-# faiss_contexted_result_df = evaluate_retriever(faiss_data, dataset, my_k)
+faiss_contexted_result_df = evaluate_retriever(faiss_data, dataset, my_k)
 chroma_contexted_result_df = evaluate_retriever(chroma_data, dataset, my_k)
 # save_locally(faiss_contexted_result_df, faiss_vs)
 # save_locally(chroma_contexted_result_df, chroma_vs)
@@ -164,6 +170,11 @@ chroma_contexted_result_df = evaluate_retriever(chroma_data, dataset, my_k)
 # %%
 
 def read_local_results(docs_source, embedding_name, chunk_size, chunk_overlap_scale, k):
+    """
+    ex: output_df, faiss_df, chroma_df = read_local_results("sustainability-methods-wiki", "bge-large-en-v1.5", "200", "0.1", my_k)
+    it reads CSV files from folder "experiments/vectorstore_comp" and return a dataframe
+    """
+
     output_df = pd.DataFrame() # this will countain columns: question, ground_truths, contexts, context_precision_FAISS, context_recall_FAISS, context_precision_Chroma, context_recall_Chroma
     faiss_df = pd.read_csv(f"{OUTPUT_PATH}/faiss_{docs_source}_{embedding_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )
     chroma_df = pd.read_csv(f"{OUTPUT_PATH}/chroma_{docs_source}_{embedding_name}_{chunk_size}_{chunk_overlap_scale}_k{k}.csv", sep="|", )

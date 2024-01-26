@@ -7,7 +7,9 @@ embedding_ids = {
     'bge': "BAAI/bge-large-en-v1.5",
     'gte': "thenlper/gte-large",
     'hf_1': "sentence-transformers/all-MiniLM-L12-v2", # https://huggingface.co/sentence-transformers/all-MiniLM-L12-v2
-    'hf_2': "sentence-transformers/all-MiniLM-L6-v2" 
+    'hf_2': "sentence-transformers/all-MiniLM-L6-v2", 
+    'e5_mi': "intfloat/e5-mistral-7b-instruct", # too large
+    'uae': "WhereIsAI/UAE-Large-V1"
 }
 
 device = f'cuda:{cuda.current_device()}' if cuda.is_available() else 'cpu'
@@ -37,3 +39,4 @@ class StipEmbedding:
 
     def get_model(self):
         return self.embed_model
+    

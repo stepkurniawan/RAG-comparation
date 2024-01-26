@@ -13,27 +13,31 @@ The similarity search algorithm are:
 
 import os
 import time
-
+from datasets import Dataset
 import pandas as pd
 
+
+
 from rag_vectorstore import similarity_search_doc, multi_similarity_search_doc
+from rag_ragas import retriever_evaluation
 
 from LogSetup import logger
 from rag_ragas import retriever_evaluation
 
 from StipVectorStore import StipVectorStore
-from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset
+from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset, load_50_qa_dataset, load_suswiki, load_wikipedia
 from StipEmbedding import StipEmbedding
 
 #### 
+FOLDER_PATH = "experiments/distance_metrics_comp/"
+
 EMBED_MODEL = StipEmbedding("bge").embed_model
 CHUNK_SIZE = 200
 CHUNK_OVERLAP_SCALE = 0.1
 
 
 #### Knowledge Base 
-suswiki_kb = StipKnowledgeBase("stepkurniawan/sustainability-methods-wiki", None, "huggingface_cache/suswiki_hf")
-suswiki_docs = suswiki_kb.load_documents()
+suswiki_docs = load_suswiki()
 # suswiki_docs["documents"] = suswiki_docs["documents"][:100] # limit data for test
 print(f'successful load data from {suswiki_docs["source"]}. It has source and documents keys')
 
@@ -85,19 +89,16 @@ chroma_data_ip = chroma_vs.load_vectorstore("vectorstores/db_chroma/sustainabili
 # sanity_check_load_chroma_ip = chroma_data_ip.similarity_search_with_score("A/B testing", k=3)
 
 #%% Questions dataset
-curated_qa_dataset = StipHuggingFaceDataset("stepkurniawan/sustainability-methods-wiki", "50_QA_reviewed", ["question", "ground_truths"]).load_dataset()
+curated_qa_dataset = load_50_qa_dataset()
 dataset = curated_qa_dataset['train']
 
-
-def find_different_contexts(*datasets):
+def check_is_different_contexts(datasets):
     """
-    find the different contexts between multiple datasets
-    input: contexted_datasets
-    output: dataframe with columns: question, ground_truths, contexts_1, contexts_2, ...
+    check if there are different contexts in the dataset
     """
 
     # convert datasets to pandas and apply tuple to contexts
-    dfs = [dataset.to_pandas() for dataset in datasets]
+    dfs = [dataset1.to_pandas() for dataset1 in datasets]
     contexts_tuples = [df["contexts"].apply(tuple) for df in dfs]
 
     # find rows with different contexts
@@ -105,6 +106,16 @@ def find_different_contexts(*datasets):
     for i in range(len(contexts_tuples[0])):  # assuming all DataFrames have the same number of rows
         row_values = [df.iloc[i] for df in contexts_tuples]
         is_different.append(not all(val == row_values[0] for val in row_values[1:]))
+
+    return dfs, is_different
+
+def find_different_contexts(*datasets):
+    """
+    find the different contexts between multiple datasets
+    input: contexted_datasets
+    output: dataframe with columns: question, ground_truths, contexts_1, contexts_2, ...
+    """
+    dfs, is_different = check_is_different_contexts(datasets)
         
     # select different rows and reset index
     different_dfs = [df[is_different].reset_index(drop=True) for df in dfs]
@@ -132,15 +143,45 @@ chroma_eucledian_contexted = multi_similarity_search_doc(chroma_data_eucledian, 
 chroma_cosine_contexted = multi_similarity_search_doc(chroma_data_cosine, dataset, TOP_K)
 chroma_ip_contexted = multi_similarity_search_doc(chroma_data_ip, dataset, TOP_K)
 
-faiss_combined_df_eucledian = find_different_contexts(faiss_eucledian_contexted, faiss_cosine_contexted, faiss_ip_contexted)
-chroma_combined_df_eucledian = find_different_contexts(chroma_eucledian_contexted, chroma_cosine_contexted, chroma_ip_contexted)
+faiss_combined_df = find_different_contexts(faiss_eucledian_contexted, faiss_cosine_contexted, faiss_ip_contexted)
+chroma_combined_df = find_different_contexts(chroma_eucledian_contexted, chroma_cosine_contexted, chroma_ip_contexted)
 
-# export to csv
-folder_path = "experiments/distance_metrics_comp/"
-faiss_combined_df_eucledian.to_csv(folder_path+"combined_df_faiss.csv", index=False)
-faiss_combined_df_eucledian.to_json(folder_path+"combined_df_faiss.json", orient="records")
-chroma_combined_df_eucledian.to_csv(folder_path+"combined_df_chroma.csv", index=False)
-chroma_combined_df_eucledian.to_json(folder_path+"combined_df_chroma.json", orient="records")
+## export to csv
+# faiss_combined_df.to_csv(FOLDER_PATH+"combined_df_faiss.csv", index=False)
+# faiss_combined_df.to_json(FOLDER_PATH+"combined_df_faiss.json", orient="records")
+# chroma_combined_df.to_csv(FOLDER_PATH+"combined_df_chroma.csv", index=False)
+# chroma_combined_df.to_json(FOLDER_PATH+"combined_df_chroma.json", orient="records")
+
+#%% RAGAS evaluate retriever
+## only evaluate chroma, because faiss returned same results with different distance metrics
+
+## evaluate chroma chroma_combined_df 3x. 
+## first, evaluate the eucledian distance, columns used: question, ground_truths, contexts
+## second, evaluate the cosine distance, columns used: question, ground_truths, contexts_2
+## third, evaluate the inner product distance, columns used: question, ground_truths, contexts_3
+
+diff_euc_chroma = Dataset.from_pandas(chroma_combined_df[['question', 'ground_truths', 'contexts']])
+diff_cos_chroma = Dataset.from_pandas(chroma_combined_df[['question', 'ground_truths', 'contexts_2']].rename(columns={'contexts_2':'contexts'}))
+diff_ip_chroma = Dataset.from_pandas(chroma_combined_df[['question', 'ground_truths', 'contexts_3']].rename(columns={'contexts_3':'contexts'}))
+
+
+diff_euc_evaluated = retriever_evaluation(diff_euc_chroma, FOLDER_PATH+"eval_chroma_eucledian.csv")
+diff_cos_evaluated = retriever_evaluation(diff_cos_chroma, FOLDER_PATH+"eval_chroma_cosine.csv")
+diff_ip_evaluated = retriever_evaluation(diff_ip_chroma, FOLDER_PATH+"eval_chroma_ip.csv")
+
+mean_context_precision_euc = diff_euc_evaluated['context_precision'].mean()
+mean_context_precision_cos = diff_cos_evaluated['context_precision'].mean()
+mean_context_precision_ip = diff_ip_evaluated['context_precision'].mean()
+
+mean_context_recall_euc = diff_euc_evaluated['context_recall'].mean()
+mean_context_recall_cos = diff_cos_evaluated['context_recall'].mean()
+mean_context_recall_ip = diff_ip_evaluated['context_recall'].mean()
+
+#calculate f1-measure
+mean_context_f1_euc = 2 * (mean_context_precision_euc * mean_context_recall_euc) / (mean_context_precision_euc + mean_context_recall_euc)
+mean_context_f1_cos = 2 * (mean_context_precision_cos * mean_context_recall_cos) / (mean_context_precision_cos + mean_context_recall_cos)
+mean_context_f1_ip = 2 * (mean_context_precision_ip * mean_context_recall_ip) / (mean_context_precision_ip + mean_context_recall_ip)
+
 print("")
 
-#%% 
+#%%
