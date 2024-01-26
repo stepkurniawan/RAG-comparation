@@ -88,7 +88,7 @@ class StipVectorStore:
             print(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
             logger.info(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
             
-            return self.db          
+            return self.db
     
 
 
@@ -149,6 +149,8 @@ class StipVectorStore:
                 print(f'!NOTE: distance strategy: {self.db.distance_strategy}')
                 print(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
                 print(f'!NOTE: how many datapoints in vectorstore: {self.db.index.ntotal}')
+                logger.info(f'!NOTE: success save vectorstore: {self.vectorstore_name} in {self.save_path}')
+                logger.info(f'!NOTE: how many datapoints in vectorstore: {self.db.index.ntotal}')
                 
                 print("Saving vectorstore locally...")
                 self.db.save_local(self.save_path)

@@ -343,6 +343,9 @@ def retriever_evaluation(
             contexted_dataset = multi_similarity_search_doc(db, dataset, top_k)
         except:
             raise Exception("Error: dataset doesnt have 'contexts' column, and failed to do multisimilarity search, check if you have the correct db and topk")
+    elif isinstance(dataset, pd.DataFrame):     # if dataset is a dataframe, change to to Dataset
+        print("dataset is a dataframe. Change to Dataset")
+        contexted_dataset = Dataset.from_pandas(dataset)
     else:
         print("dataset already has 'contexts' column. Skip multisimilarity search")
         contexted_dataset = dataset
@@ -363,6 +366,14 @@ def retriever_evaluation(
     logger.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     
     return contexted_df
+
+def load_retriever_evaluation(path):
+    """
+    input: path to retriever evaluation csv
+    output: dataframe
+    """
+    df = pd.read_csv(path)
+    return df
 
 # result = retriever_evaluation(qa_dataset['train'])
 # #save result to csv under data dir

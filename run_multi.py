@@ -10,15 +10,15 @@ from StipEmbedding import StipEmbedding
 import multiprocessing
 
 ####
-# EMBED_MODELS = [ StipEmbedding("uae").embed_model, StipEmbedding("gte").embed_model, StipEmbedding("bge").embed_model]
-EMBED_MODELS = [ StipEmbedding("uae").embed_model, StipEmbedding("gte").embed_model]
+EMBED_MODELS = [ StipEmbedding("uae").embed_model, StipEmbedding("gte").embed_model, StipEmbedding("bge").embed_model]
+# EMBED_MODELS = [ StipEmbedding("uae").embed_model, StipEmbedding("gte").embed_model]
 CHUNK_SIZE = 200
 CHUNK_OVERLAP_SCALE = 0.1
 TOP_KS = [1,2,3]
-# INDEX_DISTANCES = ["cosine", "ip"]
-INDEX_DISTANCES = ["cosine"]
+INDEX_DISTANCES = ["cosine", "ip"]
+# INDEX_DISTANCES = ["cosine"]
 # VECTORSTORES = ( StipVectorStore("chroma"), StipVectorStore("faiss"))
-VECTORSTORES = ( StipVectorStore("faiss"),)
+VECTORSTORES = ( StipVectorStore("chroma"),)
 QUESTION_DATASET = load_50_qa_dataset()['train']
 
 #### Load Knowledge Bases
