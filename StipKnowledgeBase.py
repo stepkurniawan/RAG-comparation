@@ -204,3 +204,5 @@ def load_qa_rag_dataset():
 # wikipedia_kb = KnowledgeBase("wikipedia", "20220301.simple", "data/wikipedia_hf")
 # suswiki_document = suswiki_kb.load_documents()
 # print(suswiki_document)
+
+

@@ -7,7 +7,7 @@ from rag_ragas import retriever_evaluation
 from LogSetup import logger
 from rag_ragas import retriever_evaluation, load_retriever_evaluation
 from StipVectorStore import StipVectorStore
-from StipKnowledgeBase import load_suswiki, load_wikipedia, load_50_qa_dataset
+from StipKnowledgeBase import StipKnowledgeBase, load_suswiki, load_wikipedia, load_50_qa_dataset
 from StipEmbedding import StipEmbedding
 
 ####
@@ -77,3 +77,37 @@ wikipedia_vs = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/wikipedia/bge
 number_of_datapoints_suswiki = suswiki_vs.ndata
 number_of_datapoints_wikipedia = wikipedia_vs.ndata
 # %%
+
+
+#%% explore wikipedia dataset from huggingface
+from datasets import load_dataset
+
+wikipedia_kb = load_dataset('wikipedia', '20220301.simple', split='train')
+wikipedia_dataset = wikipedia_kb.select_columns(['title', 'text'])
+print("success loading wikipedia dataset from HF")
+print("the first title is: ", wikipedia_dataset['title'][0])
+print("the first text is: ", wikipedia_dataset['text'][0])
+
+# how many rows? 
+print("the number of rows in train dataset is: ", wikipedia_dataset.num_rows) # 205 328
+
+# how many total characters in the text column?
+total_characters = 0
+for text in wikipedia_dataset['text']:
+    total_characters += len(text)
+print("the total characters in the text column is: ", total_characters) # 215 489 882
+
+# how many total words in the text column?
+total_words = 0
+for text in wikipedia_dataset['text']:
+    total_words += len(text.split())
+print("the total words in the text column is: ", total_words) # 34 489 908
+
+# average number of words per text
+avg_words = total_words / wikipedia_dataset.num_rows
+print("the average number of words per text is: ", total_words / wikipedia_dataset.num_rows) # 167.97
+
+
+
+
+
