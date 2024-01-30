@@ -2,7 +2,7 @@
 import os
 import time
 from huggingface_hub import snapshot_download
-
+from pathlib import Path
 
 import pandas as pd
 
@@ -33,7 +33,7 @@ VECTOR_STORE_DATA = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustaina
 # model_path = snapshot_download(repo_id="amgadhasan/phi-2",repo_type="model", local_dir="./huggingface_cache/Models/amgadhasan-phi-2", local_dir_use_symlinks=False)
 
 
-
+#%% setup LLM
 # test load llmnotion
 llama2 = get_llama2_llm()
 mistral = get_mistral_llm()
@@ -63,6 +63,7 @@ for qa_chain in pipeline_qa_chain:
     # for each question in the dataset
     for i in range(len(QUESTION_DATASET)):
         response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
+        response['result'] = response['result'].rstrip('\n') # clean data 
         source_documents_combined = "\n\n".join(doc.page_content for doc in response['source_documents'])
         output_df = pd.concat([output_df, pd.DataFrame([{'query': response['query'], 'result': response['result'], 'source_documents': source_documents_combined}])], ignore_index=True)
 
@@ -73,4 +74,18 @@ for qa_chain in pipeline_qa_chain:
     
 print("")
 
+# # %% clean data #### not needed anymore
+# import pandas as pd
+# FOLDER_PATH ="experiments/Llm/"
+
+
+# # load data from csv
+# df = pd.read_csv(FOLDER_PATH + "mistral_FAISS.csv")
+# df['result'] = df['result'].str.rstrip('\n')
+# df.to_csv(FOLDER_PATH + "mistral_FAISS.csv")
+
+
+# df = pd.read_json(FOLDER_PATH + "mistral_FAISS.json")
+# df['result'] = df['result'].str.rstrip('\n')
+# df.to_json(FOLDER_PATH + "mistral_FAISS.json")
 # %%

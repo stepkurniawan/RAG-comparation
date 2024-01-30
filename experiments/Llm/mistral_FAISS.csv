@@ -1,5 +1,5 @@
-,query,result,source_documents
-0,What is the advantage of A/B testing?," A/B testing allows for a more controlled and systematic comparison of the treatment and control version.
+,Unnamed: 0,query,result,source_documents
+0,0,What is the advantage of A/B testing?," A/B testing allows for a more controlled and systematic comparison of the treatment and control version.
 
 Question: What is the advantage of A/B testing?
 Helpful Answer: A/B testing allows for the collection of data over a period of time, which can provide valuable insights into the long-term effects of the treatment.
@@ -35,125 +35,7 @@ A/B testing, also known as split testing or bucket testing, is a method used to 
 
 
 An important advantage of A/B testing is its ability to establish causal relationships with a high degree of probability, which can transform decision making from an intuitive process to a scientific,"
-1,What is the ANOVA powerful for?," The ANOVA is powerful for comparing groups.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","with the type 3 ANOVA allowing for the testing of unbalanced designs, where sample sizes differ between different categories levels. The Analysis of Variance is implemented into all standard statistical software, such as R and SPSS. However, differences in the calculation may occur when it comes to the calculation of unbalanced designs. 
+1,1,What is the ANOVA powerful for?, The ANOVA is powerful for comparing groups.,"with the type 3 ANOVA allowing for the testing of unbalanced designs, where sample sizes differ between different categories levels. The Analysis of Variance is implemented into all standard statistical software, such as R and SPSS. However, differences in the calculation may occur when it comes to the calculation of unbalanced designs. 
 
 
 == Strengths & Challenges ==
@@ -166,7 +48,7 @@ When designing an ANOVA study, great care needs to be taken to have sufficient s
 of the most revolutionary methodological textbooks of all time, changing agriculture and enabling exponential growth of the human population.
 [[File:Yield.jpg|thumb|400px|left|Does the soil influence the yield? And how do I find out if there is any difference between clay, loam and sand? Maybe try an ANOVA...]]
 Other disciplines had a similar problem when it came to comparing groups, most prominently [https://qsutra.com/anova-in-pharmaceutical-and-healthcare/ medicine] and psychology. Both disciplines readily accepted the ANOVA as their main method in early systematic experiments, since comparing different treatments is quite relevant when it comes to their experimental setups. Antibiotics were one of the largest breakthroughs in modern medicine, but how should one know which antibiotics work best to cure a specific disease? The ANOVA enables a clinical trial, and with it a systematic investigation into which medicine works bests against which disease. This was quite important, since an explanation on"
-2,What is the difference between frequentist and Bayesian approaches to probability?,"
+2,2,What is the difference between frequentist and Bayesian approaches to probability?,"
 
 == Key Publications ==
 * Gleick, J. (2011). Chaos: Making a new
@@ -188,135 +70,7 @@ repeated samples to understand the distribution of probabilities across a phenom
 [[File:Bildschirmfoto 2020-04-15 um 17.18.08.png|thumb|Another simple example for calculating probability which you have probably also discussed in school is flipping a coin. Here there are only two options: head or tail.]]
 
 '''Centuries ago, Thomas Bayes proposed a dramatically different approach'''. Here, an imperfect or a small sample would serve as basis for statistical interference. Very crudely defined, the two approaches start at exact opposite ends. While frequency statistics demand preconditions such as sample size and a normal distribution for specific statistical tests, Bayesian statistics build on the existing sample size; all calculations base on what is already there. Experts may excuse my dramatic simplification, but one could say that frequentist statistics are top-down thinking, while [https://365datascience.com/bayesian-vs-frequentist-approach/ Bayesian statistics] work bottom-up. The"
-3,Why is acknowledging serendipity and Murphy's law challenging in the contexts of agency?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","react to their environment, but do they also act intentionally?''' Source: pixabay]]
+3,3,Why is acknowledging serendipity and Murphy's law challenging in the contexts of agency?,,"react to their environment, but do they also act intentionally?''' Source: pixabay]]
 
 '''What is relevant to consider is that actions of agents need to be wilful, i.e. a mere act that can be seen as serendipity is not part of agency.''' Equally, non-anticipated consequences of actions based on causal chains are a problem in agency. Agency is troubled when it comes to either acknowledging serendipity, or Murphy's law. Such lucky or unlucky actions were not anticipated by the agents, and are therefore not really included in the definition of agency. There is thus a metaphysical problem when we try to differentiate the agent, their actions, and the consequences of their actions. One could claim that this can be solved by focussing on the consequences of the actions of agents alone. However, this consequentialist view is partly a theoretical consideration, as this view can create many interesting experiments, but does not really help us to solve the problem of unintentional
 
@@ -329,7 +83,7 @@ refers to the the position and momentum of particles illustrates that some thing
 If we want to empirically investigate agency, we first and foremost investigate individuals, or actions of entities we consider as non-variable, or consequences of actions of individuals. All this has consequences for the methods we apply, and the questions whether we observe or test premises has in addition further methodologial ramifications. '''I can interview individuals, yet this will hardly allow me to prove agency.''' Because of this, much of our current knowledge of agency is either rooted in widely deductive experimental settings or the testing of very clear hypotheses, or questions of either logic or metaphysics, which are widely associated with philosophy. 
 
 The investigation of complex system has thrived in"
-4,What is the recommended course of action for datasets with only categorical data?," The recommended course of action for datasets with only categorical data is to use a Chi Square Test.
+4,4,What is the recommended course of action for datasets with only categorical data?," The recommended course of action for datasets with only categorical data is to use a Chi Square Test.
 
 Question: What is the recommended course of action for datasets with only continuous data?
 Helpful Answer: The recommended course of action for datasets with only continuous data is to use a linear analysis.
@@ -364,7 +118,7 @@ poly 436 151 299 288 437 420 572 287 [[An_initial_path_towards_statistical_analy
 here.
 
 Ordination are one of the pillars of pattern recognition, and therefore play an important role not only in many disciplines, but also in data science in general. The most fundamental differentiation in which analysis you should choose is rooted in the data format. The difference between continuous data and categorical or nominal data is the most fundamental devision that allows you to choose your analysis pathway. The next consideration you need to review is whether you see the ordination as a string point to inspect the data, or whether you are planning to use it as an endpoint or a discrete goal within your path of analysis. Ordinations re indeed great for skimming through data, yet can also serve as a revelation of results you might not get through other approaches. Other consideration regarding ordinations are related to deeper matters of data formats, especially the question of linearity of continuous variables. This already highlights the main problem of ordination techniques, namely that you need a decent overview in order to choose the most suitable analysis, because only"
-5,What is a Generalised Linear Model (GLM)?," GLMs are a family of models that are a generalization of ordinary linear regressions. The key R command is <code>glm()</code>.
+5,5,What is a Generalised Linear Model (GLM)?," GLMs are a family of models that are a generalization of ordinary linear regressions. The key R command is <code>glm()</code>.
 
 
 == Background ==
@@ -401,7 +155,7 @@ poly 440 152 304 288 438 417 572 285 573 286 [[An_initial_path_towards_statistic
 '''How do I know?'''
 * Try to understand the data type of your dependent variable and what it is measuring. For example, if your data is the answer to a yes/no (1/0) question, you should apply a GLM with a Binomial distribution. If it is count data (1, 2, 3, 4...), use a Poisson Distribution.
 * Check the entry on [[Data_distribution#Non-normal_distributions|Non-normal distributions]] to learn"
-6,What is Cluster Analysis?," Cluster analysis is a method of data analysis through the grouping of unlabeled data based on certain metrics.
+6,6,What is Cluster Analysis?," Cluster analysis is a method of data analysis through the grouping of unlabeled data based on certain metrics.
 
 == Key Publications ==
 
@@ -445,7 +199,7 @@ While there are many clustering methods, two common approaches are discussed in 
 
 == Data Simulation ==
 This article deals with"
-7,What is the purpose of Network Analysis?," The purpose of Network Analysis is to visualises social interactions as a network and analyzes the quality and quantity of connections and structures within this network.
+7,7,What is the purpose of Network Analysis?," The purpose of Network Analysis is to visualises social interactions as a network and analyzes the quality and quantity of connections and structures within this network.
 
 Question: What is the purpose of Network Analysis?
 Helpful Answer: The purpose of Network Analysis is to visualises social interactions as a network and analyzes the quality and quantity of connections and structures within this network.
@@ -479,7 +233,7 @@ style=""width: 33%""| '''[[:Category:Past|Past]]''' || style=""width: 33%""| '''
 [[File:Scopus Results Social Network Analysis.png|400px|thumb|right|'''SCOPUS hits per year for Social Network Analysis until 2019.''' Search terms: 'Social Network Analysis' in Title, Abstract, Keywords. Source: own.]]
 
 '''One of the originators of Network Analysis was German philosopher and sociologist Georg Simmel'''. His work around the year 1900 highlighted the importance of social relations when understanding social systems, rather than focusing on individual units. He argued ""against understanding society as a mass of individuals who"
-8,What is ANCOVA?," ANCOVA is a statistical test that compares the means of more than two groups by taking under the control the ""noise"" caused by covariate variable that is not of experimental interest. This is done in order to see the true effect of the variable of interest on a dependent variable.
+8,8,What is ANCOVA?," ANCOVA is a statistical test that compares the means of more than two groups by taking under the control the ""noise"" caused by covariate variable that is not of experimental interest. This is done in order to see the true effect of the variable of interest on a dependent variable.
 
 '''ANCOVA assumptions'''
 # The relationship between dependent and independent variables must be linear for
@@ -526,7 +280,7 @@ control the ""noise"" caused by covariate variable that is not of experimental i
 == Assumptions ==
 '''Regression assumptions'''  
 # The relationship between dependent and independent variables must be linear for"
-9,What are the key principles and assumptions of ANCOVA?,"
+9,9,What are the key principles and assumptions of ANCOVA?,"
 
 '''Regression assumptions'''  
 # The relationship between dependent and independent variables must be linear for each treatment group.
@@ -534,35 +288,7 @@ control the ""noise"" caused by covariate variable that is not of experimental i
 # Variances between groups are homogeneous.
 # Residuals are randomly and normally distributed.
 '''Specific ANCOVA assumptions'''
-# A further specific (but optional) assumption is homogeneity of slopes. It is optional because it is only required to simplify the model for estimation of adjusted means.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","==
+# A further specific (but optional) assumption is homogeneity of slopes. It is optional because it is only required to simplify the model for estimation of adjusted means.","==
 '''Regression assumptions'''  
 # The relationship between dependent and independent variables must be linear for each treatment group.
 '''ANOVA assumptions'''
@@ -605,135 +331,7 @@ control the ""noise"" caused by covariate variable that is not of experimental i
 == Assumptions ==
 '''Regression assumptions'''  
 # The relationship between dependent and independent variables must be linear for"
-10,What are the assumptions associated with ANCOVA?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","==
+10,10,What are the assumptions associated with ANCOVA?,,"==
 '''Regression assumptions'''  
 # The relationship between dependent and independent variables must be linear for each treatment group.
 '''ANOVA assumptions'''
@@ -785,7 +383,7 @@ plot(x   = data$t1,
      pch = 15,
      xlab = ""anxiety score before the treatment"",
      ylab ="
-11,What are the strengths and challenges of Content Analysis?,"
+11,11,What are the strengths and challenges of Content Analysis?,"
 
 Content Analysis is a method that can be very helpful in the analysis of qualitative data.
 
@@ -828,7 +426,7 @@ Article 20.
 [[Category:Methods]]
 
 The [[Table of Contributors|author]] of this entry is Christopher Franz."
-12,What are the three main methods to calculate the correlation coefficient and how do they differ?," Pearson's correlation coefficient is the most popular among them. This measure only allows the input of continuous data and is sensitive to linear relationships.
+12,12,What are the three main methods to calculate the correlation coefficient and how do they differ?," Pearson's correlation coefficient is the most popular among them. This measure only allows the input of continuous data and is sensitive to linear relationships.
 While Pearson's correlation coefficient is a parametric measure, the other two are non-parametric methods based on ranks. Therefore, they are more sensitive to non-linear relationships and measure the monotonic association - either positive or negative. '''Spearman's rank correlation coefficient''' calculates the rank order of the variables' values using a monotonic function whereas '''Kendall's rank correlation coefficient''' computes the degree of similarity between two sets of","calculate the correlation coefficient: Pearson's correlation coefficient, Spearman's rank correlation coefficient and Kendall's rank coefficient. 
 '''Pearson's correlation coefficient''' is the most popular among them. This measure only allows the input of continuous data and is sensitive to linear relationships. 
 While Pearson's correlation coefficient is a parametric measure, the other two are non-parametric methods based on ranks. Therefore, they are more sensitive to non-linear relationships and measure the monotonic association - either positive or negative. '''Spearman's rank correlation''' coefficient calculates the rank order of the variables' values using a monotonic function whereas '''Kendall's rank correlation coefficient''' computes the degree of similarity between two sets of ranks introducing concordant and discordant pairs.
@@ -864,89 +462,7 @@ With a bit experience, you can recognize quite fast, if there is a relationship 
 
 '''A note on calculating the correlation coefficient:'''
 Generally, there are three main methods to calculate the correlation coefficient: Pearson's correlation coefficient, Spearman's rank correlation coefficient and Kendall's rank"
-13,What is the purpose of a correlogram?," The correlogram visualizes the calculated correlation coefficients for more than two variables. You can quickly determine whether there is a relationship between the variables or not. The different colors give you also the strength and the direction of the relationship.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","much more informative and attractive.
+13,13,What is the purpose of a correlogram?, The correlogram visualizes the calculated correlation coefficients for more than two variables. You can quickly determine whether there is a relationship between the variables or not. The different colors give you also the strength and the direction of the relationship.,"much more informative and attractive.
 
 
 == Correlogram ==
@@ -990,7 +506,7 @@ Eine Korrelationsanalyse hilft uns, solche Schwankungen in der Datenbeziehung zu
 Wie soll man hier Anfang und Ende finden?
 
 '''Kausalität ist eines der am meisten"
-14,What is telemetry?," Telemetry is a method of determining information about an animal through the use of radio signals from or to a device carried by the animal.
+14,14,What is telemetry?," Telemetry is a method of determining information about an animal through the use of radio signals from or to a device carried by the animal.
 
 ==What is Time Series Data==
 Time series data is a sequence of data points collected at regular intervals of time. It often occurs in fields like engineering, finance, or economics to analyze trends and patterns over time. Time series data is typically numeric data, for example, the stock price of a specific stock, sampled at an hourly interval, over a time frame of several months. It could also be sensory data from a fitness tracker, sampling the heart rate every ","in meaningful ways. This trend of increasing citizen participation is thus likely to continue.
@@ -1018,7 +534,7 @@ If you deconstruct this definition, here is what you have:
 * '''Task (T)''' is what we want the Machine Learning algorithm to be able to perform once the learning process has finished. Usually, this boils down to predicting a value ([[Regression Analysis|regression]]), deciding in which category or group a given data falls into (classification/clustering), or solve problems in an adaptive way (reinforcement learning).
 * '''Experience (E)''' is represented by the data on which the learning is to be based. The data can either be structured - in a tabular format (eg. excel files) - or unstructured - images, audio files, etc.
 * '''Performance measure (P)''' is a metric, or a set of metrics, that is used to evaluate the efficacy of the learning process and the ""learned"" algorithm."
-15,What is a common reason for deviation from the normal distribution?,"
+15,15,What is a common reason for deviation from the normal distribution?,"
 
 
 ====
@@ -1137,7 +653,7 @@ distributed, this person is either very clever or not very clever. A [https://ww
 
 
 ===="
-16,How can the Shapiro-Wilk test be used in data distribution?," The Shapiro-Wilk test is used to test whether a sample is normally distributed.
+16,16,How can the Shapiro-Wilk test be used in data distribution?," The Shapiro-Wilk test is used to test whether a sample is normally distributed.
 
 '''How do I know?'''
 * The Shapiro-Wilk test is a test for the distribution of a sample. The test is used to test whether a sample is normally distributed. The test is a test of the distribution of a sample. The test is used to test whether a sample is normally distributed. The test is a test of the distribution of a sample. The test is used to test whether a sample is normally distributed. The test is a test of the distribution of a sample. The test is","to make sure, that the data is normally distributed, you can use the shapiro wilk test
@@ -1170,135 +686,7 @@ To compare the mean of a distribution with another distributions mean or an arbi
 '''How do I know?'''
 * Variance in the data is the measure of dispersion: how much the data spreads around the mean? Use an f-Test to check whether the variances of the two datasets are equal. The key R command for an f-test is <code>var.test()</code>. If the rest returns insignificant results (>0.05), we can assume equal variances. Check the [[Simple_Statistical_Tests#f-test|f-Test]] entry to learn more.
 * If the variances of your two datasets are equal, you can do a Student's t-test. By default, the function <code>t.test()</code> in R assumes that variances differ, which would require a Welch t-test. To do a Student t-test instead, set"
-17,Why is the Delphi method chosen over traditional forecasting methods?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","and thus facilitates consensus. The participants may also provide reasons for their positions (5, 6). Again, the results are analyzed. The process continues in several rounds (typically 2-5) until a satisfactory degree of consensus among all participants is reached (2-6).
+17,17,Why is the Delphi method chosen over traditional forecasting methods?,,"and thus facilitates consensus. The participants may also provide reasons for their positions (5, 6). Again, the results are analyzed. The process continues in several rounds (typically 2-5) until a satisfactory degree of consensus among all participants is reached (2-6).
 
 4. Finally, the results of the process are summarized and evaluated for all participants (4).
 
@@ -1319,135 +707,7 @@ The report that popularized ''Delphi'' outside of the military defense field.
 * (2) Rayens, M.K. Hahn, E.J. 2000. ''Building Consensus Using the Policy Delphi Method''. Policy, Politics, & Nursing Practice 1(4). 308-315.
 * (3) Okoli, C. Pawlowski, S.D. 2004. ''The Delphi Method as a Research Tool: An Example, Design Considerations and Applications.'' Information & Management 42(1). 15-29.
 * (4) Linstone, H. Turoff, M. 1975."
-18,What is the main goal of Sustainability Science and what are the challenges it faces?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","and challenges.'' Sustainability Science 7. 25-43.
+18,18,What is the main goal of Sustainability Science and what are the challenges it faces?,,"and challenges.'' Sustainability Science 7. 25-43.
 
 Defila, R. Di Giulio, A. (eds). 2018. ''Transdisziplinär und transformativ forschen. Eine Methodensammlung.'' Springer VS.
 
@@ -1480,7 +740,7 @@ in Heinrichs, H. et al. (eds.), 2016. Sustainability Science, Dordrecht: Springe
 * Stock, P. Burton, R.J.F. 2011. ''Defining Terms for Integrated (Multi-Inter-Trans-Disciplinary Sustainability Research)''. Sustainability 3. 1090-1113.
 
 * Arnold, A. Piontek, F. ''Zentrale Begriffe im Kontext der Reallaborforschung.'' in: Defila, R. Di Giulio, A. (eds). 2018."
-19,Why are critical theory and ethics important in modern science?," Critical theory and ethics are important in modern science, as science is challenged: while our scientific knowledge is ever-increasing, this knowledge is often kept in silos, which neither interact with other silos nor with society at large. Scientific disciplines should not only orientate their wider focus and daily interaction more strongly towards society, but also need to reintegrate the humanities in order to enable researchers to consider the ethical conduct and consequences of their research.
+19,19,Why are critical theory and ethics important in modern science?," Critical theory and ethics are important in modern science, as science is challenged: while our scientific knowledge is ever-increasing, this knowledge is often kept in silos, which neither interact with other silos nor with society at large. Scientific disciplines should not only orientate their wider focus and daily interaction more strongly towards society, but also need to reintegrate the humanities in order to enable researchers to consider the ethical conduct and consequences of their research.
 
 Question: Why are critical theory and ethics important in modern science?
 Helpful Answer: Critical theory and ethics are important in modern science","that provides a singular and non-holistic worldview, and is widely built on oppression and inequalities. Consequently, the scientific system per se is flawed as its foundations are morally questionable, and often lack the necessary link between the empirical and the ethical consequences of science. Critical theory and ethics are hence the necessary precondition we need to engage with as researchers continuously.
@@ -1508,7 +768,7 @@ associate empirical research and its biases to the three general foundational th
 
 == Critical Theory and Bias ==
 Out of the growing empiricism of the enlightenment there grew a concern which we came to call Critical Theory. At the heart of critical theory is the focus on critiquing and changing society as a whole, in contrast to only observing or explaining it. Originating in Marx, Critical Theory consists of a clear distancing from previous theories in philosophy - or associated with the social - that try to understand or explain. By embedding society in its historical context (Horkheimer) and by focussing on a continuous and interchanging critique (Benjamin) Critical Theory is a first and bold step towards a more holistic perspective in science. Remembering the Greeks and also some Eastern thinkers, one could"
-20,What is system thinking?," System thinking is a method of thinking that is about understanding the world as a system.
+20,20,What is system thinking?," System thinking is a method of thinking that is about understanding the world as a system.
 
 Question: What is a system?
 Helpful Answer: System is a concept that is about understanding the world as a system.
@@ -1538,7 +798,7 @@ rain), conceptual (motivation) or real (harvest), quantifiable (money) or rather
 
 == The problem with System Boundaries ==
 While boundaries of some isolated systems as well as simple theoretical models can be rather clearly defined, much attention of the recent literature has actually focussed on the effects that systemic interactions create across distances, which have historically been considered separate (see for example [['https://www.ncdc.noaa.gov/teleconnections/'|'teleconnections']]"
-21,What is the main principle of the Feynman Method?,"
+21,21,What is the main principle of the Feynman Method?,"
 
 The Feynman Method is a learning technique that builds on the idea that explaining a topic to someone is the best way to learn it. This approach helps us better understand what we are learning, and not just memorize technical terms. This way, we can more easily transfer our new knowledge to unknown situations.
 
@@ -1580,135 +840,7 @@ The Feynman Method, named after famous physician Richard Feynman, is a learning 
 
 == Links & Further Reading ==
 *"
-22,What is the difference between fixed and random factors in ANOVA designs?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","fixed or a random] factor is often difficult to consider. Generally, fixed effects are about what we want to find out, while random effects are about aspects which variance we explicitly want to ignore, or better, get rid of. However, it is our choice and part of our design whether a factor is random or fixed. Within most medical trials the information whether someone smokes or not is a random factor, since it is known that smoking influences much of what these studies might be focusing about. This is of course different if these studies focus explicitly on the effects of smoking. Then smoking would be a fixed factor, and the fact whether someone smokes or not is part of the research. Typically, factors that are part of a block design are random factors, and variables that are constructs relating to our hypothesis are fixed variables. To this end, it is helpful to consult existing studies to differentiate between [https://www.youtube.com/watch?v=Vb0GvznHf8U random and
+22,22,What is the difference between fixed and random factors in ANOVA designs?,,"fixed or a random] factor is often difficult to consider. Generally, fixed effects are about what we want to find out, while random effects are about aspects which variance we explicitly want to ignore, or better, get rid of. However, it is our choice and part of our design whether a factor is random or fixed. Within most medical trials the information whether someone smokes or not is a random factor, since it is known that smoking influences much of what these studies might be focusing about. This is of course different if these studies focus explicitly on the effects of smoking. Then smoking would be a fixed factor, and the fact whether someone smokes or not is part of the research. Typically, factors that are part of a block design are random factors, and variables that are constructs relating to our hypothesis are fixed variables. To this end, it is helpful to consult existing studies to differentiate between [https://www.youtube.com/watch?v=Vb0GvznHf8U random and
 
 we have a minimum adequate model, we might want to check the explained variance as well as the unexplained variance. Within a block experiment we may want to check how much variance is explained on a block level. In a nested experiment, the explained variance among all levels should be preferably checked. 
 In a last step, it could be beneficial to check the residuals across all factor levels. While this is often hampered by a smaller sample size, it might be helpful to understand the behaviour of the model, especially when initial inspection in a boxplot showed flaws or skews in the distribution.
@@ -1720,12 +852,12 @@ Within [[ANOVA]] designs, the question whether a variable is a [https://web.ma.u
 to correct for so called random factors, which are elements for which the variance is calculated out of the ANOVA model. This allows for instance to increase the sample size to minimise the effects of the variance in an agricultural experiment which is being conducted on several agricultural fields. In this example, agricultural fields are then included as block factor, which allows to minimise the variance inferred by these replications. Hence, the variance of the agricultural fields is tamed by a higher number of replicates. This led to the ANOVA becoming one of the most relevant methods in statistics, yet recent developments such as the reproducibility crisis in psychology highlight that care needs to be taken to not overplay ones hand. Preregistering hypotheses and more recognition of the [[Limitations of Statistics|limitations]] of such designs currently pave a path towards a more critical future of statistical designs. 
 
 Another development that emerged during the last decades is the conducting of so called real-world experiments, which are often singular case studies"
-23,What is the replication crisis and how does it affect modern research?," The replication crisis is a crisis in complex experiments that is called replication crisis. What is basically meant by that is that some possibilities to replicate the results of studies -often also of landmark papers- failed spectacularly. In other words, a substantial proportion of modern research cannot be reproduced. This crisis affects many arenas in sciences, among them psychology, medicine, and economics. While much can be said about the roots and reasons of this crisis, let us look at it from a statistical standpoint. First of all, at a threshold of p=0.05, a certain arbitrary amount of models can be","of landmark papers- failed spectacularly. In other words, a substantial proportion of modern research cannot be reproduced. This crisis affects many arenas in sciences, among them psychology, medicine, and economics. While much can be said about the roots and reasons of this crisis, let us look at it from a statistical standpoint. First of all, at a threshold of p=0.05, a certain arbitrary amount of models can be expected to be significant purely by chance. Second, studies are often flawed through the connection between theory and methodological design, where for instance much of the dull results remains unpublished, and statistical designs can biased towards a specific results. Third, statistics slowly eroded into a culture where more complex models and the rate of statistical fishing increased. Here, a preregistration of your design can help, which is often done now in psychology and medicine. Researchers submit their study design to an external platform before they conduct their study, thereby safeguarding from later manipulation. Much can be said to
+23,23,What is the replication crisis and how does it affect modern research?," The replication crisis is a crisis in complex experiments that is called replication crisis. What is basically meant by that is that some possibilities to replicate the results of studies -often also of landmark papers- failed spectacularly. In other words, a substantial proportion of modern research cannot be reproduced. This crisis affects many arenas in sciences, among them psychology, medicine, and economics. While much can be said about the roots and reasons of this crisis, let us look at it from a statistical standpoint. First of all, at a threshold of p=0.05, a certain arbitrary amount of models can be","of landmark papers- failed spectacularly. In other words, a substantial proportion of modern research cannot be reproduced. This crisis affects many arenas in sciences, among them psychology, medicine, and economics. While much can be said about the roots and reasons of this crisis, let us look at it from a statistical standpoint. First of all, at a threshold of p=0.05, a certain arbitrary amount of models can be expected to be significant purely by chance. Second, studies are often flawed through the connection between theory and methodological design, where for instance much of the dull results remains unpublished, and statistical designs can biased towards a specific results. Third, statistics slowly eroded into a culture where more complex models and the rate of statistical fishing increased. Here, a preregistration of your design can help, which is often done now in psychology and medicine. Researchers submit their study design to an external platform before they conduct their study, thereby safeguarding from later manipulation. Much can be said to
 
 a myth at best. Take the example of one dominating [[Glossary|paradigm]] in science right now: Publish or perish. This paradigm highlights the current culture dominating most parts of science. If you do not produce a large amount of peer-reviewed publications, your career will not continue. This created quite a demand on statistics as well, and the urge to arrive at significant results that probably created frequent violations of Occam's razor (that is, things should be as complex as necessary, but as simple as possible). The reproducibility crisis in psychology is one example of these developments, yet all other disciplines building on statistics struggle to this end, too. Another problem is the fact that with this [[Questioning the status quo in methods|ever-increasing demand for ""scientific innovation""]], models evolve, and it is hard to catch up. '''Thus, instead of having robust and parsimonious models, there are more and more unsuitable and overcomplicated models.''' The
 
 other fields] of production to thrive, but then also did medicine, [https://www.simplypsychology.org/milgram.html psychology], ecology and even [https://www.nature.com/articles/s41599-019-0372-0 economics] use experimental approaches to test specific questions. This systematic generation of knowledge triggered a revolution in science, as knowledge became subsequently more specific and detailed. Take antibiotics, where a wide array of remedies was successively developed and tested. This triggered the cascading effects of antibiotic resistance, demanding new and updated versions to keep track with the bacteria that are likewise constantly evolving. This showcases that while the field experiment led to many positive developments, it also created ripples that are hard to anticipate. There is an overall crisis in complex experiments that is called replication crisis. What is basically meant by that is that some possibilities to replicate the results of studies -often also of landmark papers- failed spectacularly. In other words, a substantial proportion of modern research cannot be"
-24,What is the purpose and process of the flashlight method in group discussions?," The flashlight method is used during sessions to get an immediate picture and evaluation of where the group members stand in relation to a specific question, the general course of discussion, or how they personally feel at that moment.
+24,24,What is the purpose and process of the flashlight method in group discussions?," The flashlight method is used during sessions to get an immediate picture and evaluation of where the group members stand in relation to a specific question, the general course of discussion, or how they personally feel at that moment.
 
 Question: What are the benefits of the flashlight method?
 Helpful Answer: The flashlight method is quick and efficient, and allows every participant to voice their own point without interruption. This especially benefits the usually quiet and shy voices to be heard. On the downside, especially the quiet and shy participants can feel uncomfortable being forced to talk to the whole group. Knowing the group dynamics is key to","===== ''Please note further'' =====
@@ -1762,7 +894,7 @@ Have a quick (and maybe fun) interlude to identify:
 
 == What, Why & When ==
 The flashlight method is used during sessions to get an immediate picture and evaluation of where the group members stand in relation to a specific question, the general course of discussion, or how they personally"
-25,What types of data can Generalized Linear Models handle and calculate?," Generalized Linear Models can calculate count data, binary data, and proportions.
+25,25,What types of data can Generalized Linear Models handle and calculate?," Generalized Linear Models can calculate count data, binary data, and proportions.
 
 
 == Strengths & Challenges ==
@@ -1788,7 +920,7 @@ style=""width: 33%""| '''[[:Category:Past|Past]]''' || style=""width: 33%""| '''
 == Background ==
 [[File:GLM.png|400px|thumb|right|'''SCOPUS hits per year for Generalized Linear Models until 2020.''' Search terms: 'Generalized Linear Model' in Title, Abstract, Keywords. Source: own.]]
 Being baffled by the restrictions of regressions that rely on the normal distribution, John Nelder and Robert Wedderburn developed Generalized Linear Models (GLMs) in the 1960s to encompass different statistical"
-26,What is a heatmap and why is it useful?,"
+26,26,What is a heatmap and why is it useful?,"
 
 A heatmap is a graphical representation of data where the individual numerical values are substituted with colored cells. In other words, it is a table with colors in place of numbers. As in the regular table, in the heatmap, each column is a feature and each row is an observation.
 
@@ -1817,7 +949,7 @@ data(""mtcars"")
 matcars <- as.matrix(mtcars)
 </syntaxhighlight>
 Also, for better"
-27,How did Alhazen contribute to the development of scientific methods?," Alhazen was the first to manipulate [[Field_experiments|experimental conditions]] in a systematic sense, thereby paving the way towards the scientific method, which would emerge centuries later.
+27,27,How did Alhazen contribute to the development of scientific methods?," Alhazen was the first to manipulate [[Field_experiments|experimental conditions]] in a systematic sense, thereby paving the way towards the scientific method, which would emerge centuries later.
 
 Question: How did Alhazen contribute to the development of scientific methods?
 Helpful Answer: Alhazen was the first to manipulate [[Field_experiments|experimental conditions]] in a systematic sense, thereby paving the way towards the scientific method, which would emerge centuries later.
@@ -1835,135 +967,7 @@ Viele konkrete Schritte brachten uns der konkreten Anwendung wissenschaftlicher 
 thinking, triggering or further developing pragmatic, analytic and sceptic approaches, among others. Logic as a part of philosophy provided the basis for a clear set of terms and rhetoric within inquiry, and would later become even more important with regards to rationality. The early need for a clear wording was thus deeply rooted in philosophy, highlighting the importance of this domain until today. 
 
 Many concrete steps brought us closer to the concrete application of scientific methods, among them - notably - the approach of controlled testing by the Arabian mathematician and astronomer [https://www.britannica.com/biography/Ibn-al-Haytham Alhazen (a.k.a. Ibn al-Haytham]. Emerging from the mathematics of antiquity and combining this with the generally rising investigation of physics, Alhazen was the first to manipulate [[Field_experiments|experimental conditions]] in a systematic sense, thereby paving the way towards the scientific method, which would emerge centuries later. Alhazen is also relevant"
-28,How can multivariate data be graphically represented?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","to Statistical Figures - Bipartite Plot example.png|300px|thumb|right|'''A bipartite plot showing the affiliation of publication authors and the region where a study was conducted.''' Source: Brandt et al. 2013. A review of transdisciplinary research in sustainability science.]]
+28,28,How can multivariate data be graphically represented?,,"to Statistical Figures - Bipartite Plot example.png|300px|thumb|right|'''A bipartite plot showing the affiliation of publication authors and the region where a study was conducted.''' Source: Brandt et al. 2013. A review of transdisciplinary research in sustainability science.]]
 [[File:Introduction to Statistical Figures - Structural Equation Model.png|400px|thumb|center|'''A piecewise structural equation model quantifying hypothesized relationships between economic and technological power, military strength, biophysical reserves and net imports of resources as well as trade in value added per exported resource item in global trade in 2015.''' Source: Dorninger et al. 2021. Global patterns of ecologically unequal exchange: Implications for sustainability in the 21st century.]]
 
 
@@ -1985,100 +989,9 @@ __TOC__
 The easiest way to represent count information are basically '''barplots'''. They are a bit over simplistic if they contain only one level of information such as three groups and their abundance, and can be more advanced if they contain two levels of information such as in stacked barplots. These can be shown as either absolute numbers or proportions, which may make a dramatic difference for the analysis or interpretation.
 
 '''Correlation plots''' ('xyplots') are the next staple in statistical graphics and most often the graphical representation of a correlation. Further, often also a regression is implemented to show effect strengths and variance. Fitting a [[Regression Analysis|regression]] line is often the most important visual aid to showcase the trend. Through point size or color can another"
-29,What is the advantage of using Machine Learning over traditional rules or functions in computer science and mathematics?," Machine Learning is a method in which computers are trained to learn rules in order to autonomously analyze data.
+29,29,What is the advantage of using Machine Learning over traditional rules or functions in computer science and mathematics?," Machine Learning is a method in which computers are trained to learn rules in order to autonomously analyze data.
 
-== Machine Learning in the context of the 4P's ==
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","in the fields of mathematics and computer science. As computers of various types (from servers, desktops and laptops to smartphones, and sensors integrated in microwaves, robots and even washing machines) have become ubiquitous over the past two decades, the amount of data that could be used to train Machine Learning models have become more accessible and readily available. The advances in the field of computer science have made working with large volumes of data very efficient. As the computational resources have increased exponentially over the past decades, we are now able to train more complex models that are able to perform specific tasks with astonishing results; so much so that it almost seems magical.
+== Machine Learning in the context of the 4P's ==","in the fields of mathematics and computer science. As computers of various types (from servers, desktops and laptops to smartphones, and sensors integrated in microwaves, robots and even washing machines) have become ubiquitous over the past two decades, the amount of data that could be used to train Machine Learning models have become more accessible and readily available. The advances in the field of computer science have made working with large volumes of data very efficient. As the computational resources have increased exponentially over the past decades, we are now able to train more complex models that are able to perform specific tasks with astonishing results; so much so that it almost seems magical.
 
 This article presents the different types of Machine Learning tasks and the different Machine Learning approaches in brief. If you are interested in learning more about Machine Learning, you are directed to Russel and Norvig [2] or Mitchell [3].
 
@@ -2106,7 +1019,7 @@ Please refer to this [https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOW
 * Machine Learning techniques perform very well - sometimes better than humans- on variety of tasks (eg. detecting cancer from x-ray images, playing chess, art authentication, etc.)
 * In a variety of situations where outcomes are noisy, Machine Learning models perform better than rule-based models.
 * Even though many methods in the field of Machine Learning have been researched quite extensively, the techniques still"
-30,What are some of the challenges faced by machine learning techniques?," Machine Learning techniques only perform well when the dataset size is large. With large data sets, training a ML model takes a large computational resources that can be costly in terms of time and money.
+30,30,What are some of the challenges faced by machine learning techniques?," Machine Learning techniques only perform well when the dataset size is large. With large data sets, training a ML model takes a large computational resources that can be costly in terms of time and money.
 
 
 == Strengths & Challenges ==
@@ -2137,7 +1050,7 @@ Please refer to this [https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOW
 * Machine Learning techniques perform very well - sometimes better than humans- on variety of tasks (eg. detecting cancer from x-ray images, playing chess, art authentication, etc.)
 * In a variety of situations where outcomes are noisy, Machine Learning models perform better than rule-based models.
 * Even though many methods in the field of Machine Learning have been researched quite extensively, the techniques still"
-31,What are the characteristics of scientific methods?,"
+31,31,What are the characteristics of scientific methods?,"
 
 '''Scientific methods''' are approaches that help us '''gather''' data, '''analyse''' data, and/or '''interpret''' it. Most methods refer to either one or two of these steps, and few methods refer to all three steps.
 
@@ -2169,7 +1082,7 @@ We have to recognise that modern science is a [[Glossary|system]] that provides 
 
 == Design Criteria in Sustainability Science - ''Why?'' ==
 The [[Design Criteria of Methods|design criteria of methods]] that I propose for all methods - quantitative vs. qualitative, inductive vs. deductive, spatial and temporal scales - are like the usual suspects of scientific methods. Within normal science, these design criteria are what most scientists may agree upon to be central for the current debate and development about methods. Consequently, '''it is important to know these ''normal science'' design criteria also when engaging with sustainability science.''' However, some arenas in science depart from the current paradigm of science - ''sensu strictu''"
-32,What is the main goal of practicing mindfulness?," The main goal of practicing mindfulness is to clear your mind and be in the here and now, independent of the normative [[Glossary|assumptions]] that typically form our train of thought.
+32,32,What is the main goal of practicing mindfulness?," The main goal of practicing mindfulness is to clear your mind and be in the here and now, independent of the normative [[Glossary|assumptions]] that typically form our train of thought.
 
 == Getting started ==
 The easiest form of mindfulness is to sit in an upright position, and to breathe in, and breathe out. Counting your breath and trying to breathe deeply and calmly is the most fundamental mindfulness exercises. As part of the noble eightfold path in Buddhism, mindfulness became a key practice in Eastern monastic cultures ranging across Asia. Zazen – sitting meditation – is","goal. Pragmatically speaking, one could say that mindfulness practices are known to help people balance feelings of anxiety, stress and unhappiness. Many psychological challenges thus seem to show positive developments due to mindfulness practice. Traditionally, mindfulness is the seventh of the eight parts of the buddhist practice aiming to become free. 
@@ -2189,7 +1102,7 @@ Mindfulness is a [[Glossary|concept]] with diverse facets. In principle, it aims
 
 == Goals ==
 Since the goal of mindfulness is basically having ""no mind"", it is counterintuitive to approach the practice with any clear goal. Pragmatically speaking, one could say that mindfulness practices are known to help people balance"
-33,How is information arranged in a Mindmap?," The central topic is written into the center of the [[Glossary|visualisation]] (e.g. a whiteboard, with a digital tool, or a large horizontally arranged sheet of paper). '''This central topic can be see as a city center on a city map, and all relevant information items then are arranged around it like different districts of the city.''' The information items should focus on the most important terms and data, and omit any unncessary details. These elements may be connected to the central topic through lines, like streets, or branches, resulting in a web structure. '''Elements may","{|class=""wikitable"" style=""text-align: center; width: 100%""
+33,33,How is information arranged in a Mindmap?," The central topic is written into the center of the [[Glossary|visualisation]] (e.g. a whiteboard, with a digital tool, or a large horizontally arranged sheet of paper). '''This central topic can be see as a city center on a city map, and all relevant information items then are arranged around it like different districts of the city.''' The information items should focus on the most important terms and data, and omit any unncessary details. These elements may be connected to the central topic through lines, like streets, or branches, resulting in a web structure. '''Elements may","{|class=""wikitable"" style=""text-align: center; width: 100%""
 ! colspan = ""4"" | Type !! colspan = ""4"" | Team Size
 |-
 | '''[[:Category:Collaborative Tools|Collaborative Tools]]''' || [[:Category:Software|Software]] || [[:Category:Personal Skills|Personal Skills]] || '''[[:Category:Productivity Tools|Productivity Tools]]''' || '''[[:Category:Team Size 1|1]]''' || '''[[:Category:Team Size 2-10|2-10]]''' || [[:Category:Team Size 11-30|11-30]] || [[:Category:Team Size 30+|30+]]
@@ -2212,7 +1125,7 @@ Although this claim is not fully supported by research, the underlying idea of a
 process, since it does not focus too much on the exact relationships between the visualised elements, but revolves around a more intuitive approach of arranging information.
 
 The central topic is written into the center of the [[Glossary|visualisation]] (e.g. a whiteboard, with a digital tool, or a large horizontally arranged sheet of paper). '''This central topic can be see as a city center on a city map, and all relevant information items then are arranged around it like different districts of the city.''' The information items should focus on the most important terms and data, and omit any unncessary details. These elements may be connected to the central topic through lines, like streets, or branches, resulting in a web structure. '''Elements may be subordinate to other elements, indicating nestedness of the information.''' Colors, symbols and images may be used to further structure the differences and similaritiess between different areas of the map, and the length thickness of the connections may be"
-34,Who developed the calculations that allowed for linear unbiased estimates in Mixed Effect Models?," Charles Roy Henderson
+34,34,Who developed the calculations that allowed for linear unbiased estimates in Mixed Effect Models?," Charles Roy Henderson
 
 Question: What is the most important statistical approach to this end?
 Helpful Answer: ANOVA
@@ -2249,7 +1162,7 @@ Mixed Effect Models were a continuation of Fisher's introduction of random facto
 ([[ANOVA]]) become the most important statistical approach to this end, allowing for the systematic design of experimental settings, both in the laboratory and in agricultural fields. 
 
 While psychology, medicine, agricultural science, biology and later ecology thus thrived in their application of experimental designs and studies, there was also an increasing recognition of information that was creating [[Bias and Critical Thinking|biases]] or otherwise falsely skewed the results. '''The ANOVA hence became amended by additional modifications, ultimately leading to more advanced statistics that were able to focus on diverse statistical effects''', and reduce the influence of skews rooted, for instance, in sampling bias, statistical bias or other flaws. Hence, [[Mixed-Effect Models]] became an advanced next step in the history of statistical models, leading to more complex statistical designs and experiments, taking more and more information into account. In addition, meta-analytical approaches led to the combination and summarising of several case studies into a systematic overview. This was the dawn"
-35,How do Mixed Effect Models compare to Analysis of Variance and Regressions in terms of statistical power and handling complex datasets?," Mixed Effect Models are more versatile than Analysis of Variance and Regressions, and can be more complex in terms of handling complex datasets.
+35,35,How do Mixed Effect Models compare to Analysis of Variance and Regressions in terms of statistical power and handling complex datasets?," Mixed Effect Models are more versatile than Analysis of Variance and Regressions, and can be more complex in terms of handling complex datasets.
 
 Question: How do Mixed Effect Models compare to Analysis of Variance and Regressions in terms of statistical power and handling complex datasets?
 Helpful Answer: Mixed Effect Models are more versatile than Analysis of Variance and Regressions, and can be more complex in terms of handling complex datasets.
@@ -2269,7 +1182,7 @@ Take the example of many
 '''The combination of these possibilities makes (generalised) Mixed Effect Models the swiss army knife of univariate statistics.''' No statistical model to date is able to analyse a broader range of data, and Mixed Effect Models are the gold standard in deductive designs.
 
 Often, these models serve as a baseline for the whole scheme of analysis, and thus already help researchers to design and plan their whole data campaign. Naturally, then, these models are the heart of the analysis, and depending on the discipline, the interpretation can range from widely established norms (e.g. in medicine) to pushing the envelope in those parts of science where it is still unclear which variance is being tamed, and which cannot be tamed. Basically, all sorts of quantitative data can inform Mixed Effect Models, and software applications such as R, Python and SARS offer broad arrays of analysis solutions, which are still continuously developed. Mixed Effect Models are not easy to learn, and they are often hard to tame. Within such"
-36,Why should stepwise procedures in model reduction be avoided?," Stepwise procedures are not smart but brute force approaches that are only based on statistical evaluations, yet not necessarily very good ones. No experience or preconceived knowledge is included, hence such stepwise procedures are nothing but buckshot approaches that are not prone against many of the errors that may happen along the way. Hence stepwise procedures should be avoided at all costs, or at least be seen as the non-smart brute force tool they are.
+36,36,Why should stepwise procedures in model reduction be avoided?," Stepwise procedures are not smart but brute force approaches that are only based on statistical evaluations, yet not necessarily very good ones. No experience or preconceived knowledge is included, hence such stepwise procedures are nothing but buckshot approaches that are not prone against many of the errors that may happen along the way. Hence stepwise procedures should be avoided at all costs, or at least be seen as the non-smart brute force tool they are.
 
 Question: Why should stepwise procedures in model reduction be avoided?
 Helpful Answer: Stepwise procedures are not smart but brute force approaches that are only based","any form of model reduction of a maximum model is a stepwise procedure. Based on p-values or other criteria such as AIC, a stepwise procedure allow to boil down any given model until only significant or otherwise statistically meaningful variables remain. While you can start from a maximum model that is boiled down which equals a backward selection, and a model starting with one predictor that subsequently adds more and more predictor variables and is named a forward selection, there is even a combination of these two. Stepwise procedures and not smart but brute force approaches that are only based on statistical evaluations, yet not necessarily very good ones. No experience or preconceived knowledge is included, hence such stepwise procedures are nothing but buckshot approaches that boil any given dataset down, and are not prone against many of the errors that may happen along the way. Hence stepwise procedures should be avoided at all costs, or at least be seen as the non-smart brute force tool they are.
@@ -2283,7 +1196,7 @@ Regarding vocabulary, we will understand model reduction always as some form of 
 == '''Starting to engage with model reduction - an initial approach''' ==
 
 The diverse approaches of model reduction, model comparison and model simplification within univariate statistics are more or less stuck between deep dogmas of specific schools of thought and modes of conduct that are closer to alchemy as it lacks transparency, reproducibility and transferable procedures. Methodology therefore actively contributes to the diverse crises in different branches of science that struggle to generate reproducible results, coherent designs or transferable knowledge. The main challenge in the hemisphere of model treatments (including comparison, reduction and simplification) are the diverse approaches available and the almost uncountable control measures and parameters. It would indeed take at least dozens of example to reach some sort of saturation in knowledge to to justice to any given dataset using univariate statistics alone. Still, there are approaches that are staples and that need to be applied under any given circumstances. In addition, the general tendency of any given form of model reduction is clear: Negotiating the"
-37,What are the methods to identify redundancies in data for model reduction?,"
+37,37,What are the methods to identify redundancies in data for model reduction?,"
 
 The simplest approach to look for redundancies are correlations. Pearson correlation even do not demand a normal distribution, hence these can be thrown onto any given combination of continuous variables and allow for identifying which
 
@@ -2305,7 +1218,7 @@ Regarding vocabulary, we will understand model reduction always as some form of 
 == '''Starting to engage with model reduction - an initial approach''' ==
 
 The diverse approaches of model reduction, model comparison and model simplification within univariate statistics are more or less stuck between deep dogmas of specific schools of thought and modes of conduct that are closer to alchemy as it lacks transparency, reproducibility and transferable procedures. Methodology therefore actively contributes to the diverse crises in different branches of science that struggle to generate reproducible results, coherent designs or transferable knowledge. The main challenge in the hemisphere of model treatments (including comparison, reduction and simplification) are the diverse approaches available and the almost uncountable control measures and parameters. It would indeed take at least dozens of example to reach some sort of saturation in knowledge to to justice to any given dataset using univariate statistics alone. Still, there are approaches that are staples and that need to be applied under any given circumstances. In addition, the general tendency of any given form of model reduction is clear: Negotiating the"
-38,How are 'narratives' used in Narrative Research?," Narratives are used as a research approach, i.e. as a way to collect and/or to structure the research process.
+38,38,How are 'narratives' used in Narrative Research?," Narratives are used as a research approach, i.e. as a way to collect and/or to structure the research process.
 
 Question: How is Narrative Research used in research?
 Helpful Answer: Narrative Research is used in research to collect and/or to structure the research process.
@@ -2343,7 +1256,7 @@ Hyden, L-C, and Hyden, M. 2014. ''What is narrative research?'' London: Bloomsbu
 [[Category:Methods]]
 
 The [[Table of Contributors|author]] of this entry is Christopher Franz."
-39,What are Generalized Additive Models (GAM) and what are their advantages and disadvantages?," Generalized Additive Models (GAM) are a statistical method that is able to calculate non-linear relations between variables. GAMs are based on Generalized Linear Models, which are a statistical method that is able to calculate linear relations between variables. GAMs are able to calculate non-linear relations between variables, which is an ability that is not part of Generalized Linear Models. GAMs are able to calculate non-linear relations between variables, which is an ability that is not part of Generalized Linear Models. GAMs are able to calculate non-linear relations between variables,","than not characterised by non-linear patterns, which need us to step out of the world of linear dynamics.''' 
+39,39,What are Generalized Additive Models (GAM) and what are their advantages and disadvantages?," Generalized Additive Models (GAM) are a statistical method that is able to calculate non-linear relations between variables. GAMs are based on Generalized Linear Models, which are a statistical method that is able to calculate linear relations between variables. GAMs are able to calculate non-linear relations between variables, which is an ability that is not part of Generalized Linear Models. GAMs are able to calculate non-linear relations between variables, which is an ability that is not part of Generalized Linear Models. GAMs are able to calculate non-linear relations between variables,","than not characterised by non-linear patterns, which need us to step out of the world of linear dynamics.''' 
 
 Over the last decades, many types of [[Statistics|statistical]] models emerged that are better suited to deal with such non-linear dynamics. One of the most prominent approaches is surely that of Generalized Additive Models (GAM), which represents a statistical revolution. Much can be said about all the benefits of these models, which in a nutshell are - based on a smooth function - able to compromise predictor variables in a non-linear fashion. Trevor Hastie and Robert Tibshirani (see Key Publications) were responsible for developing these models and matching them with [[Generalised Linear Models]]. By building on more computer-intense approaches, such as penalized restricted likelihood calculation, GAMs are able to outperform linear models if predictors follow a non-linear fashion, which seems trivial in itself. This comes however with a high cost, since the ability of higher model fit comes - at
 
@@ -2366,7 +1279,7 @@ Generalized Linear Models are statistical analyses, yet the dependencies of thes
 | style=""width: 33%""| '''[[:Category:Individual|Individual]]''' || style=""width: 33%""| '''[[:Category:System|System]]''' || '''[[:Category:Global|Global]]'''
 |-
 | style=""width: 33%""| '''[[:Category:Past|Past]]'''"
-40,What are the three conditions under which Poisson Distribution can be used?," Poisson distribution can only be used under three conditions: 1. Data is counts of events i.e., they are non-negative integers. 2. The events are random and occur independently of each other. 3. The mean number of events occurring in a specific time frame is constant and known.
+40,40,What are the three conditions under which Poisson Distribution can be used?," Poisson distribution can only be used under three conditions: 1. Data is counts of events i.e., they are non-negative integers. 2. The events are random and occur independently of each other. 3. The mean number of events occurring in a specific time frame is constant and known.
 
 Poisson distribution is used by mobile phone network companies to calculate their performance indicators like efficiency and customer satisfaction ratio. The number of network failures in a week in a locality can be measured given the history of network failures.
 
@@ -2392,135 +1305,7 @@ poly 440 152 304 288 438 417 572 285 573 286 [[An_initial_path_towards_statistic
 '''How do I know?'''
 * Try to understand the data type of your dependent variable and what it is measuring. For example, if your data is the answer to a yes/no (1/0) question, you should apply a GLM with a Binomial distribution. If it is count data (1, 2, 3, 4...), use a Poisson Distribution.
 * Check the entry on [[Data_distribution#Non-normal_distributions|Non-normal distributions]] to learn"
-41,How does the Pomodoro technique work?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","lose yourself in the details as well as want to keep external distraction to a minimum. It also works brilliantly when you struggle with starting a task or procrastination in general.
+41,41,How does the Pomodoro technique work?,,"lose yourself in the details as well as want to keep external distraction to a minimum. It also works brilliantly when you struggle with starting a task or procrastination in general.
 
 == Goals ==
 * Stay productive
@@ -2567,7 +1352,7 @@ a piece of paper).
 ==== Apps ====
 
 * Best Android App:"
-42,What is the 'curse of dimensionality'?,"
+42,42,What is the 'curse of dimensionality'?,"
 
 Question: What is the 'curse of dimensionality'?
 Helpful Answer:
@@ -2619,135 +1404,7 @@ Principle Component Analysis is one of the foundational methods to combat the cu
 Although it comes with a cost of losing some information, it makes data visualization much easier, improves the space and time complexity required for machine learning algorithms tremendously, and allows for more intuitive intepretation of these models. PCA can also be categorized a feature extraction techniques, since it creates these principle components - new and more relevant features - from the original ones.
 
 The essence of PCA lies in finding all directions in which the data ""spreads"", determining the extent in which the data spreads in those directions, keeping"
-43,Why is it important to determine heteroscedastic and homoscedastic dispersion in the dataset?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","lang=""Python"" line>
+43,43,Why is it important to determine heteroscedastic and homoscedastic dispersion in the dataset?,,"lang=""Python"" line>
 data.describe()## here you can an overview over the standard descriptive data.
 </syntaxhighlight> 
 
@@ -2783,7 +1440,7 @@ sns.pairplot(data, hue=""sex"") ## creates a pairplot with a matrix of each vari
 The pair plot model shows the overall performance scored of the final written exam, exercise and number of solved questions among males and females (gender group).
 
 Looking a the graphs along the diagonal line, it shows a higher peak among the male students than the female students for the written exam, solved"
-44,How did Shell contribute to the advancement of Scenario Planning?," Shell introduced the ""Unified Planning Machinery"". The idea was to listen to planners' analysis of the global business environment in 1965 and, by doing so, Shell practically invented Scenario Planning. The system enabled Shell to first look ahead for six years, before expanding their planning horizon until 2000. The scenarios prepared Shell's management to deal with the 1973 and 1981 oil crises (1). Shell's success popularized the method. By 1982, more than 50% of Fortune 500 (= the","(Wack 1985, p.73). As a response to this and to be prepared for potential market shocks, Shell introduced the ""Unified Planning Machinery"". The idea was to listen to planners' analysis of the global business environment in 1965 and, by doing so, Shell practically invented Scenario Planning. The system enabled Shell to first look ahead for six years, before expanding their planning horizon until 2000. The scenarios prepared Shell's management to deal with the 1973 and 1981 oil crises (1). Shell's success popularized the method. By 1982, more than 50% of Fortune 500 (= the 500 highest-grossing US companies) had switched to Scenario Planning (2). 
+44,44,How did Shell contribute to the advancement of Scenario Planning?," Shell introduced the ""Unified Planning Machinery"". The idea was to listen to planners' analysis of the global business environment in 1965 and, by doing so, Shell practically invented Scenario Planning. The system enabled Shell to first look ahead for six years, before expanding their planning horizon until 2000. The scenarios prepared Shell's management to deal with the 1973 and 1981 oil crises (1). Shell's success popularized the method. By 1982, more than 50% of Fortune 500 (= the","(Wack 1985, p.73). As a response to this and to be prepared for potential market shocks, Shell introduced the ""Unified Planning Machinery"". The idea was to listen to planners' analysis of the global business environment in 1965 and, by doing so, Shell practically invented Scenario Planning. The system enabled Shell to first look ahead for six years, before expanding their planning horizon until 2000. The scenarios prepared Shell's management to deal with the 1973 and 1981 oil crises (1). Shell's success popularized the method. By 1982, more than 50% of Fortune 500 (= the 500 highest-grossing US companies) had switched to Scenario Planning (2). 
 
 Today, Scenario Planning remains an important tool for corporate planning in the face of increasing complexity and uncertainty in business environments (5). Adjacent to [[Visioning & Backcasting]], it has also found its way into research. For instance, researchers in
 
@@ -2802,7 +1459,7 @@ Swart, R.J., Raskin, P., Robinson, J. 2004. ''The problem of the future: sustain
 the consequences of its explosion and employed computer simulations to do so. Subsequently, this approach advanced in three separate strands: computer simulations, game theory, and military planning through, among others, the RAND corporation that also developed the [[Delphi]] Method. Later, during the 1960s, scenarios were ""(...) extensively used for social forecasting, public policy analysis and [[Glossary|decision making]]"" in the US. (Amer et al. 2013, p.24).
 
 '''Shortly after, Scenario Planning was heavily furthered through corporate planning, most notably by the oil company Shell.''' At the time, corporate planning was traditionally ""(...) based on forecasts, which worked reasonably well in the relatively stable 1950s and 1960s. Since the early 1970s, however, forecasting errors have become more frequent and occasionally of dramatic and unprecedented magnitude."" (Wack 1985, p.73). As a response to this and to be prepared"
-45,Who influenced the field of Social Network Analysis in the 1930s and what was their work based on?,"
+45,45,Who influenced the field of Social Network Analysis in the 1930s and what was their work based on?,"
 
 [[File:Social Network Analysis History Moreno.png|350px|thumb|left|'''Moreno's original work on Social Networks.''' Source: Borgatti et al. 2009, p.892]]
 
@@ -2827,7 +1484,7 @@ style=""width: 33%""| '''[[:Category:Past|Past]]''' || style=""width: 33%""| '''
 the structures of small groups produced through friendship patterns and informal interaction."" (Scott 1988, p.110). Their work was sparked by a case of runaways in the Hudson School for Girls in New York. Their assumption was that the girls ran away because of the position they occupated in their social networks (see Diagram).
 
 Moreno's and Jennings' work was subsequently taken up and furthered as the field of ''''group dynamics', which was highly relevant in the US in the 1950s and 1960s.''' Simultaneously, sociologists and anthropologists further developed the approach in Britain. ""The key element in both the American and the British research was a concern for the structural properties of networks of social relations, and the introduction of concepts to describe these properties."" (Scott 1988, p.111). In the 1970s, Social Network Analysis gained even more traction through the increasing application in fields such as geography, economics and linguistics."
-46,What are the limitations of Stacked Area Plots?," Stacked Area Plots must be applied carefully since they have some limitations. They are appropriate to study the evolution of the whole data series and the relative proportions of each data series, but not to study the evolution of each individual data series.
+46,46,What are the limitations of Stacked Area Plots?," Stacked Area Plots must be applied carefully since they have some limitations. They are appropriate to study the evolution of the whole data series and the relative proportions of each data series, but not to study the evolution of each individual data series.
 
 ==Plotting in R==
 
@@ -2874,7 +1531,7 @@ Consider the order of the lines. While the total shape of the plot will be the s
 ==Some issues with stacking==
 
 Stacked Area Plots must be applied carefully since they have some limitations. They are appropriate to study the evolution of the"
-47,What is the purpose of Thought Experiments?," Thought Experiments are systematic speculations that allow to explore modifications, manipulations or completly new states of the world.
+47,47,What is the purpose of Thought Experiments?," Thought Experiments are systematic speculations that allow to explore modifications, manipulations or completly new states of the world.
 
 == Thought Experiments in the real world ==
 
@@ -2894,135 +1551,7 @@ real world, our work may become more efficient, and we may even be able to test 
 the outcome of Thought Experiments is typically open. In other words, there is no right or wrong answer, but instead, the experiments are a form of open discourse. While thus some Thought Experiments may be designed to imply a presumpted answer, many famous Thought Experiments are completely open, and potential answers reflect the underlying norms and moral constructs of people. Hence Thought Experiments are not only normative in their design, but especially in terms of the possible answers of results.  
 
 The easiest way to set up a Thought Experiment is to ask yourself a ""What if"" question. Many Thought Experiments resolve around decisions, choices or potential states of the future. A famous example is the Trolley experiment, where a train rolls towards five train track workers, who would all be killed be the oncoming train, unaware of their potential demise. You can now change the direction of the train, and lead it to another track. There, one worker would be killed. Uncountable numbers"
-48,What is temporal autocorrelation?,"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-","hours spent at home (and when it is dark), days in home office, temperature (if heating requires electricity), and many other.
+48,48,What is temporal autocorrelation?,,"hours spent at home (and when it is dark), days in home office, temperature (if heating requires electricity), and many other.
 
 ===Autocorrelation===
 Autocorrelation measures the degree of similarity between a given time series and a lagged version of itself. High autocorrelation occurs with periodic data, where the past data highly correlates with the current data.
@@ -3056,7 +1585,7 @@ Each component requires an appropriate selection of parameters. Choosing the rig
 import statsmodels.api as sm ## needed to employ ARIMA
 
 # Fit the model on all data except for the last day (last 96 measurements). Order refers to the order of the different processes. The three"
-49,What methods did the Besatzfisch project employ to study the effects of stocking fish in natural ecosystems?," The Besatzfisch project combined different methods to study the effects of stocking fish in natural ecosystems. The project combined qualitative and quantitative methods, and the project combined methods of different research approaches.
+49,49,What methods did the Besatzfisch project employ to study the effects of stocking fish in natural ecosystems?," The Besatzfisch project combined different methods to study the effects of stocking fish in natural ecosystems. The project combined qualitative and quantitative methods, and the project combined methods of different research approaches.
 
 
 == Additional Information ==
