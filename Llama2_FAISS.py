@@ -88,7 +88,7 @@ create_vector_database(texts, embedding)
 
 # %%
 
-from langchain import PromptTemplate
+from langchain.prompts.prompt import PromptTemplate
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.llms import CTransformers # to use CPU only

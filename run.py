@@ -100,5 +100,5 @@ index_dist1 = "l2"
 index_dist2 = "cosine"
 index_dist3 = "ip"
 
-vector_str = faiss_vs.create_vectorstore(wikipedia_kb, bge_embedding, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, index_dist1)
+vector_str = chroma_vs.create_vectorstore(wikipedia_kb, bge_embedding, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, index_dist1)
 

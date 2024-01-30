@@ -8,7 +8,13 @@ import transformers
 
 LLAMA2_13B_CHAT_MODEL_ID = 'meta-llama/Llama-2-13b-chat-hf'
 LLAMA2_7B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
-LLAMA2_70B_CHAT_MODEL_ID = 'meta-llama/Llama-2-70b-chat-hf'
+MISTRAL_7B = 'mistralai/Mistral-7B-v0.1'
+MICROSOFT_PHI2 = 'microsoft/phi-2'
+FALCON_7B = 'tiiuae/falcon-7b-instruct'
+CUSTOM_PHI2 = 'amgadhasan/phi-2'
+
+MAX_TOKEN = 128
+
 
 def load_llm_ctra_llama27b():
     """
@@ -18,7 +24,7 @@ def load_llm_ctra_llama27b():
     llm = CTransformers(
         model = "TheBloke/Llama-2-7B-Chat-GGML",
         model_type="llama",
-        max_new_tokens = 512,
+        max_new_tokens = MAX_TOKEN,
         temperature = 0.0
     )
     return llm
@@ -32,23 +38,12 @@ def load_llm_ctra_llama2_13b():
     llm = CTransformers(
         model = "GrazittiInteractive/llama-2-13b",
         model_type="llama",
-        max_new_tokens = 512,
+        max_new_tokens = MAX_TOKEN,
         temperature = 0.0
     )
     return llm
 
 
-
-def load_llm_gpt35():
-    load_dotenv()
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    llm = ChatOpenAI(
-        openai_api_key=openai.api_key, 
-        model="gpt-3.5-turbo",
-        temperature=0.0,
-        max_tokens=1500,
-        )
-    return llm
 
 def load_llm_gpt4():
     load_dotenv()
@@ -84,7 +79,8 @@ def load_llm_tokenizer_hf_with_model(model_id):
     hf_auth = os.getenv('HF_AUTH_TOKEN')
     model_config = transformers.AutoConfig.from_pretrained(
         model_id,
-        use_auth_token=hf_auth
+        use_auth_token=hf_auth,
+        trust_remote_code=True
     )
 
     device_map = {
@@ -124,9 +120,38 @@ def load_llm_tokenizer_hf_with_model(model_id):
         task='text-generation',
         # we pass model parameters here too
         temperature=0.0,  # 'randomness' of outputs, 0.0 is the min and 1.0 the max
-        max_new_tokens=512,  # mex number of tokens to generate in the output
-        repetition_penalty=0.2  # without this output begins repeating
+        do_sample=False,  # means deterministic outputs or temperature = 0.0
+        max_new_tokens=MAX_TOKEN,  # mex number of tokens to generate in the output
+        repetition_penalty=0.3  # without this output begins repeating
+        
     )
     llm = HuggingFacePipeline(pipeline=generate_text)
 
+    return llm
+
+def get_llama2_llm():
+    llm = load_llm_tokenizer_hf_with_model(LLAMA2_13B_CHAT_MODEL_ID)
+    llm.name = "llama2"
+    return llm
+
+def get_mistral_llm():
+    llm = load_llm_tokenizer_hf_with_model(MISTRAL_7B)
+    llm.name = "mistral"
+    return llm
+
+def get_phi2_llm():
+    llm = load_llm_tokenizer_hf_with_model(CUSTOM_PHI2)
+    llm.name = "phi2"
+    return llm
+
+def get_gpt35_llm():
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    llm = ChatOpenAI(
+        openai_api_key=openai.api_key, 
+        model="gpt-3.5-turbo",
+        temperature=0.0,
+        max_tokens=MAX_TOKEN,
+        )
+    llm.name = "gpt35"
     return llm

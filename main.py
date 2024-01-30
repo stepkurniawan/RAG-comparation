@@ -8,7 +8,7 @@ from rag_embedding import embedding_ids
 from rag_vectorstore import create_faiss_db, load_local_faiss_vector_database
 from rag_vectorstore import get_index_vectorstore_wiki_nyc, create_chroma_db, load_chroma_db
 from rag_vectorstore import svm_similarity_search_doc, similarity_search_doc
-from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_tokenizer_hf_with_model
+from rag_llms import load_llm_ctra_llama27b, get_gpt35_llm, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
 # from rag_prompting import set_custom_prompt, set_custom_prompt_new, get_formatted_prompt
 from rag_chains import retrieval_qa_chain_from_local_db, chain_with_docs, final_result

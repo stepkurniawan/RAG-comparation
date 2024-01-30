@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from langchain.prompts.prompt import PromptTemplate
 from langchain_community.prompts import ChatPromptTemplate
 
 

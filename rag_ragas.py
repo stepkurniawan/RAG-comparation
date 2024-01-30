@@ -10,19 +10,16 @@ hf_token = os.getenv('HF_AUTH_TOKEN')
 from datasets import load_dataset, Dataset
 
 # from langchain_community.chat_models import AzureChatOpenAI
-from ragas.llms import LangchainLLM
 # from langchain_community.llms import AzureOpenAI
 # from langchain_community.embeddings import AzureOpenAIEmbeddings
 
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 
-from ragas.langchain import RagasEvaluatorChain
 from ragas import evaluate
 from ragas.metrics import ContextPrecision, ContextRecall
 
-from rag_llms import load_llm_gpt35, load_llm_tokenizer_hf_with_model
-from rag_llms import LLAMA2_13B_CHAT_MODEL_ID, LLAMA2_7B_CHAT_MODEL_ID, LLAMA2_70B_CHAT_MODEL_ID
-from rag_chains import retrieval_qa_chain_from_local_db, final_result
+from rag_llms import get_gpt35_llm, load_llm_tokenizer_hf_with_model
+from rag_chains import retrieval_qa_chain_from_local_db
 
 from rag_embedding import get_embed_model, embedding_ids
 import time
@@ -355,17 +352,23 @@ def retriever_evaluation(
     start_time = time.time() 
     contexted_dataset = context_precision.score(contexted_dataset)
     contexted_dataset = context_recall.score(contexted_dataset)
-    contexted_df = pd.DataFrame(contexted_dataset)
+    evaluated_df = pd.DataFrame(contexted_dataset)
     print("success evaluate retriever")
     end_time = time.time()
     total_time = end_time - start_time
-    contexted_df.to_csv(path_to_save)
+    # if folder doesnt exist, create it. folder is without the .csv filename
+    # folderpath = path_to_save, but without the filename
+    folderpath = os.path.dirname(path_to_save)
+    if not os.path.exists(folderpath):
+        os.makedirs(folderpath)
+    
+    evaluated_df.to_csv(path_to_save)
     print("success save retriever evaluation CSV to: ", path_to_save)
     print(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     logger.info("success save retriever evaluation CSV to: " + path_to_save)
     logger.info(f'Execution time: {total_time:.2f} seconds, or {total_time/60:.2f} minutes')
     
-    return contexted_df
+    return evaluated_df
 
 def load_retriever_evaluation(path):
     """

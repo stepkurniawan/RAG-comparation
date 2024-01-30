@@ -1,14 +1,14 @@
 #%%
 from rag_embedding import get_retriever_embeddings, get_generator_embeddings
 from rag_prompting import set_custom_prompt
-from rag_llms import load_llm_ctra_llama27b, load_llm_gpt35, load_llm_ctra_llama2_13b, load_llm_tokenizer_hf_with_model
+from rag_llms import load_llm_ctra_llama27b, get_gpt35_llm, load_llm_ctra_llama2_13b, load_llm_tokenizer_hf_with_model
 from rag_llms import LLAMA2_13B_CHAT_MODEL_ID
 
 from rag_chains import retrieval_qa_chain_from_local_db, final_result
 from rag_vectorstore import load_chroma_db, load_local_faiss_vector_database
 
 
-from langchain import PromptTemplate
+from langchain.prompts.prompt import PromptTemplate
 from langchain_community.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS, Chroma
 from langchain_community.chat_models import ChatOpenAI
@@ -87,7 +87,7 @@ test_llm = test_load_llm_tokenizer_llama2_13b_hf()
 #%% 
 
 def test_load_llm_gpt35():
-    llm = load_llm_gpt35()
+    llm = get_gpt35_llm()
     assert isinstance(llm, ChatOpenAI) , "Failed getting the llm, check test_load_llm_gpt35()"
     return llm
 

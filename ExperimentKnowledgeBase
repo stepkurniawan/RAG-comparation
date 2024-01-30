@@ -45,12 +45,12 @@ contexted_suswiki = multi_similarity_search_doc(suswiki_vectorstore, QUESTION_DA
 contexted_wikipedia = multi_similarity_search_doc(wikipedia_vectorstore, QUESTION_DATASET, TOP_K)
 
 
-#%% evaluate
-# suswiki_eval = retriever_evaluation(contexted_suswiki, FOLDER_PATH+"suswiki_eval.csv")
-# wikipedia_eval = retriever_evaluation(contexted_wikipedia, FOLDER_PATH+"wikipedia_eval.csv")
+#%% evaluate using RAGAS
+suswiki_eval = retriever_evaluation(contexted_suswiki, FOLDER_PATH+"suswiki_eval2.csv")
+wikipedia_eval = retriever_evaluation(contexted_wikipedia, FOLDER_PATH+"wikipedia_eval2.csv")
 
-suswiki_eval = load_retriever_evaluation(FOLDER_PATH+"suswiki_eval.csv")
-wikipedia_eval = load_retriever_evaluation(FOLDER_PATH+"wikipedia_eval.csv")
+suswiki_eval = load_retriever_evaluation(FOLDER_PATH+"suswiki_eval2.csv")
+wikipedia_eval = load_retriever_evaluation(FOLDER_PATH+"wikipedia_eval2.csv")
 
 print("")
 ## calculate mean precision, recall and F1 score

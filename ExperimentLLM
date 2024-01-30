@@ -1,0 +1,76 @@
+#%%# prepare environement
+import os
+import time
+from huggingface_hub import snapshot_download
+
+
+import pandas as pd
+
+from rag_vectorstore import multi_similarity_search_doc
+from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
+
+from LogSetup import logger
+from rag_ragas import retriever_evaluation
+from rag_chains import retrieval_qa_chain_from_local_db
+
+
+from StipVectorStore import StipVectorStore
+from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset , load_suswiki, load_wikipedia, load_50_qa_dataset
+from StipEmbedding import StipEmbedding
+
+
+#### fixed
+TEST_QUERY = "what is A/B testing?"
+CHUNK_SIZE = 200
+CHUNK_OVERLAP_SCALE = 0.1
+TOP_K = 3
+INDEX_DISTANCE = "l2"
+QUESTION_DATASET = load_50_qa_dataset()['train']
+FOLDER_PATH ="experiments/Llm/"
+VECTORSTORE = StipVectorStore("faiss")
+VECTOR_STORE_DATA = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_"+INDEX_DISTANCE)
+
+# model_path = snapshot_download(repo_id="amgadhasan/phi-2",repo_type="model", local_dir="./huggingface_cache/Models/amgadhasan-phi-2", local_dir_use_symlinks=False)
+
+
+
+# test load llmnotion
+llama2 = get_llama2_llm()
+mistral = get_mistral_llm()
+gpt35 = get_gpt35_llm()
+
+
+#%% sanity test, retrieving and generating for 1 question
+test_qa_chain = retrieval_qa_chain_from_local_db(llm=llama2, vectorstore=VECTOR_STORE_DATA) 
+response = test_qa_chain({'query': TEST_QUERY})
+
+print(test_qa_chain.name)
+print("the query is: ", response['query'])
+print("the result is: ", response['result'])
+print("the source documents are: ", response['source_documents'])
+
+
+#%% now RETRIEVE for all questions in QUESTION_DATASET
+llama2_qa_chain = retrieval_qa_chain_from_local_db(llm=llama2, vectorstore=VECTOR_STORE_DATA)
+mistral_qa_chain = retrieval_qa_chain_from_local_db(llm=mistral, vectorstore=VECTOR_STORE_DATA)
+gpt35_qa_chain = retrieval_qa_chain_from_local_db(llm=gpt35, vectorstore=VECTOR_STORE_DATA)
+pipeline_qa_chain = [llama2_qa_chain, mistral_qa_chain, gpt35_qa_chain]
+# pipeline_qa_chain = [llama2_qa_chain, mistral_qa_chain]
+# QUESTION_DATASET = QUESTION_DATASET[:3]
+
+for qa_chain in pipeline_qa_chain:
+    output_df = pd.DataFrame()
+    # for each question in the dataset
+    for i in range(len(QUESTION_DATASET)):
+        response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
+        source_documents_combined = "\n\n".join(doc.page_content for doc in response['source_documents'])
+        output_df = pd.concat([output_df, pd.DataFrame([{'query': response['query'], 'result': response['result'], 'source_documents': source_documents_combined}])], ignore_index=True)
+
+
+    # save output as a csv file and json
+    output_df.to_csv(FOLDER_PATH + qa_chain.name + ".csv")
+    output_df.to_json(FOLDER_PATH + qa_chain.name + ".json")
+    
+print("")
+
+# %%
