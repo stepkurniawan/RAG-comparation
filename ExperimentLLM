@@ -69,23 +69,23 @@ for qa_chain in pipeline_qa_chain:
 
 
     # save output as a csv file and json
-    output_df.to_csv(FOLDER_PATH + qa_chain.name + ".csv")
+    output_df.to_csv(FOLDER_PATH + qa_chain.name + ".csv", index=False)
     output_df.to_json(FOLDER_PATH + qa_chain.name + ".json")
     
 print("")
 
 # # %% clean data #### not needed anymore
 # import pandas as pd
-# FOLDER_PATH ="experiments/Llm/"
+FOLDER_PATH ="experiments/Llm/"
 
 
-# # load data from csv
-# df = pd.read_csv(FOLDER_PATH + "mistral_FAISS.csv")
-# df['result'] = df['result'].str.rstrip('\n')
-# df.to_csv(FOLDER_PATH + "mistral_FAISS.csv")
+# load data from csv
+df = pd.read_csv(FOLDER_PATH + "llama2_FAISS.csv", index_col=False)
+df['result'] = df['result'].str.rstrip('\n')
+df.to_csv(FOLDER_PATH + "llama2_FAISS.csv", index=False)
 
 
-# df = pd.read_json(FOLDER_PATH + "mistral_FAISS.json")
-# df['result'] = df['result'].str.rstrip('\n')
-# df.to_json(FOLDER_PATH + "mistral_FAISS.json")
+df = pd.read_json(FOLDER_PATH + "llama2_FAISS.json")
+df['result'] = df['result'].str.rstrip('\n')
+df.to_json(FOLDER_PATH + "llama2_FAISS.json")
 # %%
