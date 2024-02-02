@@ -46,7 +46,7 @@ contexted_faiss_uae = multi_similarity_search_doc(faiss_uae, QUESTION_DATASET, T
 
 #%% Evaluation
 ## create evaluation FIRST TIME ONLY
-evaluated_bge = retriever_evaluation(contexted_faiss_bge, FOLDER_PATH+"bge_eval.csv")
+# evaluated_bge = retriever_evaluation(contexted_faiss_bge, FOLDER_PATH+"bge_eval.csv")
 # evaluated_gte = retriever_evaluation(contexted_faiss_gte, FOLDER_PATH+"gte_eval.csv")
 # evaluated_uae = retriever_evaluation(contexted_faiss_uae, FOLDER_PATH+"uae_eval.csv")
 

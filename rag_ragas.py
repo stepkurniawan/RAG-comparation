@@ -209,8 +209,7 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
 
     # loop the query, because each row have different question
     for index, query in enumerate(questions):
-        qa_chain_result = final_result(qa_chain, query) # result has 4 keys: questions,ground_truths, result, source_documents 
-
+        qa_chain_result = qa_chain({'query' : query}) # result has 4 keys: questions,ground_truths, result, source_documents 
         answer = qa_chain_result['result']
         contexts = qa_chain_result['source_documents'] 
         print(f"{index}: question: ", query)
@@ -253,7 +252,7 @@ def generate_context_answer_langchain(dataset:Dataset, llm, db):
     qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
 
     for index, query in enumerate(questions):
-        qa_chain_result = final_result(qa_chain, query) # result has 4 keys: questions,ground_truths, result, source_documents 
+        qa_chain_result = qa_chain({'query' : query}) # result has 4 keys: questions,ground_truths, result, source_documents 
         
         # append the "result" and "source_documents" to the dataset
         # TODO TEST
@@ -261,6 +260,27 @@ def generate_context_answer_langchain(dataset:Dataset, llm, db):
         dataset['source_documents'][index] = qa_chain_result['source_documents']
     
     return dataset
+
+def generate_answer_using_qa_chain(qa_dataset:Dataset, qa_chain, save_path:Optional[str]=None):
+    for i in range(len(qa_dataset)):
+        response = qa_chain({'query' : qa_dataset['question'][i]})
+        response['result'] = response['result'].rstrip('\n') # clean data 
+        # contexts_retrieved = [doc.page_content for doc in response['source_documents']]
+        output_df = pd.concat([output_df, 
+                               pd.DataFrame([{'query': response['query'], 
+                                              'ground_truths': qa_dataset['ground_truths'][i] , 
+                                              'answer': response['result'], 
+                                              'contexts': response['source_documents']}])], ignore_index=True)
+        
+        if save_path is not None:
+            # save output as a csv file and json
+            output_df.to_csv(save_path + qa_chain.name + ".csv", index=False)
+            output_df.to_json(save_path + qa_chain.name + ".json")
+        
+    return output_df
+
+
+
 
 # %%
 
@@ -382,3 +402,41 @@ def load_retriever_evaluation(path):
 # #save result to csv under data dir
 # result.to_csv('data/retriever_evaluation.csv')
 # print(result)
+
+
+#%% GENERATOR EVALUATION ########################################################
+from ragas.langchain.evalchain import RagasEvaluatorChain
+
+faithfulness_chain = RagasEvaluatorChain(metric=faithfulness)
+answer_rel_chain = RagasEvaluatorChain(metric=answer_relevancy)
+context_rel_chain = RagasEvaluatorChain(metric=context_precision)
+context_recall_chain = RagasEvaluatorChain(metric=context_recall)
+
+def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
+    output_df = pd.DataFrame()
+    for i in range(1, len(QUESTION_DATASET)):
+        response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
+        response['result'] = response['result'].rstrip('\n') # clean data 
+        response['ground_truths'] = QUESTION_DATASET['ground_truths'][i]
+
+        faithfulness_eval = faithfulness_chain(response) # add 'faithfulness_score': 1.0 to the dict
+        answer_rel_eval = answer_rel_chain(response) # add answer_relevancy_score': 0.991 to the dict
+        context_rel_eval = context_rel_chain(response)# add context_precision_score': 0.8333 to the dict
+        context_recall_eval = context_recall_chain(response) # context_recall_score': 1.0 to the dict
+
+        output_df = pd.concat([output_df,
+                                pd.DataFrame([{'query': response['query'],  # in ragas: question
+                                                'ground_truths': response['ground_truths'] ,  # ground_truth
+                                                'result': response['result'], # answer
+                                                'source_documents': response['source_documents'],
+                                                'faithfulness_score': faithfulness_eval['faithfulness_score'],
+                                                'answer_relevancy_score': answer_rel_eval['answer_relevancy_score'],
+                                                'context_precision_score': context_rel_eval['context_precision_score'],
+                                                'context_recall_score': context_recall_eval['context_recall_score']}])], 
+                                                ignore_index=True) # contexts
+        
+    # save output as a csv file and json
+    output_df.to_csv(FOLDER_PATH + qa_chain.name + "_eval.csv", index=False) # only for excel
+    output_df.to_json(FOLDER_PATH + qa_chain.name + "_eval.json")
+
+print("")
