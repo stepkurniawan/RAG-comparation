@@ -412,7 +412,7 @@ answer_rel_chain = RagasEvaluatorChain(metric=answer_relevancy)
 context_rel_chain = RagasEvaluatorChain(metric=context_precision)
 context_recall_chain = RagasEvaluatorChain(metric=context_recall)
 
-def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
+def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH:Optional[str]=None):
     output_df = pd.DataFrame()
     for i in range(1, len(QUESTION_DATASET)):
         response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
@@ -436,7 +436,8 @@ def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
                                                 ignore_index=True) # contexts
         
     # save output as a csv file and json
-    output_df.to_csv(FOLDER_PATH + qa_chain.name + "_eval.csv", index=False) # only for excel
-    output_df.to_json(FOLDER_PATH + qa_chain.name + "_eval.json")
+    if FOLDER_PATH is not None:
+        output_df.to_csv(FOLDER_PATH + qa_chain.name + "_eval.csv", index=False) # only for excel
+        output_df.to_json(FOLDER_PATH + qa_chain.name + "_eval.json")
 
 print("")
