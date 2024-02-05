@@ -28,7 +28,12 @@ from ragas.metrics import (
     faithfulness,
     context_recall,
     context_precision,
+    AnswerCorrectness
 )
+answer_correctness = AnswerCorrectness(
+    weights=[0.4,0.6]
+)
+
 from ragas import evaluate
 
 
@@ -127,6 +132,7 @@ context_rel_chain = RagasEvaluatorChain(metric=context_precision)
 context_recall_chain = RagasEvaluatorChain(metric=context_recall)
 
 
+
 # load question one-by-one, and then add the ground_truth
 # QUESTION_DATASET = QUESTION_DATASET[:3]
 
@@ -135,7 +141,7 @@ test_response['ground_truths'] = QUESTION_DATASET['ground_truths'][0]
 
 def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
     output_df = pd.DataFrame()
-    for i in range(1, len(QUESTION_DATASET)):
+    for i in range(0, len(QUESTION_DATASET)):
         response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
         response['result'] = response['result'].rstrip('\n') # clean data 
         response['ground_truths'] = QUESTION_DATASET['ground_truths'][i]
@@ -168,4 +174,34 @@ gpt35_eval = evaluate_qa_dataset_with_chain(gpt35_qa_chain, QUESTION_DATASET)
 
 
 
+# %% add answer correctness and answer semantic similarity
+
+llama2_eval_df = pd.read_json(FOLDER_PATH + "llama2_FAISS_eval.json")
+mistral_eval_df = pd.read_json(FOLDER_PATH + "mistral_FAISS_eval.json")
+gpt35_eval_df = pd.read_json(FOLDER_PATH + "gpt35_FAISS_eval.json")
+
+# change the column "result" to "answer"
+llama2_eval_df.rename(columns={'result': 'answer'}, inplace=True)
+mistral_eval_df.rename(columns={'result': 'answer'}, inplace=True)
+gpt35_eval_df.rename(columns={'result': 'answer'}, inplace=True)
+
+# convert to dataset
+llama2_eval_dataset = Dataset.from_pandas(llama2_eval_df)
+mistral_eval_dataset = Dataset.from_pandas(mistral_eval_df)
+gpt35_eval_dataset = Dataset.from_pandas(gpt35_eval_df)
+
+# add answer correctness
+llama2_answer_correct = answer_correctness(llama2_eval_dataset)
+print("llama2_answer_correctness", llama2_answer_correct)
+logger.info(f"llm experiment; llama2_answer_correctness: {llama2_answer_correct}")
+
+mistral_answer_correct = answer_correctness(mistral_eval_dataset)
+print("mistral_answer_correctness", mistral_answer_correct)
+logger.info(f"llm experiment; mistral_answer_correctness: {mistral_answer_correct}")
+
+gpt35_answer_correct = answer_correctness(gpt35_eval_dataset)
+print("gpt35_answer_correctness", gpt35_answer_correct)
+logger.info(f"llm experiment; gpt35_answer_correctness: {gpt35_answer_correct}")
+
 # %%
+
