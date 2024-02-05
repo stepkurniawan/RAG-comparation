@@ -32,8 +32,8 @@ wikipedia_kb = load_wikipedia()
 # faiss_uae = VECTORSTORE.create_vectorstore(KNOWLEDGE_BASE_SUSWIKI, StipEmbedding("uae").embed_model, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, INDEX_DISTANCE)
 
 #### Load VectorStore
-faiss_bge = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_l2")
 faiss_gte = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/gte-large_200_0.1_l2")
+faiss_bge = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_l2")
 faiss_uae = VECTORSTORE.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/UAE-Large-V1_200_0.1_l2")
 
 

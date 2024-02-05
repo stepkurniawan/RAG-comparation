@@ -68,10 +68,10 @@ gpt35 = get_gpt35_llm()
 llama2_qa_chain = retrieval_qa_chain_from_local_db(llm=llama2, vectorstore=VECTOR_STORE_DATA)
 mistral_qa_chain = retrieval_qa_chain_from_local_db(llm=mistral, vectorstore=VECTOR_STORE_DATA)
 gpt35_qa_chain = retrieval_qa_chain_from_local_db(llm=gpt35, vectorstore=VECTOR_STORE_DATA)
-# pipeline_qa_chain = [llama2_qa_chain, mistral_qa_chain, gpt35_qa_chain]
-pipeline_qa_chain = [llama2_qa_chain]
-QUESTION_DATASET = load_50_qa_dataset()['train']
-QUESTION_DATASET = QUESTION_DATASET[:3]
+pipeline_qa_chain = [llama2_qa_chain, mistral_qa_chain, gpt35_qa_chain]
+# pipeline_qa_chain = [llama2_qa_chain]
+# QUESTION_DATASET = load_50_qa_dataset()['train']
+# QUESTION_DATASET = QUESTION_DATASET[:3]
 
 # %% ## 
 
