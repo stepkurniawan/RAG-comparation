@@ -413,12 +413,22 @@ context_rel_chain = RagasEvaluatorChain(metric=context_precision)
 context_recall_chain = RagasEvaluatorChain(metric=context_recall)
 
 def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH:Optional[str]=None):
+    """
+    Call ragas on a qa_chain, and evaluate the result using faithfulness, answer_relevancy, context_precision, context_recall
+        based on a question dataset.
+    This function combines both: generation and evaluation.
+    input: qa_chain, QUESTION_DATASET
+    output: dataframe with columns: query, result, context, and metrics in the ragas_metrics
+
+    """
     output_df = pd.DataFrame()
-    for i in range(1, len(QUESTION_DATASET)):
+    for i in range(0, len(QUESTION_DATASET["question"])):
+        ## GENERATION using LLM
         response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
         response['result'] = response['result'].rstrip('\n') # clean data 
         response['ground_truths'] = QUESTION_DATASET['ground_truths'][i]
 
+        ## EVALUATION using RAGAS
         faithfulness_eval = faithfulness_chain(response) # add 'faithfulness_score': 1.0 to the dict
         answer_rel_eval = answer_rel_chain(response) # add answer_relevancy_score': 0.991 to the dict
         context_rel_eval = context_rel_chain(response)# add context_precision_score': 0.8333 to the dict
@@ -440,4 +450,5 @@ def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH:Optio
         output_df.to_csv(FOLDER_PATH + qa_chain.name + "_eval.csv", index=False) # only for excel
         output_df.to_json(FOLDER_PATH + qa_chain.name + "_eval.json")
 
-print("")
+    return output_df
+

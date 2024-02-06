@@ -140,6 +140,9 @@ test_response = qa_chain({'query' : QUESTION_DATASET['question'][0]})
 test_response['ground_truths'] = QUESTION_DATASET['ground_truths'][0]
 
 def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
+    """
+    Deprecated, since I have move it to rag_ragas.evaluate_qa_dataset_with_chain()
+    """
     output_df = pd.DataFrame()
     for i in range(0, len(QUESTION_DATASET)):
         response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
@@ -165,6 +168,7 @@ def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET):
     # save output as a csv file and json
     output_df.to_csv(FOLDER_PATH + qa_chain.name + "_eval.csv", index=False) # only for excel
     output_df.to_json(FOLDER_PATH + qa_chain.name + "_eval.json")
+    return output_df
 
 print("")
 
