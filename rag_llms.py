@@ -7,7 +7,7 @@ from torch import cuda, bfloat16
 import transformers
 
 LLAMA2_13B_CHAT_MODEL_ID = 'meta-llama/Llama-2-13b-chat-hf'
-LLAMA2_7B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
+# LLAMA2_7B_CHAT_MODEL_ID = 'meta-llama/Llama-2-7b-chat-hf'
 MISTRAL_7B = 'mistralai/Mistral-7B-Instruct-v0.2'
 MICROSOFT_PHI2 = 'microsoft/phi-2'
 FALCON_7B = 'tiiuae/falcon-7b-instruct'

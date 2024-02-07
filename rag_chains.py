@@ -91,33 +91,33 @@ def chain_with_docs(llm, unique_docs, question):
 
 #############
 # GENERATE ANSWER FROM QA CHAIN
+# DEPRECATED
+# def generate_answer_from_qa_chain(qa_chain, qa_dataset, save_path:Optional[str]=None):
+#     """
+#     input: qa_chain, qa_dataset
+#     output: response dataframe with columns: query, ground_truths, result, source_documents
+#     """
+#     print(f"Generating answer from QA chain: {qa_chain.name}")
+#     response_out_df = pd.DataFrame()
+#     for i in range(0, len(qa_dataset["question"])):
+#         response = qa_chain({'query' : qa_dataset['question'][i]})
+#         response['result'] = response['result'].rstrip('\n') # clean data 
+#         response['ground_truths'] = qa_dataset['ground_truths'][i]
 
-def generate_answer_from_qa_chain(qa_chain, qa_dataset, save_path:Optional[str]=None):
-    """
-    input: qa_chain, qa_dataset
-    output: response dataframe with columns: query, ground_truths, result, source_documents
-    """
-    print(f"Generating answer from QA chain: {qa_chain.name}")
-    response_out_df = pd.DataFrame()
-    for i in range(0, len(qa_dataset["question"])):
-        response = qa_chain({'query' : qa_dataset['question'][i]})
-        response['result'] = response['result'].rstrip('\n') # clean data 
-        response['ground_truths'] = qa_dataset['ground_truths'][i]
-
-        response_out_df = pd.concat([response_out_df,
-                                pd.DataFrame([{'query': response['query'],  # in ragas: question
-                                                'ground_truths': response['ground_truths'] ,  # ground_truth
-                                                'result': response['result'], # answer
-                                                'source_documents': response['source_documents'],}])],
-                                                ignore_index=True) # contexts
+#         response_out_df = pd.concat([response_out_df,
+#                                 pd.DataFrame([{'query': response['query'],  # in ragas: question
+#                                                 'ground_truths': response['ground_truths'] ,  # ground_truth
+#                                                 'result': response['result'], # answer
+#                                                 'source_documents': response['source_documents'],}])],
+#                                                 ignore_index=True) # contexts
         
-    # save output as a csv file and json
-    if save_path is not None:
-        response_out_df.to_csv(save_path + qa_chain.name + "_gen.csv", index=False) # only for excel
-        response_out_df.to_json(save_path + qa_chain.name + "_gen.json")
-        print(f"output created in path: {save_path}, check for CSV and JSON {qa_chain.name}")
+#     # save output as a csv file and json
+#     if save_path is not None:
+#         response_out_df.to_csv(save_path + qa_chain.name + "_gen.csv", index=False) # only for excel
+#         response_out_df.to_json(save_path + qa_chain.name + "_gen.json")
+#         print(f"output created in path: {save_path}, check for CSV and JSON {qa_chain.name}")
 
-    return response_out_df
+#     return response_out_df
 
 def generate_context_answer_langchain(qa_dataset:Dataset, llm, db: Type[VST], k, save_path:Optional[str]=None):
     """

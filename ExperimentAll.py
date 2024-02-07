@@ -101,14 +101,14 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 #%% try the algorithm using trimmed values
 
 ### trim experiment using pseudo value
-QUESTION_DATASET = QUESTION_DATASET[:2]
-FOLDER_PATH ="experiments/ALL/trim/"
-TOP_K = [2,3]
+# QUESTION_DATASET = QUESTION_DATASET[:2]
+# FOLDER_PATH ="experiments/ALL/trim/"
+# TOP_K = [2,3,4]
 LLMS = [llama2,mistral]
-VECTORSTORES = [chroma_str]
-KNOWLEDGE_BASES = [suswiki_str]
-EMBEDDINGS = [bge_str,gte_str]
-INDEX_DISTANCES = [eucledian_str, cosine_str]
+# VECTORSTORES = [chroma_str]
+# KNOWLEDGE_BASES = [suswiki_str]
+# EMBEDDINGS = [bge_str,gte_str]
+# INDEX_DISTANCES = [eucledian_str, cosine_str]
 
 
 for knowledge_base in KNOWLEDGE_BASES:
@@ -151,16 +151,9 @@ for knowledge_base in KNOWLEDGE_BASES:
                         print(f"Retrieving for {language_model.name} using {vector_store_path}...")
                         logger.info(f"Retrieving for {language_model.name} using {vector_store_path}...")
                         
-                        # # Create QA Chain object
-                        # qa_chain = retrieval_qa_chain_from_local_db(llm=language_model, vectorstore=vector_store_data, k=k)
-                        
-                        # # Print a message indicating that retrieval and evaluation are being performed
-                        # print(f"retrieving and evaluating...")
 
-                        # # Generate answer result from QA chain
-                        # generate_df = generate_answer_from_qa_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH)
-
-                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, FOLDER_PATH)
+                        # # Generate answer result from QA dataset
+                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, save_path=FOLDER_PATH)
                         
                         # Evaluate the QA dataset with the QA chain and create an output dataframe
                         # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
