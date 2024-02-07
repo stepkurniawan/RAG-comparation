@@ -6,7 +6,7 @@ import pandas as pd
 
 from rag_vectorstore import multi_similarity_search_doc
 from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
-from rag_chains import generate_context_answer_langchain, retrieval_qa_chain_from_local_db, generate_answer_from_qa_chain
+from rag_chains import generate_context_answer_langchain, retrieval_qa_chain_from_local_db
 from rag_ragas import evaluate_qa_dataset_with_response
 
 
