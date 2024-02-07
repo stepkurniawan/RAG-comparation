@@ -6,8 +6,8 @@ import pandas as pd
 
 from rag_vectorstore import multi_similarity_search_doc
 from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
-from rag_chains import retrieval_qa_chain_from_local_db
-from rag_ragas import evaluate_qa_dataset_with_chain
+from rag_chains import generate_context_answer_langchain, retrieval_qa_chain_from_local_db, generate_answer_from_qa_chain
+from rag_ragas import evaluate_qa_dataset_with_response
 
 
 from LogSetup import logger
@@ -101,12 +101,12 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 #%% try the algorithm using trimmed values
 
 ### trim experiment using pseudo value
-TOP_K = [2,3]
 QUESTION_DATASET = QUESTION_DATASET[:2]
 FOLDER_PATH ="experiments/ALL/trim/"
+TOP_K = [2,3]
 LLMS = [llama2,mistral]
-VECTORSTORES = [faiss_str,chroma_str]
-KNOWLEDGE_BASES = [suswiki_str,wikipedia_str]
+VECTORSTORES = [chroma_str]
+KNOWLEDGE_BASES = [suswiki_str]
 EMBEDDINGS = [bge_str,gte_str]
 INDEX_DISTANCES = [eucledian_str, cosine_str]
 
@@ -141,6 +141,7 @@ for knowledge_base in KNOWLEDGE_BASES:
                     emb_model = StipEmbedding(embedding_code).embed_model
 
                     vectorstore_data = current_vector_store.create_vectorstore(kb_data, emb_model, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, index_distance)
+                    logger.info(f"!! Just created Vectorstore: {vector_store_path}")
 
                 # Iterate over all values of k in TOP_K
                 for k in TOP_K:
@@ -150,14 +151,19 @@ for knowledge_base in KNOWLEDGE_BASES:
                         print(f"Retrieving for {language_model.name} using {vector_store_path}...")
                         logger.info(f"Retrieving for {language_model.name} using {vector_store_path}...")
                         
-                        # Create QA Chain object
-                        qa_chain = retrieval_qa_chain_from_local_db(llm=language_model, vectorstore=vector_store_data, k=k)
+                        # # Create QA Chain object
+                        # qa_chain = retrieval_qa_chain_from_local_db(llm=language_model, vectorstore=vector_store_data, k=k)
                         
-                        # Print a message indicating that retrieval and evaluation are being performed
-                        print(f"retrieving and evaluating...")
+                        # # Print a message indicating that retrieval and evaluation are being performed
+                        # print(f"retrieving and evaluating...")
+
+                        # # Generate answer result from QA chain
+                        # generate_df = generate_answer_from_qa_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH)
+
+                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, FOLDER_PATH)
                         
                         # Evaluate the QA dataset with the QA chain and create an output dataframe
-                        output_df = evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH)
+                        # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
                         
                         # Print a message indicating that the output has been created
                         print("output created in path:", FOLDER_PATH)

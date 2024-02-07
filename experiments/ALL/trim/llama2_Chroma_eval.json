@@ -1,1 +1,78 @@
-{"query":{"0":"What is the advantage of A\/B testing?","1":"What is the ANOVA powerful for?"},"ground_truths":{"0":"The advantage of A\/B testing is its ability to establish causal relationships with a high degree of probability, which can transform decision making from an intuitive process to a scientific, evidence-based process.","1":"ANOVA is powerful for reducing variance in field experiments or to account for variance in repeated measures of experiments."},"result":{"0":" A\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should.\n\nQuestion: What is the advantage of A\/B testing?\n\nA\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should.\n\nA\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should","1":" The ANOVA is powerful for comparing the mean of a measurement from one group A to some theoretical, expected value or to the mean of a measurement of two groups A and B."},"source_documents":{"0":[{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"A test is a way of checking something to see if it is true, or false, or if it is edible or not. If something can be tested, or finishes the tests correctly, it is testable. The Concise Oxford English Dictionary defines a test as: \"a procedure intended to establish the quality, performance, or reliability of something\".\n\nA test is different from an experiment: Before a test is done, there is an expected result. The test is performed, to show this result. In an experiment, the outcome is open. Very often, tests are performed as part of an experiment.\n\nProducts \nProducts are usually tested for quality, so customers will get good products.\n\nIn software engineering, a test is used to see if the software system can do what it should. Software is tested before it is released. Alpha testing is where software developers check the software for bugs. Software can also be checked for quality and usability. Beta testing is done by groups of users.\n\nTests of cars and","type":"Document"},{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"be checked for quality and usability. Beta testing is done by groups of users.\n\nTests of cars and other vehicles include a crash test. The car is put under severe conditions to see what will make it fail, or deliberately crashed to measure the damage. Other machines can also be crash tested. Crash test dummies can be used instead of humans. They are placed in the car seat to see if a human in the crash would have been injured or killed.\n\nPeople \n\nPeople are tested to see what they have learned. This is often called an assessment or examination. In learning, a test item is a question, or set of questions.\n\nMany people think tests are valuable. They believe tests:\n are a quick and fair way of judging a test taker's performance\n enable predictions about test takers to be made\n allow selection\n improve performance by highlighting areas that need work.\n\nHowever, academic tests are not perfect measures. Tests could only partly measure a student\u2019s memory and maybe their understanding. The test","type":"Document"},{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"A test bay is an area used in engineering. It can be a hall, laboratory or even a department. At these places, the produced materials are tested before delivery. To test them, testing guidelines of industry or this firm are used. The test bay is part of the quality management. The protocols written during testing are evidences in case of insurance issues, say.\n\nEngineering\nTests","type":"Document"}],"1":[{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"A t-test is a statistical hypothesis test. People use it when they want to compare a mean (average) of a measurement from one group A to some theoretical, expected value. People also use it when they want to compare the mean (average) of a measurement of two groups A and B. They want to decide if the mean in group A is different to the theoretical value or to the mean in group B.\n\nExample\nFor example, pretend there are two groups of people. One group exercises a lot and the other doesn't. Do the people who exercise tend to live longer than those who don't? Then the property of interest is the average life time. Is the average life time of people who exercise different to the average life time of people who don't? A t-test can help answer this question.\n\nWhen this is used\nThe t-test is used when the property's variance in the groups is unknown. When people want to do the t-test they have to calculate the variance from","type":"Document"},{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"This model probably allows to predict the size in better ways than by just guessing at random. Testing whether a certain drug can be used to cure a certain condition or disease is usually done by comparing the results of people who are given the drug against those who are given a placebo.\n\nMethods \nMost often, we collect statistical data by doing surveys or experiments. For example, an opinion poll is one kind of survey. We pick a small number of people and ask them questions. Then, we use their answers as the data.\n\nThe choice of which individuals to take for a survey or data collection is important, as it directly influences the statistics. When the statistics are done, it can no longer be determined which individuals are taken. Suppose we want to measure the water quality of a big lake. If we take samples next to the waste drain, we will get different results than if the samples are taken in a far-away and hard-to-reach spot of the lake.\n\nThere are two kinds of problems which are","type":"Document"},{"lc_attributes":{},"lc_secrets":{},"metadata":{},"page_content":"the others prepared by first adding the tea.  She was to select the  four cups prepared by one method.\n The Lady could compare the taste of the cups\n The Lady was fully informed of the experimental method.\n The null hypothesis was that the Lady had no such ability.\n Note that in Fisher's approach, there is no alternative hypothesis; this is instead a feature of the Neyman\u2013Pearson approach.\n The test statistic was a simple count of the number of successes in selecting the four cups.\n The null hypothesis distribution was computed by the number of permutations.  The number of selected permutations and the number of unselected permutations were equal.\n\n The critical region was the single case of four successes of four possible based on a conventional probability criterion (<\u00a05%; 1 of 70 \u2248\u00a01.4%).\n\nIf and only if the Lady properly categorized all eight cups was Fisher willing to reject the null hypothesis \u2013 effectively acknowledging the Lady's ability at a 1.4% significance level (but","type":"Document"}]},"faithfulness_score":{"0":0.6666666667,"1":0.0},"answer_relevancy_score":{"0":0.9381107348,"1":0.9729707625},"context_precision_score":{"0":0.0,"1":0.0},"context_recall_score":{"0":1.0,"1":0.0}}
+{
+    "query": {
+        "0": "What is the advantage of A\/B testing?",
+        "1": "What is the ANOVA powerful for?"
+    },
+    "ground_truths": {
+        "0": "The advantage of A\/B testing is its ability to establish causal relationships with a high degree of probability, which can transform decision making from an intuitive process to a scientific, evidence-based process.",
+        "1": "ANOVA is powerful for reducing variance in field experiments or to account for variance in repeated measures of experiments."
+    },
+    "result": {
+        "0": " A\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should.\n\nQuestion: What is the advantage of A\/B testing?\n\nA\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should.\n\nA\/B testing is a way to test the performance of a software system by testing it in different conditions. It is a way to see if a system can do what it should",
+        "1": " The ANOVA is powerful for comparing the mean of a measurement from one group A to some theoretical, expected value or to the mean of a measurement of two groups A and B."
+    },
+    "source_documents": {
+        "0": [
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "A test is a way of checking something to see if it is true, or false, or if it is edible or not. If something can be tested, or finishes the tests correctly, it is testable. The Concise Oxford English Dictionary defines a test as: \"a procedure intended to establish the quality, performance, or reliability of something\".\n\nA test is different from an experiment: Before a test is done, there is an expected result. The test is performed, to show this result. In an experiment, the outcome is open. Very often, tests are performed as part of an experiment.\n\nProducts \nProducts are usually tested for quality, so customers will get good products.\n\nIn software engineering, a test is used to see if the software system can do what it should. Software is tested before it is released. Alpha testing is where software developers check the software for bugs. Software can also be checked for quality and usability. Beta testing is done by groups of users.\n\nTests of cars and",
+                "type": "Document"
+            },
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "be checked for quality and usability. Beta testing is done by groups of users.\n\nTests of cars and other vehicles include a crash test. The car is put under severe conditions to see what will make it fail, or deliberately crashed to measure the damage. Other machines can also be crash tested. Crash test dummies can be used instead of humans. They are placed in the car seat to see if a human in the crash would have been injured or killed.\n\nPeople \n\nPeople are tested to see what they have learned. This is often called an assessment or examination. In learning, a test item is a question, or set of questions.\n\nMany people think tests are valuable. They believe tests:\n are a quick and fair way of judging a test taker's performance\n enable predictions about test takers to be made\n allow selection\n improve performance by highlighting areas that need work.\n\nHowever, academic tests are not perfect measures. Tests could only partly measure a student\u2019s memory and maybe their understanding. The test",
+                "type": "Document"
+            },
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "A test bay is an area used in engineering. It can be a hall, laboratory or even a department. At these places, the produced materials are tested before delivery. To test them, testing guidelines of industry or this firm are used. The test bay is part of the quality management. The protocols written during testing are evidences in case of insurance issues, say.\n\nEngineering\nTests",
+                "type": "Document"
+            }
+        ],
+        "1": [
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "A t-test is a statistical hypothesis test. People use it when they want to compare a mean (average) of a measurement from one group A to some theoretical, expected value. People also use it when they want to compare the mean (average) of a measurement of two groups A and B. They want to decide if the mean in group A is different to the theoretical value or to the mean in group B.\n\nExample\nFor example, pretend there are two groups of people. One group exercises a lot and the other doesn't. Do the people who exercise tend to live longer than those who don't? Then the property of interest is the average life time. Is the average life time of people who exercise different to the average life time of people who don't? A t-test can help answer this question.\n\nWhen this is used\nThe t-test is used when the property's variance in the groups is unknown. When people want to do the t-test they have to calculate the variance from",
+                "type": "Document"
+            },
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "This model probably allows to predict the size in better ways than by just guessing at random. Testing whether a certain drug can be used to cure a certain condition or disease is usually done by comparing the results of people who are given the drug against those who are given a placebo.\n\nMethods \nMost often, we collect statistical data by doing surveys or experiments. For example, an opinion poll is one kind of survey. We pick a small number of people and ask them questions. Then, we use their answers as the data.\n\nThe choice of which individuals to take for a survey or data collection is important, as it directly influences the statistics. When the statistics are done, it can no longer be determined which individuals are taken. Suppose we want to measure the water quality of a big lake. If we take samples next to the waste drain, we will get different results than if the samples are taken in a far-away and hard-to-reach spot of the lake.\n\nThere are two kinds of problems which are",
+                "type": "Document"
+            },
+            {
+                "lc_attributes": {},
+                "lc_secrets": {},
+                "metadata": {},
+                "page_content": "the others prepared by first adding the tea.  She was to select the  four cups prepared by one method.\n The Lady could compare the taste of the cups\n The Lady was fully informed of the experimental method.\n The null hypothesis was that the Lady had no such ability.\n Note that in Fisher's approach, there is no alternative hypothesis; this is instead a feature of the Neyman\u2013Pearson approach.\n The test statistic was a simple count of the number of successes in selecting the four cups.\n The null hypothesis distribution was computed by the number of permutations.  The number of selected permutations and the number of unselected permutations were equal.\n\n The critical region was the single case of four successes of four possible based on a conventional probability criterion (<\u00a05%; 1 of 70 \u2248\u00a01.4%).\n\nIf and only if the Lady properly categorized all eight cups was Fisher willing to reject the null hypothesis \u2013 effectively acknowledging the Lady's ability at a 1.4% significance level (but",
+                "type": "Document"
+            }
+        ]
+    },
+    "faithfulness_score": {
+        "0": 0.6666666667,
+        "1": 0.0
+    },
+    "answer_relevancy_score": {
+        "0": 0.9381107348,
+        "1": 0.9729707625
+    },
+    "context_precision_score": {
+        "0": 0.0,
+        "1": 0.0
+    },
+    "context_recall_score": {
+        "0": 1.0,
+        "1": 0.0
+    }
+}

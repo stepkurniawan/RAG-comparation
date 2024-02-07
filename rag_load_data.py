@@ -116,3 +116,18 @@ def load_50_qa_dataset():
 
 ############################################################################
 
+# %% UPLOAD DATAFRAME TO HUGGINGFACE
+
+def upload_dataframe_to_hf(dataset: Dataset, dataset_id: str, dataset_name: str, dataset_description: str):
+    """
+    upload a dataframe to huggingface dataset
+    """
+    dataset.push_to_hub(
+        dataset_id=dataset_id,
+        dataset_name=dataset_name,
+        dataset_description=dataset_description,
+        use_local_files=True,
+        overwrite=True,
+        ignore_verifications=True,
+    )
+    print(f"success upload dataframe to huggingface: {dataset_name}")

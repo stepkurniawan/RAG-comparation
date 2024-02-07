@@ -239,27 +239,7 @@ def generate_contexts_answer(dataset:Dataset, llm, db):
     return dataset
 
 
-def generate_context_answer_langchain(dataset:Dataset, llm, db):
-    """
-    input: Dataset with columns: question, ground_truths
-    output: Dataset with columns: question, ground_truths, contexts, answer
 
-    the context is coming from the retriever
-    the answer is coming from the generator
-    """
-    # get the question from the dataset
-    questions = dataset['question']
-    qa_chain = retrieval_qa_chain_from_local_db(llm=llm, vectorstore=db) 
-
-    for index, query in enumerate(questions):
-        qa_chain_result = qa_chain({'query' : query}) # result has 4 keys: questions,ground_truths, result, source_documents 
-        
-        # append the "result" and "source_documents" to the dataset
-        # TODO TEST
-        dataset['result'][index] = qa_chain_result['result']
-        dataset['source_documents'][index] = qa_chain_result['source_documents']
-    
-    return dataset
 
 def generate_answer_using_qa_chain(qa_dataset:Dataset, qa_chain, save_path:Optional[str]=None):
     for i in range(len(qa_dataset)):
@@ -412,22 +392,20 @@ answer_rel_chain = RagasEvaluatorChain(metric=answer_relevancy)
 context_rel_chain = RagasEvaluatorChain(metric=context_precision)
 context_recall_chain = RagasEvaluatorChain(metric=context_recall)
 
-def evaluate_qa_dataset_with_chain(qa_chain, QUESTION_DATASET, FOLDER_PATH:Optional[str]=None):
+
+
+def evaluate_qa_dataset_with_response(response, QUESTION_DATASET, qa_chain , FOLDER_PATH:Optional[str]=None):
     """
     Call ragas on a qa_chain, and evaluate the result using faithfulness, answer_relevancy, context_precision, context_recall
         based on a question dataset.
     This function combines both: generation and evaluation.
-    input: qa_chain, QUESTION_DATASET
+    input: response, QUESTION_DATASET
+        - response is a dataframe that has query, result, ground_truths, and source_documents
     output: dataframe with columns: query, result, context, and metrics in the ragas_metrics
 
     """
     output_df = pd.DataFrame()
     for i in range(0, len(QUESTION_DATASET["question"])):
-        ## GENERATION using LLM
-        response = qa_chain({'query' : QUESTION_DATASET['question'][i]})
-        response['result'] = response['result'].rstrip('\n') # clean data 
-        response['ground_truths'] = QUESTION_DATASET['ground_truths'][i]
-
         ## EVALUATION using RAGAS
         faithfulness_eval = faithfulness_chain(response) # add 'faithfulness_score': 1.0 to the dict
         answer_rel_eval = answer_rel_chain(response) # add answer_relevancy_score': 0.991 to the dict

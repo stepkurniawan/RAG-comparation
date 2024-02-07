@@ -1,17 +1,17 @@
 from langchain.prompts.prompt import PromptTemplate
-from langchain_community.prompts import ChatPromptTemplate
 
 
 
 custom_prompt_template = """ Use the following pieces of information to answer user's question.
 If you don't know the answer, just say you don't know. Don't make up information yourself.
+Do not repeat yourself either. 
 Use the relevant information from the context to answer the question.
 
-Context: {context}
-Question: {query}
+### Context: {context}
+
+### Question: {query}
 
 Only returns helpful answer below and nothing else.
-Helpful answer:
 """
 
 def set_custom_prompt():
