@@ -41,7 +41,8 @@ def retrieval_qa_chain_from_local_db(llm,
         chain_type = 'stuff', # you can also change this to map reduce
         retriever = vectorstore.as_retriever(
             search_kwargs = {'k':k,
-                             'score_threshold': 0.8}
+                            #  'score_threshold': 0.8
+                             }
             ),
         return_source_documents = True,        # retriever will ensure that llm will retrieve the information from the document that we have
         # chain_type_kwargs = {"prompt": qa_chain_prompt} 
@@ -119,7 +120,7 @@ def chain_with_docs(llm, unique_docs, question):
 
 #     return response_out_df
 
-def generate_context_answer_langchain(qa_dataset:Dataset, llm, db: Type[VST], k, save_path:Optional[str]=None):
+def generate_context_answer_langchain(qa_dataset:Dataset, llm, db: Type[VST], k, folder_save_path:Optional[str]=None):
     """
     input: Dataset with columns: question, ground_truths
     output: Dataset with columns: question, ground_truths, contexts, answer
@@ -150,10 +151,10 @@ def generate_context_answer_langchain(qa_dataset:Dataset, llm, db: Type[VST], k,
     ## save the dataset
     end_time = time.time()
 
-    if save_path is not None:
-        response_out_df.to_csv(save_path + qa_chain.name + "_gen.csv", index=False)
-        response_out_df.to_json(save_path + qa_chain.name + "_gen.json")
-        print(f"output created in path: {save_path}, check for CSV and JSON {qa_chain.name}. Time taken: {(end_time-start_time)/60} minutes")
-        logger.info(f"output created in path: {save_path}, check for CSV and JSON {qa_chain.name}")
+    if folder_save_path is not None:
+        response_out_df.to_csv(folder_save_path + qa_chain.name + "_" + str(k) + "_gen.csv", index=False)
+        response_out_df.to_json(folder_save_path + qa_chain.name + "_" + str(k) + "_gen.json")
+        print(f"output created in path: {folder_save_path}, check for CSV and JSON {qa_chain.name}. Time taken: {(end_time-start_time)/60} minutes")
+        logger.info(f"output created in path: {folder_save_path}, check for CSV and JSON {qa_chain.name}")
     
     return response_out_df
