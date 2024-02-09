@@ -149,6 +149,9 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
 
                             # # Generate answer result from QA dataset
                             FOLDER_PATH = f"experiments/ALL/{knowledge_base}/{embedding}/{vector_store_name}/{index_distance}/"
+                            if FOLDER_PATH is not None:
+                                os.makedirs(FOLDER_PATH, exist_ok=True)
+                                
                             generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH)
                             
                             # Evaluate the QA dataset with the QA chain and create an output dataframe
@@ -159,7 +162,7 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
                             logger.info(f"output created in path: {FOLDER_PATH}, check for CSV and JSON {language_model.name} in {vector_store_path} ")
 
                         
-
+run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
 
 # %% FIX some answer
 
