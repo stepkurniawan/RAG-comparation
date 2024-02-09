@@ -46,7 +46,7 @@ wikipedia_kb = load_wikipedia()
 
 
 
-# %% ### load vectorstore locally
+# %% ### parameters
 
 suswiki_str = "sustainability-methods-wiki"
 wikipedia_str = "wikipedia"
@@ -110,64 +110,59 @@ LLMS = [llama2,mistral]
 # EMBEDDINGS = [bge_str,]
 # INDEX_DISTANCES = [eucledian_str, ]
 
+def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
+    if vector_store_name == faiss_str:
+        current_vector_store = faiss_vs
+    elif vector_store_name == chroma_str:
+        current_vector_store = chroma_vs
+    
+    if os.path.exists(vector_store_path):
+        return current_vector_store.load_vectorstore(vector_store_path)
+    else:
+        print(f"WARNING! Vectorstore {vector_store_path} does not exist")
+        print(f"WARNING! Creating vector store {vector_store_path}...")
+        
+        kb_data = suswiki_kb if knowledge_base == suswiki_str else wikipedia_kb
+        embedding_code = embedding.split("-")[0].lower()
+        emb_model = StipEmbedding(embedding_code).embed_model
 
-for knowledge_base in KNOWLEDGE_BASES:
-    for embedding in EMBEDDINGS:
-        for vector_store_name in VECTORSTORES:
-            for index_distance in INDEX_DISTANCES:
-                # Load the appropriate vector store based on the current vector store name
-                # I need this, because I want to use the string as the path instead of using the vector store object
-                if vector_store_name == faiss_str:
-                    current_vector_store = faiss_vs
-                elif vector_store_name == chroma_str:
-                    current_vector_store = chroma_vs
-                
-                # Construct the path to the vector store
-                vector_store_path = f"vectorstores/{vector_store_name}/{knowledge_base}/{embedding}_{CHUNK_SIZE}_{CHUNK_OVERLAP_SCALE}_{index_distance}"
-                
-                # Print a message indicating that the vector store is being loaded
-                print(f"Loading vectorstore {vector_store_path}...")
-                
-                # Check if the vector store exists at the constructed path
-                if os.path.exists(vector_store_path):
-                    #### Important: Load the vector store data
-                    vector_store_data = current_vector_store.load_vectorstore(vector_store_path)
-                else:
-                    # If it doesn't exist, create it
-                    print(f"WARNING! Vectorstore {vector_store_path} does not exist")
-                    print(f"WARNING! Creating vector store {vector_store_path}...")
+        return current_vector_store.create_vectorstore(kb_data, emb_model, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, index_distance)
+
+def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH):
+    for knowledge_base in KNOWLEDGE_BASES:
+        for embedding in EMBEDDINGS:
+            for vector_store_name in VECTORSTORES:
+                for index_distance in INDEX_DISTANCES:
                     
-                    # decide using which Knowledge base 
-                    kb_data = suswiki_kb if knowledge_base == suswiki_str else wikipedia_kb
+                    # Construct the path to the vector store
+                    vector_store_path = f"vectorstores/{vector_store_name}/{knowledge_base}/{embedding}_{CHUNK_SIZE}_{CHUNK_OVERLAP_SCALE}_{index_distance}"
+                    vector_store_data = load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance)
+                    
+                    # Iterate over all values of k in TOP_K
+                    for k in TOP_K:
+                        # Iterate over all language models in LLMS
+                        for language_model in LLMS:
+                            # Print a message indicating that retrieval is being performed
+                            print(f"Retrieving for {language_model.name} using {vector_store_path}...")
+                            logger.info(f"Retrieving for {language_model.name} using {vector_store_path}...")
+                            
 
-                    # get the name of embedding code name such as bge, gte, uae from the embedding string
-                    embedding_code = embedding.split("-")[0].lower()
-                    emb_model = StipEmbedding(embedding_code).embed_model
+                            # # Generate answer result from QA dataset
+                            FOLDER_PATH = f"experiments/ALL/{knowledge_base}/{embedding}/{vector_store_name}/{index_distance}/"
+                            generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH)
+                            
+                            # Evaluate the QA dataset with the QA chain and create an output dataframe
+                            # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
+                            
+                            # Print a message indicating that the output has been created
+                            print("output created in path:", FOLDER_PATH)
+                            logger.info(f"output created in path: {FOLDER_PATH}, check for CSV and JSON {language_model.name} in {vector_store_path} ")
 
-                    vectorstore_data = current_vector_store.create_vectorstore(kb_data, emb_model, CHUNK_SIZE, CHUNK_OVERLAP_SCALE, index_distance)
-                    logger.info(f"!! Just created Vectorstore: {vector_store_path}")
-
-                # Iterate over all values of k in TOP_K
-                for k in TOP_K:
-                    # Iterate over all language models in LLMS
-                    for language_model in LLMS:
-                        # Print a message indicating that retrieval is being performed
-                        print(f"Retrieving for {language_model.name} using {vector_store_path}...")
-                        logger.info(f"Retrieving for {language_model.name} using {vector_store_path}...")
                         
 
-                        # # Generate answer result from QA dataset
-                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH)
-                        
-                        # Evaluate the QA dataset with the QA chain and create an output dataframe
-                        # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
-                        
-                        # Print a message indicating that the output has been created
-                        print("output created in path:", FOLDER_PATH)
-                        logger.info(f"output created in path: {FOLDER_PATH}, check for CSV and JSON {language_model.name} in {vector_store_path} ")
 
+# %% FIX some answer
 
-                
 
 #%% testing using GPU
 import torch

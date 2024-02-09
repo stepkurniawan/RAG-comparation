@@ -12,6 +12,7 @@ MISTRAL_7B = 'mistralai/Mistral-7B-Instruct-v0.2'
 MICROSOFT_PHI2 = 'microsoft/phi-2'
 FALCON_7B = 'tiiuae/falcon-7b-instruct'
 CUSTOM_PHI2 = 'amgadhasan/phi-2'
+GPT35_0125 = 'gpt-3.5-turbo-0125'
 
 MAX_TOKEN = 128
 
@@ -150,6 +151,18 @@ def get_gpt35_llm():
     llm = ChatOpenAI(
         openai_api_key=openai.api_key, 
         model="gpt-3.5-turbo",
+        temperature=0.0,
+        max_tokens=MAX_TOKEN,
+        )
+    llm.name = "gpt35"
+    return llm
+
+def get_gpt35_0125_llm():
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    llm = ChatOpenAI(
+        openai_api_key=openai.api_key, 
+        model=GPT35_0125,
         temperature=0.0,
         max_tokens=MAX_TOKEN,
         )
