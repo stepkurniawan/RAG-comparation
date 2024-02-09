@@ -98,17 +98,17 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 
 # faiss_data = faiss_vs.load_vectorstore("vectorstores/db_faiss/sustainability-methods-wiki/bge-large-en-v1.5_200_0.1_"+INDEX_DISTANCE)
 
-#%% try the algorithm using trimmed values
+#%% trial algorithm using trimmed values  
 
 ### trim experiment using pseudo value
-# QUESTION_DATASET = QUESTION_DATASET[:2]
+# QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
 # TOP_K = [2,3,4]
 LLMS = [llama2,mistral]
-# VECTORSTORES = [chroma_str]
+# VECTORSTORES = [chroma_str, faiss_str]
 # KNOWLEDGE_BASES = [suswiki_str]
-# EMBEDDINGS = [bge_str,gte_str]
-# INDEX_DISTANCES = [eucledian_str, cosine_str]
+# EMBEDDINGS = [bge_str,]
+# INDEX_DISTANCES = [eucledian_str, ]
 
 
 for knowledge_base in KNOWLEDGE_BASES:
@@ -136,7 +136,11 @@ for knowledge_base in KNOWLEDGE_BASES:
                     # If it doesn't exist, create it
                     print(f"WARNING! Vectorstore {vector_store_path} does not exist")
                     print(f"WARNING! Creating vector store {vector_store_path}...")
+                    
+                    # decide using which Knowledge base 
                     kb_data = suswiki_kb if knowledge_base == suswiki_str else wikipedia_kb
+
+                    # get the name of embedding code name such as bge, gte, uae from the embedding string
                     embedding_code = embedding.split("-")[0].lower()
                     emb_model = StipEmbedding(embedding_code).embed_model
 
@@ -153,7 +157,7 @@ for knowledge_base in KNOWLEDGE_BASES:
                         
 
                         # # Generate answer result from QA dataset
-                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, save_path=FOLDER_PATH)
+                        generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH)
                         
                         # Evaluate the QA dataset with the QA chain and create an output dataframe
                         # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
@@ -165,7 +169,7 @@ for knowledge_base in KNOWLEDGE_BASES:
 
                 
 
-#%%
+#%% testing using GPU
 import torch
 import torch.nn as nn
 
