@@ -6,7 +6,23 @@ from langchain_community.vectorstores.utils import (
     maximal_marginal_relevance,
 )
 
-from typing import Iterator, List, Mapping, Optional, Sequence, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
+
+VST = TypeVar("VST", bound="VectorStore")
+
 
 
 import chromadb
@@ -67,7 +83,7 @@ class StipVectorStore:
 
 
 
-    def load_vectorstore(self, vectorstore_path):
+    def load_vectorstore(self, vectorstore_path)->Type[VST]:
             start_time = time.time()
 
             # Load the class attributes
@@ -88,7 +104,7 @@ class StipVectorStore:
             print(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
             logger.info(f'success load vectorstore: {vectorstore_path} in {end_time-start_time} seconds')
             
-            return self.db
+            return self
     
 
 
@@ -101,7 +117,7 @@ class StipVectorStore:
                            chunk_size, 
                            chunk_overlap_scale, 
                            index_distance: Optional[str],
-                            ):
+                            )->Type[VST]:
         
         # set attributes
         self.embedding = embedding
@@ -158,6 +174,8 @@ class StipVectorStore:
                 
             except Exception as e:
                 print(f"!NOTE: Exception occurred while creating FAISS vectorstore using {self.embedding_name}: {e}")
+
+            return self
 
     
 
@@ -235,7 +253,7 @@ class StipVectorStore:
         logger.info(f'!NOTE: success create vectorstore: {self.vectorstore_name} using {self.embedding_name} in {self.total_time} seconds or {self.total_time/60} minutes')
         
         
-        return self.db
+        return self
     
 
 def get_faiss_distance_strategy(index_distance):
