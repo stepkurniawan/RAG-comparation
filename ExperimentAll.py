@@ -73,7 +73,7 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 # for kb in KNOWLEDGE_BASES:
 #     for emb in EMBEDDINGS:
 #         for vs in VECTORSTORES:
-#             for dist in INDEX_DISTANCE:
+#             for dist in INDEX_DISTANCES:
 #                 if vs == faiss_str:
 #                     vectorstore = faiss_vs
 #                 elif vs == chroma_str:
@@ -103,12 +103,12 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 ### trim experiment using pseudo value
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
-# TOP_K = [2,3,4]
-LLMS = [llama2,mistral]
-# VECTORSTORES = [chroma_str, faiss_str]
+TOP_K = [3]
+LLMS = [gpt35]
+VECTORSTORES = [faiss_str]
 # KNOWLEDGE_BASES = [suswiki_str]
-# EMBEDDINGS = [bge_str,]
-# INDEX_DISTANCES = [eucledian_str, ]
+EMBEDDINGS = [bge_str,]
+INDEX_DISTANCES = [eucledian_str, ]
 
 def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
     if vector_store_name == faiss_str:
@@ -136,7 +136,7 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
                     
                     # Construct the path to the vector store
                     vector_store_path = f"vectorstores/{vector_store_name}/{knowledge_base}/{embedding}_{CHUNK_SIZE}_{CHUNK_OVERLAP_SCALE}_{index_distance}"
-                    vector_store_data = load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance)
+                    vector_store_data = load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance).db
                     
                     # Iterate over all values of k in TOP_K
                     for k in TOP_K:

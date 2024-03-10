@@ -5,7 +5,7 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_community.vectorstores.chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.retrievers import SVMRetriever
-import chromadb
+# import chromadb
 
 
 from rag_load_data import load_sustainability_wiki_langchain_documents
