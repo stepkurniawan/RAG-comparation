@@ -3,6 +3,7 @@ import os
 import time
 
 import pandas as pd
+import pickle
 from datasets import Dataset, Value, Sequence
 
 from rag_vectorstore import multi_similarity_search_doc
@@ -30,7 +31,8 @@ from ragas.metrics import (
 #### fixed
 CHUNK_SIZE = 200 # since we know the lower it is, the better
 CHUNK_OVERLAP_SCALE = 0.1
-TOP_K = [2,3,4] # these are 3 best topk
+# TOP_K = [2,3,4] # these are 3 best topk
+TOP_K = [2]
 QUESTION_DATASET = load_50_qa_dataset()['train']
 FOLDER_PATH ="experiments/ALL/"
 
@@ -105,12 +107,12 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 ### trim experiment using pseudo value
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
-TOP_K = [3]
+TOP_K = [2]
 LLMS = [gpt35]
 VECTORSTORES = [faiss_str]
-# KNOWLEDGE_BASES = [suswiki_str]
+# KNOWLEDGE_BASES = [ suswiki_str]
 EMBEDDINGS = [bge_str,]
-INDEX_DISTANCES = [eucledian_str, ]
+INDEX_DISTANCES = [cosine_str, innerproduct_str]
 
 def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
     if vector_store_name == faiss_str:
@@ -164,7 +166,7 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
                             logger.info(f"output created in path: {FOLDER_PATH}, check for CSV and JSON {language_model.name} in {vector_store_path} ")
 
                         
-# run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
+run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
 
 # %% Optional: FIX some answer
 
@@ -221,6 +223,10 @@ for knowledge_base in KNOWLEDGE_BASES:
                                     answer_correctness
                                     ]
                             )
+
+                            # save result object as pickle dump
+                            with open(FOLDER_PATH + f"{language_model.name}_{vector_store_name_experiment_file}_{k}_RagasEval.pkl", 'wb') as f:
+                                pickle.dump(result, f)
 
                             result_df = result.to_pandas()
                             result_df.to_csv(FOLDER_PATH + f"{language_model.name}_{vector_store_name_experiment_file}_{k}_RagasEval.csv")
