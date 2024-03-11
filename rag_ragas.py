@@ -385,12 +385,12 @@ def load_retriever_evaluation(path):
 
 
 #%% GENERATOR EVALUATION ########################################################
-from ragas.langchain.evalchain import RagasEvaluatorChain
+# from ragas.langchain.evalchain import RagasEvaluatorChain
 
-faithfulness_chain = RagasEvaluatorChain(metric=faithfulness)
-answer_rel_chain = RagasEvaluatorChain(metric=answer_relevancy)
-context_rel_chain = RagasEvaluatorChain(metric=context_precision)
-context_recall_chain = RagasEvaluatorChain(metric=context_recall)
+# faithfulness_chain = RagasEvaluatorChain(metric=faithfulness)
+# answer_rel_chain = RagasEvaluatorChain(metric=answer_relevancy)
+# context_rel_chain = RagasEvaluatorChain(metric=context_precision)
+# context_recall_chain = RagasEvaluatorChain(metric=context_recall)
 
 
 

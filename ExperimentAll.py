@@ -3,6 +3,7 @@ import os
 import time
 
 import pandas as pd
+from datasets import Dataset, Value, Sequence
 
 from rag_vectorstore import multi_similarity_search_doc
 from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
@@ -17,12 +18,13 @@ from StipVectorStore import StipVectorStore
 from StipKnowledgeBase import StipKnowledgeBase, StipHuggingFaceDataset , load_suswiki, load_wikipedia, load_50_qa_dataset
 from StipEmbedding import StipEmbedding
 
+from ragas import evaluate
 from ragas.metrics import (
     answer_relevancy,
     faithfulness,
     context_recall,
     context_precision,
-    AnswerCorrectness
+    answer_correctness
 )
 
 #### fixed
@@ -104,7 +106,7 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
 TOP_K = [3]
-LLMS = [gpt35]
+LLMS = [llama2]
 VECTORSTORES = [faiss_str]
 # KNOWLEDGE_BASES = [suswiki_str]
 EMBEDDINGS = [bge_str,]
@@ -152,7 +154,7 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
                             if FOLDER_PATH is not None:
                                 os.makedirs(FOLDER_PATH, exist_ok=True)
                                 
-                            generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH)
+                            generate_df = generate_context_answer_langchain(QUESTION_DATASET, language_model, vector_store_data, k, folder_save_path=FOLDER_PATH) # create csv and json with name: folder_save_path + qa_chain.name + "_" + str(k) + "_gen.json"
                             
                             # Evaluate the QA dataset with the QA chain and create an output dataframe
                             # output_df = evaluate_qa_dataset_with_response(generate_df, QUESTION_DATASET, FOLDER_PATH)
@@ -162,9 +164,79 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
                             logger.info(f"output created in path: {FOLDER_PATH}, check for CSV and JSON {language_model.name} in {vector_store_path} ")
 
                         
-run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
+# run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
 
-# %% FIX some answer
+# %% Optional: FIX some answer
+
+
+#%% RAGAS Evaluation JSON dataframe
+for knowledge_base in KNOWLEDGE_BASES:
+        for embedding in EMBEDDINGS:
+            for vector_store_name in VECTORSTORES:
+                for index_distance in INDEX_DISTANCES:
+                    # Iterate over all values of k in TOP_K
+                    for k in TOP_K:
+                        # Iterate over all language models in LLMS
+                        for language_model in LLMS:
+                            FOLDER_PATH = f"experiments/ALL/{knowledge_base}/{embedding}/{vector_store_name}/{index_distance}/"
+                            if vector_store_name == faiss_str:
+                                vector_store_name_experiment_file = "FAISS"
+                            elif vector_store_name == chroma_str:
+                                vector_store_name_experiment_file = "Chroma"
+
+                            file_name = FOLDER_PATH + f"{language_model.name}_{vector_store_name_experiment_file}_{k}_gen.json"
+
+                            ### evaluate json 
+                            # create a dataframe from json file
+                            df = pd.read_json(file_name)
+
+                            # change column names query -> question, ground_truths -> ground_truth, result -> answer, source_documents -> contexts
+                            df = df.rename(columns={'query': 'question', 
+                                                    'ground_truths': 'ground_truth', 
+                                                    'result': 'answer', 
+                                                    'source_documents': 'contexts'})
+                                                        # clean context into just page_content
+                            for i in range(len(df)):
+                                for j in range(len(df['contexts'][i])):
+                                    if isinstance(df['contexts'][i][j], dict):
+                                        df['contexts'][i][j] = df['contexts'][i][j]['page_content']
+                            
+                            data_dict = {
+                                'question': df['question'].tolist(),
+                                'ground_truth': df['ground_truth'].tolist(),
+                                'contexts': df['contexts'].tolist(),
+                                'answer': df['answer'].tolist(),
+                            }
+
+                            dataset = Dataset.from_dict(data_dict)
+
+                            # Evaluate dataset
+                            result = evaluate(
+                                dataset,
+                                metrics = [
+                                    answer_relevancy,
+                                    faithfulness,
+                                    context_recall,
+                                    context_precision,
+                                    answer_correctness
+                                    ]
+                            )
+
+                            result_df = result.to_pandas()
+                            result_df.to_csv(FOLDER_PATH + f"{language_model.name}_{vector_store_name_experiment_file}_{k}_RagasEval.csv")
+                            result_df.to_json(FOLDER_PATH + f"{language_model.name}_{vector_store_name_experiment_file}_{k}_RagasEval.json")
+                            print(f"evaluation result saved in {FOLDER_PATH + language_model.name}_{vector_store_name_experiment_file}_{k}_eval.csv")
+
+
+
+
+
+
+
+
+
+
+                    
 
 
 #%% testing using GPU
