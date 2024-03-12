@@ -108,9 +108,9 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 # FOLDER_PATH ="experiments/ALL/trim/"
 TOP_K = [2]
 LLMS = [llama2, mistral]
-INDEX_DISTANCES = [cosine_str]
-VECTORSTORES = [faiss_str]
-EMBEDDINGS = [bge_str,]
+INDEX_DISTANCES = [eucledian_str, innerproduct_str]
+VECTORSTORES = [faiss_str, chroma_str]
+EMBEDDINGS = [gte_str,]
 KNOWLEDGE_BASES = [ suswiki_str, wikipedia_str]
 
 GENERATE_FLAG = False # to generate the answer csv and json - use it mainly for trigerring gpt35
