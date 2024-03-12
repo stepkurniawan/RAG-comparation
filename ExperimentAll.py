@@ -107,12 +107,13 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
 TOP_K = [2]
-LLMS = [gpt35]
+LLMS = [mistral, llama2]
 VECTORSTORES = [faiss_str]
-# KNOWLEDGE_BASES = [ suswiki_str]
+KNOWLEDGE_BASES = [ suswiki_str, wikipedia_str]
 EMBEDDINGS = [bge_str,]
-INDEX_DISTANCES = [cosine_str, innerproduct_str]
-EVALUATE_FLAG = False
+INDEX_DISTANCES = [innerproduct_str]
+EVALUATE_FLAG = True
+GENERATE_FLAG = False
 
 def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
     if vector_store_name == faiss_str:
@@ -167,7 +168,8 @@ def run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, L
 
 
 # uncomment run_all to create a csv and json file. Right now, the ones that are missing are from GPT35
-# run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
+if GENERATE_FLAG:
+    run_all(KNOWLEDGE_BASES, EMBEDDINGS, VECTORSTORES, INDEX_DISTANCES, TOP_K, LLMS, QUESTION_DATASET, FOLDER_PATH)
 
 # %% Optional: FIX some answer
 
