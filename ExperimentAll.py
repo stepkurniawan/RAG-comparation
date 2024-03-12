@@ -107,11 +107,11 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
 TOP_K = [2]
-LLMS = [mistral, llama2]
+LLMS = [llama2, mistral]
+INDEX_DISTANCES = [cosine_str]
 VECTORSTORES = [faiss_str]
+EMBEDDINGS = [bge_str,]
 KNOWLEDGE_BASES = [ suswiki_str, wikipedia_str]
-EMBEDDINGS = [gte_str,]
-INDEX_DISTANCES = [eucledian_str]
 
 GENERATE_FLAG = False # to generate the answer csv and json - use it mainly for trigerring gpt35
 EVALUATE_FLAG = True # to generate ragas evaluation and save it in csv and json
