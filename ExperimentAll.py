@@ -110,10 +110,11 @@ TOP_K = [2]
 LLMS = [mistral, llama2]
 VECTORSTORES = [faiss_str]
 KNOWLEDGE_BASES = [ suswiki_str, wikipedia_str]
-EMBEDDINGS = [bge_str,]
-INDEX_DISTANCES = [innerproduct_str]
-EVALUATE_FLAG = True
-GENERATE_FLAG = False
+EMBEDDINGS = [gte_str,]
+INDEX_DISTANCES = [eucledian_str]
+
+GENERATE_FLAG = False # to generate the answer csv and json - use it mainly for trigerring gpt35
+EVALUATE_FLAG = True # to generate ragas evaluation and save it in csv and json
 
 def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
     if vector_store_name == faiss_str:
