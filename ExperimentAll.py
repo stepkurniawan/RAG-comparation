@@ -106,15 +106,15 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 ### trim experiment using pseudo value
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
-TOP_K = [2]
-LLMS = [llama2, mistral]
-INDEX_DISTANCES = [eucledian_str, innerproduct_str]
-VECTORSTORES = [faiss_str, chroma_str]
-EMBEDDINGS = [gte_str,]
-KNOWLEDGE_BASES = [ suswiki_str, wikipedia_str]
+TOP_K = [1]
+LLMS = [gpt35]
+INDEX_DISTANCES = [eucledian_str, ]
+VECTORSTORES = [faiss_str]
+EMBEDDINGS = [bge_str,]
+# KNOWLEDGE_BASES = [suswiki_str, ]
 
-GENERATE_FLAG = False # to generate the answer csv and json - use it mainly for trigerring gpt35
-EVALUATE_FLAG = True # to generate ragas evaluation and save it in csv and json
+GENERATE_FLAG = True # to generate the answer csv and json - use it mainly for trigerring gpt35
+EVALUATE_FLAG = False # to generate ragas evaluation and save it in csv and json
 
 def load_or_create_vectorstore(vector_store_name, vector_store_path, knowledge_base, embedding, index_distance):
     if vector_store_name == faiss_str:
