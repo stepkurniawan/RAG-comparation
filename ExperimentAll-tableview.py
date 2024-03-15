@@ -2,7 +2,10 @@
 
 import pickle
 import pandas as pd
+import seaborn as sns
+sns.set_palette('husl')
 
+import matplotlib.pyplot as plt
 
 suswiki_str = "sustainability-methods-wiki"
 wikipedia_str = "wikipedia"
@@ -27,7 +30,7 @@ INDEX_DISTANCES = [eucledian_str, cosine_str, innerproduct_str]
 ### trim experiment using pseudo value
 # QUESTION_DATASET = QUESTION_DATASET[:10]
 # FOLDER_PATH ="experiments/ALL/trim/"
-TOP_K = [2]
+TOP_K = [1,2]
 LLMS = ["llama2", "mistral", "gpt35"]
 INDEX_DISTANCES = [eucledian_str, innerproduct_str, cosine_str]
 VECTORSTORES = [faiss_str, chroma_str]
@@ -109,10 +112,126 @@ for knowledge_base in KNOWLEDGE_BASES:
                             all_result_df = all_result_df.reset_index(drop=True)
 
                         except FileNotFoundError:
-                            print(f"File not found: {FOLDER_PATH + f'{language_model}_{vector_store_name_experiment_file}_{k}_RagasEval.pkl'}")
-
-                        
+                            print(f"File not found:wou {FOLDER_PATH + f'{language_model}_{vector_store_name_experiment_file}_{k}_RagasEval.pkl'}")
 
 
 
+#%% arrange the columns to be: KB	Embedding	Vector Store	Index Distance	k Docs	LLM Context Recall	Context Precision	Faithfulness    Answer Relevancy	Answer Correctness
+from scipy.stats import hmean
 
+# add retriever harmonic mean = harmonic_mean('Context Recall', 'Context Precision')
+all_result_df['Retriever HMean'] = all_result_df[['Context Recall', 'Context Precision']].apply(hmean, axis=1).round(3)
+
+# add generator harmonic mean = harmonic_mean('Faithfulness', 'Answer Relevancy', 'Answer Correctness')
+all_result_df['Generator HMean'] = all_result_df[['Faithfulness', 'Answer Relevancy', 'Answer Correctness']].apply(hmean, axis=1).round(3)
+
+# add harmonic mean = harmonic_mean('Context Recall', 'Context Precision', 'Faithfulness', 'Answer Relevancy', 'Answer Correctness')
+all_result_df['RAGAS HMean'] = all_result_df[['Context Recall', 'Context Precision', 'Faithfulness', 'Answer Relevancy', 'Answer Correctness']].apply(hmean, axis=1).round(3)
+
+#%%
+all_result_df 
+
+#%%
+# create a seaborne exploration analysis of the result
+# The independent variables are: KB, Embedding, Vector Store, Index Distance, k Docs, LLM
+# The dependent variables are: Retriever HMean, Generator HMean, RAGAS HMean (combination of the retriever and generator Hmean)
+
+# create pairplot to see the distribution of the independent variables
+all_result_df_trim = all_result_df[[ 'KB', 'Embedding', 'Vector Store', 'Index Distance',  'LLM', 'Retriever HMean', 'Generator HMean', 'RAGAS HMean']]
+sns.pairplot(all_result_df_trim, hue='KB',diag_kind='kde', kind='scatter', palette='husl', plot_kws={'alpha': 0.6})
+sns.PairGrid(all_result_df_trim, hue='KB', diag_sharey=False).map_lower(sns.kdeplot, alpha=0.6).map_upper(sns.scatterplot, alpha=0.6).map_diag(sns.kdeplot, lw=3, alpha=0.6)
+
+# create a 2d plot where x axis is the generator hmean and y axis is the retriever hmean
+sns.scatterplot(data=all_result_df, x='Generator HMean', y='Retriever HMean', hue='KB', style='LLM', s=all_result_df['RAGAS HMean']*100, alpha=0.6)
+
+# create a pivot table to show the mean of the retriever hmean and generator hmean
+pivot_table = all_result_df.pivot_table(index=['KB', 'Embedding'], values=['Retriever HMean', 'Generator HMean', 'RAGAS HMean']).round(2)
+
+sns.boxplot(data=all_result_df, x='RAGAS HMean', y='LLM', hue='Embedding', width=.5, palette='coolwarm').set_xlim([0.5, 1])
+# Add in points to show each observation
+sns.stripplot(all_result_df, x='RAGAS HMean', y='LLM', hue='Embedding', size=7, palette='husl', alpha=1, linewidth=0.5)
+
+
+
+# %% MANUAL filtering
+filter_k = 2
+filter_index_dist = "Eucledian"
+filter_vectorstore = "FAISS"
+filter_embedding="BGE"
+
+filtered_df = all_result_df[
+    # (all_result_df['k Docs'] == filter_k) & 
+    (all_result_df['Index Distance'] == filter_index_dist) & 
+    (all_result_df['Vector Store'] == filter_vectorstore) & 
+    (all_result_df['Embedding'] == filter_embedding)]
+filtered_df
+
+plt.rcParams['figure.figsize'] = [7, 5]  # Width, height in inches
+
+# create a 2d plot where x axis is the generator hmean and y axis is the retriever hmean
+sns.scatterplot(data=filtered_df, x='Generator HMean', y='Retriever HMean', hue='k Docs', style='LLM', alpha=0.6, s = 200, edgecolor='black')
+
+
+
+# %%
+# 1. Unfiltered 'k Docs'
+filtered_df1 = all_result_df[
+    # (all_result_df['k Docs'] == filter_k) & 
+    (all_result_df['Index Distance'] == filter_index_dist) & 
+    (all_result_df['Vector Store'] == filter_vectorstore) & 
+    (all_result_df['Embedding'] == filter_embedding)]
+
+# 2. Unfiltered 'Index Distance'
+filtered_df2 = all_result_df[
+    (all_result_df['k Docs'] == filter_k) & 
+    # (all_result_df['Index Distance'] == filter_index_dist) & 
+    (all_result_df['Vector Store'] == filter_vectorstore) & 
+    (all_result_df['Embedding'] == filter_embedding)]
+
+# 3. Unfiltered 'Vector Store'
+filtered_df3 = all_result_df[
+    (all_result_df['k Docs'] == filter_k) & 
+    (all_result_df['Index Distance'] == filter_index_dist) & 
+    # (all_result_df['Vector Store'] == filter_vectorstore) & 
+    (all_result_df['Embedding'] == filter_embedding)]
+
+# 4. Unfiltered 'Embedding'
+filtered_df4 = all_result_df[
+    (all_result_df['k Docs'] == filter_k) & 
+    (all_result_df['Index Distance'] == filter_index_dist) & 
+    (all_result_df['Vector Store'] == filter_vectorstore) 
+    # & (all_result_df['Embedding'] == filter_embedding)
+]
+
+# create 4 scatterplots based on the 4 filtered dataframes with titles 'k Docs', 'Index Distance', 'Vector Store', 'Embedding'
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+sns.scatterplot(data=filtered_df1, x='Generator HMean', y='Retriever HMean', hue='k Docs', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[0, 0])
+sns.scatterplot(data=filtered_df2, x='Generator HMean', y='Retriever HMean', hue='Index Distance', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[0, 1])
+sns.scatterplot(data=filtered_df3, x='Generator HMean', y='Retriever HMean', hue='Vector Store', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[1, 0])
+sns.scatterplot(data=filtered_df4, x='Generator HMean', y='Retriever HMean', hue='Embedding', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[1, 1])
+
+# Set titles
+axes[0, 0].set_title('Comparing Top k Documents with different LLMs')
+axes[0, 1].set_title('Comparing Index Distance with different LLMs')
+axes[1, 0].set_title('Comparing Vector Store with different LLMs')
+axes[1, 1].set_title('Comparing Embedding with different LLMs')
+
+
+#%% more pythonic way
+
+# Define filters
+filters = {
+    'k Docs': 2,
+    'Index Distance': "Eucledian",
+    'Vector Store': "FAISS",
+    'Embedding': "BGE"
+}
+
+# Create filtered dataframes
+filtered_dfs = {f: all_result_df[all_result_df[col] == val] if col in filters else all_result_df for f, (col, val) in enumerate(filters.items())}
+
+# Set plot size temporarily
+with plt.rc_context({'figure.figsize': [7, 5]}):
+    # Create a 2d plot where x axis is the generator hmean and y axis is the retriever hmean
+    sns.scatterplot(data=filtered_dfs[0], x='Generator HMean', y='Retriever HMean', hue='k Docs', style='LLM', alpha=0.6, s = 200, edgecolor='black')
+# %%
