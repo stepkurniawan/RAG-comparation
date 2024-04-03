@@ -4,6 +4,8 @@ import pickle
 import pandas as pd
 import seaborn as sns
 sns.set_palette('husl')
+#set font size
+sns.set_context("paper", font_scale=1.2)
 
 import matplotlib.pyplot as plt
 
@@ -138,18 +140,35 @@ all_result_df
 
 # create pairplot to see the distribution of the independent variables
 all_result_df_trim = all_result_df[[ 'KB', 'Embedding', 'Vector Store', 'Index Distance',  'LLM', 'Retriever HMean', 'Generator HMean', 'RAGAS HMean']]
-sns.pairplot(all_result_df_trim, hue='KB',diag_kind='kde', kind='scatter', palette='husl', plot_kws={'alpha': 0.6})
-sns.PairGrid(all_result_df_trim, hue='KB', diag_sharey=False).map_lower(sns.kdeplot, alpha=0.6).map_upper(sns.scatterplot, alpha=0.6).map_diag(sns.kdeplot, lw=3, alpha=0.6)
+# sns.pairplot(all_result_df_trim, hue='KB',diag_kind='kde', kind='scatter', palette='husl', plot_kws={'alpha': 0.6})
+# sns.PairGrid(all_result_df_trim, hue='KB', diag_sharey=False).map_lower(sns.kdeplot, alpha=0.6).map_upper(sns.scatterplot, alpha=0.6).map_diag(sns.kdeplot, lw=3, alpha=0.6)
 
-# create a 2d plot where x axis is the generator hmean and y axis is the retriever hmean
-sns.scatterplot(data=all_result_df, x='Generator HMean', y='Retriever HMean', hue='KB', style='LLM', s=all_result_df['RAGAS HMean']*100, alpha=0.6)
+#%%   ALL DATAPOINTS: DIFFERENTIATE KB: create a 2d plot where x axis is the generator hmean and y axis is the retriever hmean
+plt.rcParams['figure.figsize'] = [7, 5]  # Width, height in inches
+sns.scatterplot(data=all_result_df, x='Generator HMean', y='Retriever HMean', hue='KB', style='LLM', s=150, alpha=0.7, edgecolor='black', palette='husl').set_title('Cluster of different KBs based on Generator and Retriever HMean')
 
+#%% ALL DATAPOINTS BOXPLOT - DIFFERENTIATE KB
+# plt.rcParams['figure.figsize'] = [7, 5]  # Width, height in inches
+KB_boxplot = sns.boxplot(data=all_result_df, x='RAGAS HMean', y='KB',  width=.5, palette='coolwarm')#
+# add label of the mean values of each KB
+means = all_result_df.groupby('KB')['RAGAS HMean'].mean()
+
+# Add mean labels
+for i in range(len(means)):
+    KB_boxplot.text(means[i], i-0.3, f'{means[i]:.2f}', horizontalalignment='center', color='black', weight='light')
+
+KB_boxplot.set_xlim([0.5, 1])
+KB_boxplot.set_title('Boxplot of different KBs based on RAGAS HMean')
+plt.show()
+#%% CREATE BOX PLOT
 # create a pivot table to show the mean of the retriever hmean and generator hmean
-pivot_table = all_result_df.pivot_table(index=['KB', 'Embedding'], values=['Retriever HMean', 'Generator HMean', 'RAGAS HMean']).round(2)
 
 sns.boxplot(data=all_result_df, x='RAGAS HMean', y='LLM', hue='Embedding', width=.5, palette='coolwarm').set_xlim([0.5, 1])
+# label the mean of each of the boxplot
+
+
 # Add in points to show each observation
-sns.stripplot(all_result_df, x='RAGAS HMean', y='LLM', hue='Embedding', size=7, palette='husl', alpha=1, linewidth=0.5)
+sns.swarmplot(all_result_df, x='RAGAS HMean', y='LLM', hue='Embedding', size=7, palette='husl', alpha=1, linewidth=0.5)
 
 
 
@@ -205,10 +224,10 @@ filtered_df4 = all_result_df[
 
 # create 4 scatterplots based on the 4 filtered dataframes with titles 'k Docs', 'Index Distance', 'Vector Store', 'Embedding'
 fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-sns.scatterplot(data=filtered_df1, x='Generator HMean', y='Retriever HMean', hue='k Docs', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[0, 0])
-sns.scatterplot(data=filtered_df2, x='Generator HMean', y='Retriever HMean', hue='Index Distance', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[0, 1])
-sns.scatterplot(data=filtered_df3, x='Generator HMean', y='Retriever HMean', hue='Vector Store', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[1, 0])
-sns.scatterplot(data=filtered_df4, x='Generator HMean', y='Retriever HMean', hue='Embedding', style='LLM', alpha=0.6, s = 200, edgecolor='black', ax=axes[1, 1])
+sns.scatterplot(data=filtered_df1, x='Generator HMean', y='Retriever HMean', hue='k Docs', style='LLM', alpha=0.6, palette='coolwarm', s = 200, edgecolor='black', ax=axes[0, 0])
+sns.scatterplot(data=filtered_df2, x='Generator HMean', y='Retriever HMean', hue='Index Distance', style='LLM', alpha=0.6, palette='husl', s = 200, edgecolor='black', ax=axes[0, 1])
+sns.scatterplot(data=filtered_df3, x='Generator HMean', y='Retriever HMean', hue='Vector Store', style='LLM', alpha=0.6, palette='husl', s = 200, edgecolor='black', ax=axes[1, 0])
+sns.scatterplot(data=filtered_df4, x='Generator HMean', y='Retriever HMean', hue='Embedding', style='LLM', alpha=0.6, palette='husl', s = 200, edgecolor='black', ax=axes[1, 1])
 
 # Set titles
 axes[0, 0].set_title('Comparing Top k Documents with different LLMs')
@@ -216,6 +235,84 @@ axes[0, 1].set_title('Comparing Index Distance with different LLMs')
 axes[1, 0].set_title('Comparing Vector Store with different LLMs')
 axes[1, 1].set_title('Comparing Embedding with different LLMs')
 
+#%% SWARMPLOTS
+
+
+plt.rcParams['figure.figsize'] = [7, 5]  # Width, height in inches
+# sns.boxplot(data=filtered_df4, x='RAGAS HMean', y='LLM', hue='Embedding', width=.5, palette='coolwarm').set_xlim([0.5, 1])
+# label the mean of each of the boxplot
+
+# Add in points to show each observation
+# sns.stripplot(filtered_df4, x='RAGAS HMean', y='LLM', hue='Embedding', size=7, palette='husl', alpha=1, linewidth=0.5)
+
+# Add horizontal lines
+unique_y = filtered_df1['LLM'].unique()
+for y in unique_y:
+    plt.axhline(y, color='gray', linestyle='--', alpha=0.6)
+
+# create a new strip plot for filtered_df1
+sns.swarmplot(filtered_df1, x='RAGAS HMean', y='LLM' ,hue='k Docs',size=15, alpha=1, linewidth=0.5).set_title('Comparing Top k Documents with different LLMs')
+plt.show()
+sns.swarmplot(filtered_df2, x='RAGAS HMean', y='LLM', hue='Index Distance', size=15, palette='husl', alpha=1, linewidth=0.5).set_title('Comparing Index Distance with different LLMs')
+plt.show()
+sns.swarmplot(filtered_df3, x='RAGAS HMean', y='LLM', hue='Vector Store', size=15, palette='husl', alpha=1, linewidth=0.5).set_title('Comparing Vector Store with different LLMs')
+plt.show()
+sns.swarmplot(filtered_df4, x='RAGAS HMean', y='LLM', hue='Embedding', size=15, palette='husl', alpha=1, linewidth=0.5).set_title('Comparing Embedding with different LLMs')
+
+#%% use forloop to add horizontal line to everything
+
+for df in [filtered_df1, filtered_df2, filtered_df3, filtered_df4]:
+    hue_filter = ''
+    palette_col = 'husl'
+    # if filtered_df1 -> then dont use hue=
+
+    if filtered_df1 is df:
+        hue_filter = 'k Docs'
+        ax = sns.swarmplot(data=df, x='RAGAS HMean', y='LLM', hue=hue_filter, size=15, alpha=1, linewidth=0.5)
+        ax.set_title(f'Comparing {hue_filter} with different LLMs')
+
+        for y in unique_y:
+            plt.axhline(y, color='gray', linestyle='--', alpha=0.6)
+        plt.show()
+        continue
+    elif filtered_df2 is df:
+        hue_filter = 'Index Distance'
+        palette_col = 'husl'
+    elif filtered_df3 is df:
+        hue_filter = 'Vector Store'
+        palette_col = 'husl'
+    elif filtered_df4 is df:
+        hue_filter = 'Embedding'
+        palette_col = 'husl'
+
+        
+
+    ax = sns.swarmplot(data=df, x='RAGAS HMean', y='LLM', hue=hue_filter, size=15, palette='husl', alpha=1, linewidth=0.5)
+    ax.set_title(f'Comparing {hue_filter} with different LLMs')
+
+    for y in unique_y:
+        plt.axhline(y, color='gray', linestyle='--', alpha=0.6)
+
+    plt.show()
+
+
+#%% SCATTERPLOT 
+sns.scatterplot(filtered_df1, x='RAGAS HMean', y='LLM' ,hue='k Docs', style='LLM' , alpha=0.75, s=200, edgecolor='black').set_title('Comparing Top k Documents with different LLMs')
+plt.show()
+sns.scatterplot(filtered_df2, x='RAGAS HMean', y='LLM', hue='Index Distance', style='LLM', palette='husl', alpha=0.75, s=200, edgecolor='black').set_title('Comparing Index Distance with different LLMs')
+plt.show()
+sns.scatterplot(filtered_df3, x='RAGAS HMean', y='LLM', hue='Vector Store', style='LLM', palette='husl', alpha=0.75, s=200, edgecolor='black').set_title('Comparing Vector Store with different LLMs')
+plt.show()
+sns.scatterplot(filtered_df4, x='RAGAS HMean', y='LLM', hue='Embedding', style='LLM',palette='husl', alpha=0.75, s=200, edgecolor='black').set_title('Comparing Embedding with different LLMs')
+
+#%% create a horizontal grouped bar chart to show the mean of the RAGAS HMean for each Index Distance
+
+# create a pivot table to show the mean of the RAGAS HMean for each Index Distance
+index_distance_pivot = filtered_df2.pivot_table(index='LLM', columns='Index Distance', values='RAGAS HMean')
+
+# create a horizontal grouped bar chart
+# hue is the index of the pivot table
+sns.barplot(data=index_distance_pivot, hue=index_distance_pivot.index ,orient='h').set_title('Mean of the RAGAS HMean for each Index Distance')
 
 #%% more pythonic way
 
