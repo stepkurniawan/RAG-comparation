@@ -5,13 +5,13 @@ At the end, it outputs JSON file that we can use for RAGAS evaluation.
 """
 
 import json
-from rag_llms import load_llm_gpt4,load_llm_gpt35
+from rag_llms import load_llm_gpt4,get_gpt35_llm
 
 import openai
 import os
 import pandas as pd
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.prompts.prompt import PromptTemplate
+from langchain_community.chains import LLMChain
 
 
 from dotenv import load_dotenv, find_dotenv
