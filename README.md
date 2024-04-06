@@ -1,5 +1,14 @@
 # RAG-comparation
-Evaluate and Compare different combination of Retriever and Generator of RAG models
+Evaluate and Compare different combination of Retriever and Generator of RAG models. In this experiment we will compare RAG elements as seen in the picture: 
+![image](https://github.com/stepkurniawan/RAG-comparation/assets/11275004/89aebb2f-74b5-4bd9-a1ca-a9303a64c9d0)
+And then we will evaluate the result using RAGAS https://docs.ragas.io/en/latest/index.html
+The main files here depends on which experiment. All of the experiments have "Experiment" as their starting name. 
+The results of the experiments are stored in the `experiments` folder.
+Here are some results: 
+![image](https://github.com/stepkurniawan/RAG-comparation/assets/11275004/b470675c-eb1f-4bf4-9a73-e17b4092780f)
+![image](https://github.com/stepkurniawan/RAG-comparation/assets/11275004/f3ced946-40fe-4d28-920a-c399274c4b89)
+
+
 
 
 # Preparations
