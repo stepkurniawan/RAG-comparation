@@ -1,3 +1,13 @@
+"""
+- **ExperimentLLM**: comparing LLM models: Llama2, Mistral, and GPT3.5
+    - load LLM 
+    - test each LLM to answer a question 
+    - generate answer for 50 question using each LLM & save the result locally
+    - data cleaning
+    - evaluate the results using RAGAS metrics
+"""
+
+
 #%%# prepare environement
 import os
 import time
@@ -8,7 +18,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from rag_vectorstore import multi_similarity_search_doc
 from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
 
 from LogSetup import logger
@@ -87,6 +96,7 @@ def convert_source_documents_to_ragas_contexts(source_documents):
     return contexts
 
 
+# MAIN LOGIC
 for qa_chain in pipeline_qa_chain:
     output_df = pd.DataFrame()
     # for each question in the dataset

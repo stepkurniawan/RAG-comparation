@@ -1,3 +1,14 @@
+"""
+- **ExperimentAll**: comparing each component of the RAG model
+    - set up parameters
+        - GENERATE_FLAG: for generating the answer - csv and json, use it if you trigger gpt3.5 (because its expensive)
+        - EVALUATE_FLAG: to triggere ragas evaluation
+    - load or otherwise create vector store if it wasnt existing
+    - run_all: for all knowledge base, embedding, vector store, index distance, k, and LLM and store it locally
+    - evaluate_all the results using RAGAS metrics and store it locally
+    - the JSONS and CSVs are saved in the `experiments/ALL/` folder
+"""
+
 #%%# prepare environement
 import os
 import time
@@ -6,7 +17,6 @@ import pandas as pd
 import pickle
 from datasets import Dataset, Value, Sequence
 
-from rag_vectorstore import multi_similarity_search_doc
 from rag_llms import get_llama2_llm, get_mistral_llm, get_gpt35_llm
 from rag_chains import generate_context_answer_langchain, retrieval_qa_chain_from_local_db
 from rag_ragas import evaluate_qa_dataset_with_response

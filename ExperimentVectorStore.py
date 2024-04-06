@@ -20,7 +20,6 @@ load_dotenv()
 import threading
 import concurrent.futures
 import matplotlib.pyplot as plt
-from adjustText import adjust_text # better annotation
 import numpy as np
 
 

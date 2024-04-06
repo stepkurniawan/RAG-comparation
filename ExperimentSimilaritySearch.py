@@ -3,7 +3,18 @@ Experiment to compare different Similarity Search Algorithm and see the effect o
 The similarity search algorithm are:
 1. Eucledian Distance
 2. Cosine Similarity
-3. SVM
+3. MIP
+
+# Structure: 
+- **ExperimentSimilaritySearch**: comparing similarity search models: Eucledian, Cosine, and MIP
+    - load vector store for each vectorstore
+    - for each vectorstore
+        - for each similarity search model
+            - create vectorstore 
+    - retrieve using multi similarity search
+    - evaluate the results of the retrieval using RAGAS metrics
+    - combine the results into 2 dataframes
+    - the CSVs are saved in the `experiments/distance_metrics_comp/` folder
 """
 # compare with 1 knowledge base first, and then compare with 2 knowledge bases, 
 # if there is no significant difference, then we can use 1 knowledge base only in the paper
