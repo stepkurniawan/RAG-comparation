@@ -5,7 +5,6 @@ And then we will evaluate the result using RAGAS https://docs.ragas.io/en/latest
 The main files here depends on which experiment. All of the experiments have "Experiment" as their starting name. 
 The results of the experiments are stored in the `experiments` folder.
 Here are some results: 
-![image](https://github.com/stepkurniawan/RAG-comparation/assets/11275004/b470675c-eb1f-4bf4-9a73-e17b4092780f)
 ![image](https://github.com/stepkurniawan/RAG-comparation/assets/11275004/f3ced946-40fe-4d28-920a-c399274c4b89)
 
 
