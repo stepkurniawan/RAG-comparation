@@ -88,6 +88,10 @@ Deprecated: There are packages that are moved to the `deprecated` folder.
     - and folders which contains the results of chunk splitting strategy (split size and overlap)
 - Datasets_preparation: to converts unstructured Suswiki xml dump to structured csv files with questions and answers, and upload it to hugging face
 - RAGAS notebook: just as a way for me to store RAGAS reference materials. 
+- huggingface_cache: to store datasets that has been downloaded from Hugging Face
 
-## Logfile
+#### Logfile
 The logfile contains info such as how long does the experiment run. 
+
+#### List of Ablation todo.xlsx
+Just a file where I track which combination should I prioritize when running the ExperimentAll
